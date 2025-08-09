@@ -11,7 +11,7 @@ export const Navigation = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center">
               <img src="/lovable-uploads/8213b813-2daf-4854-8610-bcd75cb3bdfb.png" alt="Acres and Beyond logo icon" className="w-full h-full object-contain" loading="lazy" />
             </div>
             <span className="text-xl font-bold text-foreground">Acres and Beyond</span>
