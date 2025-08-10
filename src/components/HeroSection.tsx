@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SearchSection } from "./SearchSection";
+import { PhotoUpload } from "./PhotoUpload";
 import { TrendingUp, Users, Award } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 
 export const HeroSection = () => {
+  const [showUpload, setShowUpload] = useState(false);
+
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-hero overflow-hidden">
       {/* Background Image */}
@@ -34,7 +38,12 @@ export const HeroSection = () => {
             <Button variant="hero" size="lg" className="text-lg px-8">
               Start Searching
             </Button>
-            <Button variant="outline" size="lg" className="text-lg px-8 bg-card/20 backdrop-blur-sm border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="text-lg px-8 bg-card/20 backdrop-blur-sm border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+              onClick={() => setShowUpload(true)}
+            >
               List Your Property
             </Button>
           </div>
@@ -70,6 +79,8 @@ export const HeroSection = () => {
           <SearchSection />
         </div>
       </div>
+
+      <PhotoUpload open={showUpload} onOpenChange={setShowUpload} />
     </section>
   );
 };
