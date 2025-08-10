@@ -2,7 +2,8 @@ import { PropertyCard } from "./PropertyCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SlidersHorizontal, Grid, List } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 
 // Import property images
 import property1 from "@/assets/property-1.jpg";
@@ -86,13 +87,52 @@ const sampleProperties = [
 export const PropertyGrid = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedType, setSelectedType] = useState<string>("all");
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const typeParam = (searchParams.get("type") || "all").toLowerCase();
+    setSelectedType(typeParam);
+  }, [searchParams]);
+
+  const query = (searchParams.get("q") || "").toLowerCase();
+  const priceParam = searchParams.get("price") || "";
 
   const propertyTypes = ["all", "house", "apartment", "land", "commercial"];
 
-  const filteredProperties = selectedType === "all" 
-    ? sampleProperties 
-    : sampleProperties.filter(property => property.type.toLowerCase() === selectedType);
+  const priceToNumber = (price: string) => {
+    const num = Number(price.replace(/[^0-9]/g, ""));
+    return isNaN(num) ? 0 : num;
+  };
 
+  const inPriceRange = (price: number) => {
+    switch (priceParam) {
+      case "0-100k":
+        return price <= 100000;
+      case "100k-300k":
+        return price >= 100000 && price <= 300000;
+      case "300k-500k":
+        return price >= 300000 && price <= 500000;
+      case "500k-1m":
+        return price >= 500000 && price <= 1000000;
+      case "1m+":
+        return price > 1000000;
+      default:
+        return true;
+    }
+  };
+
+  const filteredProperties = sampleProperties
+    .filter((property) =>
+      selectedType === "all"
+        ? true
+        : property.type.toLowerCase() === selectedType
+    )
+    .filter((property) => {
+      if (!query) return true;
+      const text = `${property.title} ${property.location}`.toLowerCase();
+      return text.includes(query);
+    })
+    .filter((property) => inPriceRange(priceToNumber(property.price)));
   return (
     <section className="py-16 bg-background">
       <div className="container mx-auto px-4">

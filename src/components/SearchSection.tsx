@@ -1,13 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, MapPin, Home } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export const SearchSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [priceRange, setPriceRange] = useState("");
+
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const q = searchParams.get('q') || '';
+    const type = searchParams.get('type') || '';
+    const price = searchParams.get('price') || '';
+    if (q) setSearchQuery(q);
+    if (type) setPropertyType(type);
+    if (price) setPriceRange(price);
+  }, [searchParams]);
+
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    if (propertyType) params.set('type', propertyType);
+    if (priceRange) params.set('price', priceRange);
+    navigate(`/?${params.toString()}`);
+  };
 
   return (
     <div className="bg-card/90 backdrop-blur-sm p-6 rounded-lg shadow-card border">
@@ -18,6 +39,7 @@ export const SearchSection = () => {
             placeholder="Location or ZIP code"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             className="pl-10"
           />
         </div>
@@ -49,7 +71,7 @@ export const SearchSection = () => {
           </SelectContent>
         </Select>
         
-        <Button className="bg-gradient-primary hover:opacity-90 transition-smooth">
+        <Button className="bg-gradient-primary hover:opacity-90 transition-smooth" onClick={handleSearch}>
           <Search className="w-4 h-4 mr-2" />
           Search Properties
         </Button>

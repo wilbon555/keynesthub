@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { SearchSection } from "./SearchSection";
 import { PhotoUpload } from "./PhotoUpload";
@@ -7,6 +7,7 @@ import heroImage from "@/assets/hero-image.jpg";
 
 export const HeroSection = () => {
   const [showUpload, setShowUpload] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
 
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-hero overflow-hidden">
@@ -35,7 +36,18 @@ export const HeroSection = () => {
           </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button variant="hero" size="lg" className="text-lg px-8">
+            <Button 
+              variant="hero" 
+              size="lg" 
+              className="text-lg px-8"
+              onClick={() => {
+                searchRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                setTimeout(() => {
+                  const input = document.querySelector('input[placeholder="Location or ZIP code"]') as HTMLInputElement | null;
+                  input?.focus();
+                }, 500);
+              }}
+            >
               Start Searching
             </Button>
             <Button 
@@ -75,7 +87,7 @@ export const HeroSection = () => {
         </div>
         
         {/* Search Section */}
-        <div className="mt-12 animate-slide-up">
+        <div className="mt-12 animate-slide-up" ref={searchRef}>
           <SearchSection />
         </div>
       </div>
