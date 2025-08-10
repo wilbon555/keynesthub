@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <nav className="bg-card/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
@@ -31,7 +33,7 @@ export const Navigation = () => {
               <Phone className="w-4 h-4 mr-2" />
               Contact
             </Button>
-            <Button variant="hero" size="sm">
+            <Button variant="hero" size="sm" onClick={() => navigate("/auth") }>
               <User className="w-4 h-4 mr-2" />
               Sign In
             </Button>
@@ -62,7 +64,7 @@ export const Navigation = () => {
                   <Phone className="w-4 h-4 mr-2" />
                   Contact
                 </Button>
-                <Button variant="hero" size="sm" className="justify-start">
+                <Button variant="hero" size="sm" className="justify-start" onClick={() => navigate("/auth") }>
                   <User className="w-4 h-4 mr-2" />
                   Sign In
                 </Button>
