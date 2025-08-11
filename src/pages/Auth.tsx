@@ -6,14 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 const Auth = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const { toast } = useToast();
+  const { user } = useSupabaseAuth();
 
   const redirectTo = useMemo(() => {
-    return params.get("redirect") || "/dashboard";
+    return params.get("redirect") || "/";
   }, [params]);
 
   const [loading, setLoading] = useState(false);
@@ -23,6 +25,12 @@ const Auth = () => {
   useEffect(() => {
     document.title = "Sign in or Sign up | Acres and Beyond";
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      navigate(redirectTo || "/", { replace: true });
+    }
+  }, [user, navigate, redirectTo]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +58,7 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const redirectUrl = `${window.location.origin}${redirectTo.startsWith("/") ? redirectTo : "/dashboard"}`;
+      const redirectUrl = `${window.location.origin}${redirectTo.startsWith("/") ? redirectTo : "/"}`;
       const { error } = await supabase.auth.signUp({
         email,
         password,
