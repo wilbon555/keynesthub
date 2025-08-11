@@ -15,7 +15,10 @@ const Auth = () => {
   const { user } = useSupabaseAuth();
 
   const redirectTo = useMemo(() => {
-    return params.get("redirect") || "/";
+    const raw = params.get("redirect") || "/";
+    const safe = raw.startsWith("/") ? raw : "/";
+    // Force home when redirect points to dashboard
+    return safe.startsWith("/dashboard") ? "/" : safe;
   }, [params]);
 
   const [loading, setLoading] = useState(false);
@@ -58,7 +61,7 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const redirectUrl = `${window.location.origin}${redirectTo.startsWith("/") ? redirectTo : "/"}`;
+      const redirectUrl = `${window.location.origin}${redirectTo}`;;
       const { error } = await supabase.auth.signUp({
         email,
         password,
