@@ -21,8 +21,8 @@ export const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium">Buy</a>
-            <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium">Sell</a>
+            <a href="/#featured" className="text-foreground hover:text-primary transition-smooth font-medium">Buy</a>
+            <a href="/?action=list" className="text-foreground hover:text-primary transition-smooth font-medium">Sell</a>
             <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium">Rent</a>
             <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium">Agents</a>
           </div>
@@ -55,8 +55,8 @@ export const Navigation = () => {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border animate-fade-in">
             <div className="flex flex-col space-y-3">
-              <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium py-2">Buy</a>
-              <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium py-2">Sell</a>
+              <a href="/#featured" className="text-foreground hover:text-primary transition-smooth font-medium py-2">Buy</a>
+              <a href="/?action=list" className="text-foreground hover:text-primary transition-smooth font-medium py-2">Sell</a>
               <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium py-2">Rent</a>
               <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium py-2">Agents</a>
               <div className="flex flex-col space-y-2 pt-4">

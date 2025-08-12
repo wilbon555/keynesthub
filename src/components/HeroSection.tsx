@@ -1,10 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { SearchSection } from "./SearchSection";
 import { PhotoUpload } from "./PhotoUpload";
 import { TrendingUp, Users, Award } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export const HeroSection = () => {
@@ -12,6 +12,17 @@ export const HeroSection = () => {
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { user } = useSupabaseAuth();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('action') === 'list') {
+      if (user) {
+        setShowUpload(true);
+      } else {
+        navigate(`/auth?redirect=${encodeURIComponent('/')}`);
+      }
+    }
+  }, [searchParams, user, navigate]);
 
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-hero overflow-hidden">
