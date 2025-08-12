@@ -5,11 +5,13 @@ import { PhotoUpload } from "./PhotoUpload";
 import { TrendingUp, Users, Award } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 import { useNavigate } from "react-router-dom";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export const HeroSection = () => {
   const [showUpload, setShowUpload] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { user } = useSupabaseAuth();
 
   return (
     <section className="relative min-h-[80vh] flex items-center justify-center bg-gradient-hero overflow-hidden">
@@ -56,7 +58,13 @@ export const HeroSection = () => {
               variant="outline" 
               size="lg" 
               className="text-lg px-8 bg-card/20 backdrop-blur-sm border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground hover:text-primary"
-              onClick={() => navigate(`/auth?redirect=${encodeURIComponent('/dashboard')}&cta=list`)}
+              onClick={() => {
+                if (user) {
+                  setShowUpload(true)
+                } else {
+                  navigate(`/auth?redirect=${encodeURIComponent('/')}`)
+                }
+              }}
             >
               List Your Property
             </Button>
