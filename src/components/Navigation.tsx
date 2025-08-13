@@ -30,17 +30,17 @@ export const Navigation = () => {
                     <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px]">
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Residential</a>
+                          <a href="/#featured?type=house" className="block rounded-md p-2 hover:bg-accent text-foreground">Residential</a>
                         </NavigationMenuLink>
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Commercial</a>
+                          <a href="/#featured?type=commercial" className="block rounded-md p-2 hover:bg-accent text-foreground">Commercial</a>
                         </NavigationMenuLink>
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Land</a>
+                          <a href="/#featured?type=land" className="block rounded-md p-2 hover:bg-accent text-foreground">Land</a>
                         </NavigationMenuLink>
                       </li>
                       <li>
@@ -81,12 +81,12 @@ export const Navigation = () => {
                     <ul className="grid gap-3 p-4 md:w-[300px]">
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Apartments</a>
+                          <a href="/#featured?type=apartment" className="block rounded-md p-2 hover:bg-accent text-foreground">Apartments</a>
                         </NavigationMenuLink>
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Houses</a>
+                          <a href="/#featured?type=house" className="block rounded-md p-2 hover:bg-accent text-foreground">Houses</a>
                         </NavigationMenuLink>
                       </li>
                       <li>
@@ -179,9 +179,9 @@ export const Navigation = () => {
               <div>
                 <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Buy</div>
                 <div className="mt-2 flex flex-col">
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Residential</a>
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Commercial</a>
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Land</a>
+                  <a href="/#featured?type=house" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Residential</a>
+                  <a href="/#featured?type=commercial" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Commercial</a>
+                  <a href="/#featured?type=land" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Land</a>
                   <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">New Developments</a>
                 </div>
               </div>
@@ -198,8 +198,8 @@ export const Navigation = () => {
               <div>
                 <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Rent</div>
                 <div className="mt-2 flex flex-col">
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Apartments</a>
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Houses</a>
+                  <a href="/#featured?type=apartment" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Apartments</a>
+                  <a href="/#featured?type=house" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Houses</a>
                   <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Office Spaces</a>
                   <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Short Term</a>
                 </div>

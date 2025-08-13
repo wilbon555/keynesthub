@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { SlidersHorizontal, Grid, List } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { propertyStore, type Property } from "@/lib/propertyStore";
 
 // Import property images
 import property1 from "@/assets/property-1.jpg";
@@ -88,11 +89,21 @@ export const PropertyGrid = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedType, setSelectedType] = useState<string>("all");
   const [searchParams] = useSearchParams();
+  const [newProperties, setNewProperties] = useState<Property[]>([]);
 
   useEffect(() => {
     const typeParam = (searchParams.get("type") || "all").toLowerCase();
     setSelectedType(typeParam);
   }, [searchParams]);
+
+  useEffect(() => {
+    const unsubscribe = propertyStore.subscribe(() => {
+      setNewProperties(propertyStore.getProperties());
+    });
+    
+    setNewProperties(propertyStore.getProperties());
+    return unsubscribe;
+  }, []);
 
   const query = (searchParams.get("q") || "").toLowerCase();
   const priceParam = searchParams.get("price") || "";
@@ -121,7 +132,10 @@ export const PropertyGrid = () => {
     }
   };
 
-  const filteredProperties = sampleProperties
+  // Combine new properties with sample properties, with new ones first
+  const allProperties = [...newProperties, ...sampleProperties];
+  
+  const filteredProperties = allProperties
     .filter((property) =>
       selectedType === "all"
         ? true

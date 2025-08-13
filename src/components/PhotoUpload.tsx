@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { propertyStore } from "@/lib/propertyStore";
 interface PhotoUploadProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -56,13 +57,33 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   });
 
   const onSubmit = (values: DetailsForm) => {
+    // Create property from form data
+    const newProperty = {
+      title: values.description.split('.')[0] || "New Property Listing",
+      price: `$${values.priceMin.toLocaleString()} - $${values.priceMax.toLocaleString()}`,
+      location: `${values.location}, ${values.region}`,
+      area: "TBD", // Can be enhanced later
+      type: "House", // Default type, can be enhanced with form field
+      image: selectedFiles.length > 0 ? URL.createObjectURL(selectedFiles[0]) : "/placeholder.svg",
+      featured: true,
+      region: values.region,
+      country: values.country,
+      phone: values.phone,
+      description: values.description
+    };
+
+    // Add to property store
+    propertyStore.addProperty(newProperty);
+
     toast({
-      title: "Listing details captured",
-      description: `Files: ${selectedFiles.length} • ${values.country}, ${values.region} - ${values.location}`,
+      title: "Property listed successfully!",
+      description: `Your property in ${values.location}, ${values.region} is now featured at the top of our listings.`,
     });
+    
     onOpenChange(false);
     setSelectedFiles([]);
     setStep("select");
+    form.reset();
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
