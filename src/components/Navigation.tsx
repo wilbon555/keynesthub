@@ -137,7 +137,7 @@ export const Navigation = () => {
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Investment Tips</a>
+                          <a href="/investment-tips" className="block rounded-md p-2 hover:bg-accent text-foreground">Investment Tips</a>
                         </NavigationMenuLink>
                       </li>
                     </ul>
@@ -218,7 +218,7 @@ export const Navigation = () => {
                 <div className="mt-2 flex flex-col">
                   <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Property Trends</a>
                   <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Mortgage Calculator</a>
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
+                  <a href="/investment-tips" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
                 </div>
               </div>
 
