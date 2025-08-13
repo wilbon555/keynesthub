@@ -109,12 +109,12 @@ export const Navigation = () => {
                     <ul className="grid gap-3 p-4 md:w-[300px]">
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Find an Agent</a>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Find an Agent</a>
                         </NavigationMenuLink>
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Become an Agent</a>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Become an Agent</a>
                         </NavigationMenuLink>
                       </li>
                     </ul>
@@ -127,17 +127,17 @@ export const Navigation = () => {
                     <ul className="grid gap-3 p-4 md:w-[300px]">
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Property Trends</a>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Property Trends</a>
                         </NavigationMenuLink>
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Mortgage Calculator</a>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Mortgage Calculator</a>
                         </NavigationMenuLink>
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Investment Tips</a>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Investment Tips</a>
                         </NavigationMenuLink>
                       </li>
                     </ul>
@@ -208,17 +208,17 @@ export const Navigation = () => {
               <div>
                 <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Agents</div>
                 <div className="mt-2 flex flex-col">
-                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Find an Agent</a>
-                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Become an Agent</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Find an Agent</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Become an Agent</a>
                 </div>
               </div>
 
               <div>
                 <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Market Insights</div>
                 <div className="mt-2 flex flex-col">
-                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Property Trends</a>
-                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Mortgage Calculator</a>
-                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Property Trends</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Mortgage Calculator</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
                 </div>
               </div>
 
