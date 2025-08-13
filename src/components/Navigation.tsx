@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { Menu, X, Phone, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -20,11 +21,131 @@ export const Navigation = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <a href="/#featured" className="text-foreground hover:text-primary transition-smooth font-medium">Buy</a>
-            <a href="/?action=list" className="text-foreground hover:text-primary transition-smooth font-medium">Sell</a>
-            <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium">Rent</a>
-            <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium">Agents</a>
+          <div className="hidden md:flex items-center">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Buy</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-4 md:w-[400px] lg:w-[500px]">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Residential</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Commercial</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Land</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">New Developments</a>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Sell</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-4 md:w-[300px]">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/?action=list" className="block rounded-md p-2 hover:bg-accent text-foreground">List Your Property</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Pricing Plans</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Agent Assistance</a>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Rent</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-4 md:w-[300px]">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Apartments</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Houses</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Office Spaces</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Short Term</a>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Agents</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-4 md:w-[300px]">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Find an Agent</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Become an Agent</a>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Market Insights</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-4 md:w-[300px]">
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Property Trends</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Mortgage Calculator</a>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="#" className="block rounded-md p-2 hover:bg-accent text-foreground">Investment Tips</a>
+                        </NavigationMenuLink>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+
+              </NavigationMenuList>
+            </NavigationMenu>
           </div>
 
           {/* Desktop CTA */}
@@ -54,11 +175,53 @@ export const Navigation = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-border animate-fade-in">
-            <div className="flex flex-col space-y-3">
-              <a href="/#featured" className="text-foreground hover:text-primary transition-smooth font-medium py-2">Buy</a>
-              <a href="/?action=list" className="text-foreground hover:text-primary transition-smooth font-medium py-2">Sell</a>
-              <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium py-2">Rent</a>
-              <a href="#" className="text-foreground hover:text-primary transition-smooth font-medium py-2">Agents</a>
+            <div className="flex flex-col space-y-4">
+              <div>
+                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Buy</div>
+                <div className="mt-2 flex flex-col">
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Residential</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Commercial</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Land</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">New Developments</a>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Sell</div>
+                <div className="mt-2 flex flex-col">
+                  <a href="/?action=list" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">List Your Property</a>
+                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Pricing Plans</a>
+                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Agent Assistance</a>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Rent</div>
+                <div className="mt-2 flex flex-col">
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Apartments</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Houses</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Office Spaces</a>
+                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Short Term</a>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Agents</div>
+                <div className="mt-2 flex flex-col">
+                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Find an Agent</a>
+                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Become an Agent</a>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Market Insights</div>
+                <div className="mt-2 flex flex-col">
+                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Property Trends</a>
+                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Mortgage Calculator</a>
+                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
+                </div>
+              </div>
+
               <div className="flex flex-col space-y-2 pt-4">
                 <Button variant="ghost" size="sm" className="justify-start">
                   <Phone className="w-4 h-4 mr-2" />
