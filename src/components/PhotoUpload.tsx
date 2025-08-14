@@ -57,11 +57,45 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
     },
   });
 
+  // Currency mapping based on country
+  const getCurrencyInfo = (country: string) => {
+    const countryLower = country.toLowerCase();
+    const currencyMap: { [key: string]: { symbol: string; code: string } } = {
+      kenya: { symbol: "Ksh", code: "KES" },
+      uganda: { symbol: "UGX", code: "UGX" },
+      tanzania: { symbol: "TSh", code: "TZS" },
+      "united states": { symbol: "$", code: "USD" },
+      usa: { symbol: "$", code: "USD" },
+      "united kingdom": { symbol: "£", code: "GBP" },
+      uk: { symbol: "£", code: "GBP" },
+      canada: { symbol: "C$", code: "CAD" },
+      australia: { symbol: "A$", code: "AUD" },
+      "south africa": { symbol: "R", code: "ZAR" },
+      nigeria: { symbol: "₦", code: "NGN" },
+      ghana: { symbol: "₵", code: "GHS" },
+      egypt: { symbol: "E£", code: "EGP" },
+      morocco: { symbol: "MAD", code: "MAD" },
+      ethiopia: { symbol: "Br", code: "ETB" },
+    };
+
+    // Try to find exact match or partial match
+    for (const [key, value] of Object.entries(currencyMap)) {
+      if (countryLower.includes(key) || key.includes(countryLower)) {
+        return value;
+      }
+    }
+    
+    // Default to USD if no match found
+    return { symbol: "$", code: "USD" };
+  };
+
   const onSubmit = (values: DetailsForm) => {
+    const currency = getCurrencyInfo(values.country);
+    
     // Create property from form data
     const newProperty = {
       title: values.description.split('.')[0] || "New Property Listing",
-      price: `$${values.priceMin.toLocaleString()} - $${values.priceMax.toLocaleString()}`,
+      price: `${currency.symbol}${values.priceMin.toLocaleString()} - ${currency.symbol}${values.priceMax.toLocaleString()}`,
       location: `${values.location}, ${values.region}`,
       area: "TBD", // Can be enhanced later
       type: "House", // Default type, can be enhanced with form field
