@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Menu, X, Phone, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -174,65 +175,67 @@ export const Navigation = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border animate-fade-in">
-            <div className="flex flex-col space-y-4">
-              <div>
-                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Buy</div>
-                <div className="mt-2 flex flex-col">
-                  <a href="/#featured?type=house" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Residential</a>
-                  <a href="/#featured?type=commercial" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Commercial</a>
-                  <a href="/#featured?type=land" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Land</a>
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">New Developments</a>
+          <div className="md:hidden border-t border-border animate-fade-in">
+            <ScrollArea className="h-[calc(100vh-4rem)] py-4">
+              <div className="flex flex-col space-y-4 px-4">
+                <div>
+                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Buy</div>
+                  <div className="mt-2 flex flex-col">
+                    <a href="/#featured?type=house" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Residential</a>
+                    <a href="/#featured?type=commercial" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Commercial</a>
+                    <a href="/#featured?type=land" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Land</a>
+                    <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">New Developments</a>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Sell</div>
+                  <div className="mt-2 flex flex-col">
+                    <a href="/?action=list" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">List Your Property</a>
+                    <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Pricing Plans</a>
+                    <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Agent Assistance</a>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Rent</div>
+                  <div className="mt-2 flex flex-col">
+                    <a href="/#featured?type=apartment" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Apartments</a>
+                    <a href="/#featured?type=house" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Houses</a>
+                    <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Office Spaces</a>
+                    <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Short Term</a>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Agents</div>
+                  <div className="mt-2 flex flex-col">
+                    <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Find an Agent</a>
+                    <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Become an Agent</a>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Market Insights</div>
+                  <div className="mt-2 flex flex-col">
+                    <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Property Trends</a>
+                    <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Mortgage Calculator</a>
+                    <a href="/investment-tips" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-2 pt-4">
+                  <Button variant="ghost" size="sm" className="justify-start">
+                    <Phone className="w-4 h-4 mr-2" />
+                    Contact
+                  </Button>
+                  <Button variant="hero" size="sm" className="justify-start" onClick={() => navigate("/auth") }>
+                    <User className="w-4 h-4 mr-2" />
+                    Sign In
+                  </Button>
                 </div>
               </div>
-
-              <div>
-                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Sell</div>
-                <div className="mt-2 flex flex-col">
-                  <a href="/?action=list" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">List Your Property</a>
-                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Pricing Plans</a>
-                  <a href="#" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Agent Assistance</a>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Rent</div>
-                <div className="mt-2 flex flex-col">
-                  <a href="/#featured?type=apartment" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Apartments</a>
-                  <a href="/#featured?type=house" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Houses</a>
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Office Spaces</a>
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Short Term</a>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Agents</div>
-                <div className="mt-2 flex flex-col">
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Find an Agent</a>
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Become an Agent</a>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Market Insights</div>
-                <div className="mt-2 flex flex-col">
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Property Trends</a>
-                  <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Mortgage Calculator</a>
-                  <a href="/investment-tips" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
-                </div>
-              </div>
-
-              <div className="flex flex-col space-y-2 pt-4">
-                <Button variant="ghost" size="sm" className="justify-start">
-                  <Phone className="w-4 h-4 mr-2" />
-                  Contact
-                </Button>
-                <Button variant="hero" size="sm" className="justify-start" onClick={() => navigate("/auth") }>
-                  <User className="w-4 h-4 mr-2" />
-                  Sign In
-                </Button>
-              </div>
-            </div>
+            </ScrollArea>
           </div>
         )}
       </div>
