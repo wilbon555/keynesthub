@@ -29,8 +29,8 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       region: z.string().min(2, "Region is required"),
       country: z.string().min(2, "Country is required"),
       location: z.string().min(2, "Location is required"),
-      priceMin: z.coerce.number().min(0, "Min price must be >= 0"),
-      priceMax: z.coerce.number().min(0, "Max price must be >= 0"),
+      priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
+      priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       phone: z
         .string()
         .min(7, "Phone is required")
@@ -50,8 +50,8 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       region: "",
       country: "",
       location: "",
-      priceMin: 0,
-      priceMax: 0,
+      priceMin: 1,
+      priceMax: 1,
       phone: "",
       description: "",
     },
@@ -314,29 +314,51 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                       <FormField
                         control={form.control}
                         name="priceMin"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Price Min</FormLabel>
-                            <FormControl>
-                              <Input type="number" min={0} step={1} placeholder="0" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                        render={({ field }) => {
+                          const country = form.watch("country");
+                          const currency = getCurrencyInfo(country);
+                          return (
+                            <FormItem>
+                              <FormLabel>Price Min ({currency.symbol})</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min={1} 
+                                  max={1000000000}
+                                  step={1} 
+                                  placeholder={`1 ${currency.code}`} 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          );
+                        }}
                       />
 
                       <FormField
                         control={form.control}
                         name="priceMax"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Price Max</FormLabel>
-                            <FormControl>
-                              <Input type="number" min={0} step={1} placeholder="0" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
+                        render={({ field }) => {
+                          const country = form.watch("country");
+                          const currency = getCurrencyInfo(country);
+                          return (
+                            <FormItem>
+                              <FormLabel>Price Max ({currency.symbol})</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min={1} 
+                                  max={1000000000}
+                                  step={1} 
+                                  placeholder={`1000000 ${currency.code}`} 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          );
+                        }}
                       />
                     </div>
 
