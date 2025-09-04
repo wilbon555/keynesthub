@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import InvestmentTips from "./pages/InvestmentTips";
 import MortgageCalculator from "./pages/MortgageCalculator";
+import BecomeAgent from "./pages/BecomeAgent";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/investment-tips" element={<InvestmentTips />} />
           <Route path="/mortgage-calculator" element={<MortgageCalculator />} />
+          <Route path="/become-agent" element={<BecomeAgent />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

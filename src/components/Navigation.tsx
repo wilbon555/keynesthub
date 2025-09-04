@@ -115,7 +115,7 @@ export const Navigation = () => {
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="/#featured" className="block rounded-md p-2 hover:bg-accent text-foreground">Become an Agent</a>
+                          <a href="/become-agent" className="block rounded-md p-2 hover:bg-accent text-foreground">Become an Agent</a>
                         </NavigationMenuLink>
                       </li>
                     </ul>
@@ -211,7 +211,7 @@ export const Navigation = () => {
                   <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Agents</div>
                   <div className="mt-2 flex flex-col">
                     <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Find an Agent</a>
-                    <a href="/#featured" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Become an Agent</a>
+                    <a href="/become-agent" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Become an Agent</a>
                   </div>
                 </div>
 
