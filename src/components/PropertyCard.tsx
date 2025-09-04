@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Bed, Bath, Square } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MapPin, Bed, Bath, Square, Phone, MessageCircle } from "lucide-react";
 
 interface PropertyCardProps {
   id: string;
@@ -13,6 +14,7 @@ interface PropertyCardProps {
   type: string;
   image: string;
   featured?: boolean;
+  phone?: string;
 }
 
 export const PropertyCard = ({
@@ -24,7 +26,8 @@ export const PropertyCard = ({
   area,
   type,
   image,
-  featured = false
+  featured = false,
+  phone
 }: PropertyCardProps) => {
   return (
     <Card className="group cursor-pointer transition-smooth hover:shadow-elegant hover:-translate-y-1 overflow-hidden bg-gradient-card">
@@ -79,6 +82,29 @@ export const PropertyCard = ({
               {area}
             </div>
           </div>
+
+          {phone && (
+            <div className="flex gap-2 pt-2">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="flex-1" 
+                onClick={() => window.open(`tel:${phone}`, '_self')}
+              >
+                <Phone className="w-4 h-4 mr-2" />
+                Call
+              </Button>
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => window.open(`sms:${phone}?body=Hi, I'm interested in your property: ${title}`, '_self')}
+              >
+                <MessageCircle className="w-4 h-4 mr-2" />
+                Message
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
