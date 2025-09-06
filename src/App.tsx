@@ -12,6 +12,29 @@ import MortgageCalculator from "./pages/MortgageCalculator";
 import BecomeAgent from "./pages/BecomeAgent";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
+// Buy pages
+import Residential from "./pages/buy/Residential";
+import Commercial from "./pages/buy/Commercial";
+import Land from "./pages/buy/Land";
+import NewDevelopments from "./pages/buy/NewDevelopments";
+
+// Sell pages
+import ListProperty from "./pages/sell/ListProperty";
+import PricingPlans from "./pages/sell/PricingPlans";
+import AgentAssistance from "./pages/sell/AgentAssistance";
+
+// Rent pages
+import Apartments from "./pages/rent/Apartments";
+import Houses from "./pages/rent/Houses";
+import OfficeSpaces from "./pages/rent/OfficeSpaces";
+import ShortTerm from "./pages/rent/ShortTerm";
+
+// Agent pages
+import FindAgent from "./pages/agents/FindAgent";
+
+// Market pages
+import PropertyTrends from "./pages/market/PropertyTrends";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -24,9 +47,33 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          
+          {/* Buy Routes */}
+          <Route path="/buy/residential" element={<Residential />} />
+          <Route path="/buy/commercial" element={<Commercial />} />
+          <Route path="/buy/land" element={<Land />} />
+          <Route path="/buy/new-developments" element={<NewDevelopments />} />
+          
+          {/* Sell Routes */}
+          <Route path="/sell/list-property" element={<ListProperty />} />
+          <Route path="/sell/pricing-plans" element={<PricingPlans />} />
+          <Route path="/sell/agent-assistance" element={<AgentAssistance />} />
+          
+          {/* Rent Routes */}
+          <Route path="/rent/apartments" element={<Apartments />} />
+          <Route path="/rent/houses" element={<Houses />} />
+          <Route path="/rent/office-spaces" element={<OfficeSpaces />} />
+          <Route path="/rent/short-term" element={<ShortTerm />} />
+          
+          {/* Agent Routes */}
+          <Route path="/agents/find-agent" element={<FindAgent />} />
+          <Route path="/become-agent" element={<BecomeAgent />} />
+          
+          {/* Market Routes */}
+          <Route path="/market/property-trends" element={<PropertyTrends />} />
           <Route path="/investment-tips" element={<InvestmentTips />} />
           <Route path="/mortgage-calculator" element={<MortgageCalculator />} />
-          <Route path="/become-agent" element={<BecomeAgent />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
