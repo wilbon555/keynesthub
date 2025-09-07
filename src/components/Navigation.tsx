@@ -2,12 +2,32 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Menu, X, Phone, User } from "lucide-react";
+import { Menu, X, Phone, User, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        variant: "destructive",
+        title: "Sign Out Failed",
+        description: error.message
+      });
+    } else {
+      toast({
+        title: "Signed Out",
+        description: "You have been successfully signed out."
+      });
+    }
+  };
 
   return (
     <nav className="bg-card/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
@@ -155,10 +175,17 @@ export const Navigation = () => {
               <Phone className="w-4 h-4 mr-2" />
               Contact
             </Button>
-            <Button variant="hero" size="sm" onClick={() => navigate("/auth") }>
-              <User className="w-4 h-4 mr-2" />
-              Sign In
-            </Button>
+            {user ? (
+              <Button variant="outline" size="sm" onClick={handleSignOut}>
+                <LogOut className="w-4 h-4 mr-2" />
+                Sign Out
+              </Button>
+            ) : (
+              <Button variant="hero" size="sm" onClick={() => navigate("/auth")}>
+                <User className="w-4 h-4 mr-2" />
+                Sign In
+              </Button>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -229,10 +256,17 @@ export const Navigation = () => {
                     <Phone className="w-4 h-4 mr-2" />
                     Contact
                   </Button>
-                  <Button variant="hero" size="sm" className="justify-start" onClick={() => navigate("/auth") }>
-                    <User className="w-4 h-4 mr-2" />
-                    Sign In
-                  </Button>
+                  {user ? (
+                    <Button variant="outline" size="sm" className="justify-start" onClick={handleSignOut}>
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  ) : (
+                    <Button variant="hero" size="sm" className="justify-start" onClick={() => navigate("/auth")}>
+                      <User className="w-4 h-4 mr-2" />
+                      Sign In
+                    </Button>
+                  )}
                 </div>
               </div>
             </ScrollArea>

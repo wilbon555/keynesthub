@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { user, loading } = useSupabaseAuth();
+  const { user, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
