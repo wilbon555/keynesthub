@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Menu, X, Phone, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { ContactDropdown } from "@/components/ContactDropdown";
 
 export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -171,10 +172,7 @@ export const Navigation = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-3">
-            <Button variant="ghost" size="sm">
-              <Phone className="w-4 h-4 mr-2" />
-              Contact
-            </Button>
+            <ContactDropdown variant="ghost" size="sm" />
             {user ? (
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />
@@ -252,10 +250,7 @@ export const Navigation = () => {
                 </div>
 
                 <div className="flex flex-col space-y-2 pt-4">
-                  <Button variant="ghost" size="sm" className="justify-start">
-                    <Phone className="w-4 h-4 mr-2" />
-                    Contact
-                  </Button>
+                  <ContactDropdown variant="ghost" size="sm" className="justify-start" />
                   {user ? (
                     <Button variant="outline" size="sm" className="justify-start" onClick={handleSignOut}>
                       <LogOut className="w-4 h-4 mr-2" />
