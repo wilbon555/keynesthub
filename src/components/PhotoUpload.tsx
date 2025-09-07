@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +30,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       region: z.string().min(2, "Region is required"),
       country: z.string().min(2, "Country is required"),
       location: z.string().min(2, "Location is required"),
+      propertyType: z.string().min(1, "Property type is required"),
       priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       phone: z
@@ -50,6 +52,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       region: "",
       country: "",
       location: "",
+      propertyType: "",
       priceMin: 1,
       priceMax: 1,
       phone: "",
@@ -98,7 +101,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       price: `${currency.symbol}${values.priceMin.toLocaleString()} - ${currency.symbol}${values.priceMax.toLocaleString()}`,
       location: `${values.location}, ${values.region}`,
       area: "TBD", // Can be enhanced later
-      type: "House", // Default type, can be enhanced with form field
+      type: values.propertyType,
       image: selectedFiles.length > 0 ? URL.createObjectURL(selectedFiles[0]) : "/placeholder.svg",
       featured: true,
       region: values.region,
@@ -299,11 +302,38 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                         control={form.control}
                         name="location"
                         render={({ field }) => (
-                          <FormItem className="sm:col-span-2">
+                          <FormItem>
                             <FormLabel>Location</FormLabel>
                             <FormControl>
                               <Input placeholder="City, neighborhood or address" {...field} />
                             </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="propertyType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Property Type</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select property type" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="House">House</SelectItem>
+                                <SelectItem value="Apartment">Apartment</SelectItem>
+                                <SelectItem value="Commercial">Commercial</SelectItem>
+                                <SelectItem value="Land">Land</SelectItem>
+                                <SelectItem value="Condo">Condo</SelectItem>
+                                <SelectItem value="Villa">Villa</SelectItem>
+                                <SelectItem value="Rentals">Rentals</SelectItem>
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
