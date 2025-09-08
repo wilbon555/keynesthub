@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Camera, Upload, FileImage } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,7 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { propertyStore } from "@/lib/propertyStore";
+import { toast } from "sonner";
+import { useProperties } from "@/hooks/useProperties";
+import { useAuth } from "@/hooks/useAuth";
 interface PhotoUploadProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -21,9 +22,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-
   const [step, setStep] = useState<"select" | "details">("select");
+  const { addProperty } = useProperties();
+  const { user } = useAuth();
 
   const detailsSchema = z
     .object({
@@ -92,7 +93,12 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
     return { symbol: "$", code: "USD" };
   };
 
-  const onSubmit = (values: DetailsForm) => {
+  const onSubmit = async (values: DetailsForm) => {
+    if (!user) {
+      toast.error("Please log in to list a property");
+      return;
+    }
+
     const currency = getCurrencyInfo(values.country);
     
     // Create property from form data
@@ -107,31 +113,27 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       region: values.region,
       country: values.country,
       phone: values.phone,
-      description: values.description
+      description: values.description,
+      status: 'available' as const
     };
 
-    // Add to property store
-    propertyStore.addProperty(newProperty);
-
-    toast({
-      title: "Property listed successfully!",
-      description: `Your property in ${values.location}, ${values.region} is now featured at the top of our listings.`,
-    });
+    // Add to database
+    const result = await addProperty(newProperty);
     
-    onOpenChange(false);
-    setSelectedFiles([]);
-    setStep("select");
-    form.reset();
+    if (result) {
+      // Reset and close on success
+      onOpenChange(false);
+      setSelectedFiles([]);
+      setStep("select");
+      form.reset();
+    }
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     if (files.length > 0) {
       setSelectedFiles(prev => [...prev, ...files]);
-      toast({
-        title: "Files selected",
-        description: `${files.length} file(s) ready to upload`,
-      });
+      toast.success(`${files.length} file(s) ready to upload`);
     }
   };
 
@@ -139,10 +141,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
     const files = Array.from(event.target.files || []);
     if (files.length > 0) {
       setSelectedFiles(prev => [...prev, ...files]);
-      toast({
-        title: "Photo captured",
-        description: "Photo ready to upload",
-      });
+      toast.success("Photo captured and ready to upload");
     }
   };
 

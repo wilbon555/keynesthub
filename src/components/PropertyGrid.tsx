@@ -1,12 +1,11 @@
 import { PropertyCard } from "./PropertyCard";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import { useProperties, Property } from "@/hooks/useProperties";
+
 import { SlidersHorizontal, Grid, List } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { propertyStore, type Property } from "@/lib/propertyStore";
-
-// Import property images
 import property1 from "@/assets/property-1.jpg";
 import property2 from "@/assets/property-2.jpg";
 import property3 from "@/assets/property-3.jpg";
@@ -14,7 +13,7 @@ import property4 from "@/assets/property-4.jpg";
 import property5 from "@/assets/property-5.jpg";
 import property6 from "@/assets/property-6.jpg";
 
-const sampleProperties = [
+const sampleProperties: Property[] = [
   {
     id: "1",
     title: "Modern Family Home with Garden",
@@ -25,7 +24,11 @@ const sampleProperties = [
     area: "2,400 sq ft",
     type: "House",
     image: property1,
-    featured: true
+    featured: true,
+    status: 'available',
+    user_id: 'sample',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   },
   {
     id: "2",
@@ -37,7 +40,11 @@ const sampleProperties = [
     area: "1,200 sq ft",
     type: "Apartment",
     image: property2,
-    featured: false
+    featured: false,
+    status: 'available',
+    user_id: 'sample',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   },
   {
     id: "3",
@@ -47,7 +54,11 @@ const sampleProperties = [
     area: "5.2 acres",
     type: "Land",
     image: property3,
-    featured: false
+    featured: false,
+    status: 'available',
+    user_id: 'sample',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   },
   {
     id: "4",
@@ -59,7 +70,11 @@ const sampleProperties = [
     area: "3,100 sq ft",
     type: "House",
     image: property4,
-    featured: true
+    featured: true,
+    status: 'available',
+    user_id: 'sample',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   },
   {
     id: "5",
@@ -69,7 +84,11 @@ const sampleProperties = [
     area: "8,500 sq ft",
     type: "Commercial",
     image: property5,
-    featured: false
+    featured: false,
+    status: 'available',
+    user_id: 'sample',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   },
   {
     id: "6",
@@ -81,7 +100,11 @@ const sampleProperties = [
     area: "1,800 sq ft",
     type: "House",
     image: property6,
-    featured: false
+    featured: false,
+    status: 'available',
+    user_id: 'sample',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   }
 ];
 
@@ -89,21 +112,12 @@ export const PropertyGrid = () => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedType, setSelectedType] = useState<string>("all");
   const [searchParams] = useSearchParams();
-  const [newProperties, setNewProperties] = useState<Property[]>([]);
+  const { properties, loading } = useProperties();
 
   useEffect(() => {
     const typeParam = (searchParams.get("type") || "all").toLowerCase();
     setSelectedType(typeParam);
   }, [searchParams]);
-
-  useEffect(() => {
-    const unsubscribe = propertyStore.subscribe(() => {
-      setNewProperties(propertyStore.getProperties());
-    });
-    
-    setNewProperties(propertyStore.getProperties());
-    return unsubscribe;
-  }, []);
 
   const query = (searchParams.get("q") || "").toLowerCase();
   const priceParam = searchParams.get("price") || "";
@@ -132,8 +146,8 @@ export const PropertyGrid = () => {
     }
   };
 
-  // Combine new properties with sample properties, with new ones first
-  const allProperties = [...newProperties, ...sampleProperties];
+  // Combine database properties with sample properties, with database ones first
+  const allProperties = [...properties, ...sampleProperties];
   
   const filteredProperties = allProperties
     .filter((property) =>
@@ -212,22 +226,37 @@ export const PropertyGrid = () => {
           </p>
         </div>
 
-        {/* Property Grid */}
-        <div className={`grid gap-6 ${
-          viewMode === "grid" 
-            ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" 
-            : "grid-cols-1"
-        } animate-fade-in`}>
-          {filteredProperties.map((property) => (
-            <PropertyCard key={property.id} {...property} />
-          ))}
-        </div>
+        {/* Properties Grid/List */}
+        <div className="mt-8">
+          {loading ? (
+            <div className="text-center text-muted-foreground py-12">
+              <p>Loading properties...</p>
+            </div>
+          ) : filteredProperties.length === 0 ? (
+            <div className="text-center text-muted-foreground py-12">
+              <p>No properties found matching your criteria.</p>
+            </div>
+          ) : (
+            <>
+              {/* Property Grid */}
+              <div className={`grid gap-6 ${
+                viewMode === "grid" 
+                  ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" 
+                  : "grid-cols-1"
+              } animate-fade-in`}>
+                {filteredProperties.map((property) => (
+                  <PropertyCard key={property.id} {...property} />
+                ))}
+              </div>
 
-        {/* Load More Button */}
-        <div className="text-center mt-12">
-          <Button variant="outline" size="lg" className="px-8">
-            Load More Properties
-          </Button>
+              {/* Load More Button */}
+              <div className="text-center mt-12">
+                <Button variant="outline" size="lg" className="px-8">
+                  Load More Properties
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </section>
