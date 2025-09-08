@@ -2,8 +2,11 @@ import { Navigation } from "@/components/Navigation";
 import { PhotoUpload } from "@/components/PhotoUpload";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, Eye, DollarSign, Clock } from "lucide-react";
+import { useState } from "react";
 
 const ListProperty = () => {
+  const [uploadOpen, setUploadOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -80,7 +83,10 @@ const ListProperty = () => {
             <p className="text-muted-foreground mb-4">
               Fill out the form below to list your property. Our team will review and publish your listing within 24 hours.
             </p>
-            <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
+            <div 
+              className="text-center py-8 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary transition-colors"
+              onClick={() => setUploadOpen(true)}
+            >
               <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-foreground font-medium mb-2">Upload Property Photos</p>
               <p className="text-muted-foreground text-sm">Drag and drop your photos here, or click to browse</p>
@@ -88,6 +94,8 @@ const ListProperty = () => {
           </div>
         </div>
       </main>
+
+      <PhotoUpload open={uploadOpen} onOpenChange={setUploadOpen} />
     </div>
   );
 };
