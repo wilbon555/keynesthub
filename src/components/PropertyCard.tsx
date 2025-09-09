@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Bed, Bath, Square, Phone, MessageCircle } from "lucide-react";
+import { PhotoGallery } from "./PhotoGallery";
 
 interface PropertyCardProps {
   id: string;
@@ -29,6 +31,10 @@ export const PropertyCard = ({
   featured = false,
   phone
 }: PropertyCardProps) => {
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  
+  // Convert single image to array for gallery component
+  const images = [image];
   return (
     <Card className="group cursor-pointer transition-smooth hover:shadow-elegant hover:-translate-y-1 overflow-hidden bg-gradient-card">
       <div className="relative overflow-hidden">
@@ -48,7 +54,10 @@ export const PropertyCard = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-smooth" />
       </div>
       
-      <CardContent className="p-4">
+      <CardContent 
+        className="p-4 cursor-pointer" 
+        onClick={() => setIsGalleryOpen(true)}
+      >
         <div className="space-y-3">
           <div>
             <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-smooth">
@@ -107,6 +116,13 @@ export const PropertyCard = ({
           )}
         </div>
       </CardContent>
+      
+      <PhotoGallery
+        images={images}
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        title={title}
+      />
     </Card>
   );
 };
