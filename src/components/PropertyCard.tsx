@@ -60,7 +60,13 @@ export const PropertyCard = ({
         <Badge variant="secondary" className="absolute top-3 right-3">
           {type}
         </Badge>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-smooth" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-smooth flex items-center justify-center">
+          <div className="text-white text-center">
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/30">
+              <span className="text-sm font-medium">View {images.length} Photo{images.length !== 1 ? 's' : ''}</span>
+            </div>
+          </div>
+        </div>
       </div>
       
       <CardContent 
