@@ -24,6 +24,7 @@ const sampleProperties: Property[] = [
     area: "2,400 sq ft",
     type: "House",
     image: property1,
+    images: [property1],
     featured: true,
     status: 'available',
     user_id: 'sample',
@@ -40,6 +41,7 @@ const sampleProperties: Property[] = [
     area: "1,200 sq ft",
     type: "Apartment",
     image: property2,
+    images: [property2],
     featured: false,
     status: 'available',
     user_id: 'sample',
@@ -54,6 +56,7 @@ const sampleProperties: Property[] = [
     area: "5.2 acres",
     type: "Land",
     image: property3,
+    images: [property3],
     featured: false,
     status: 'available',
     user_id: 'sample',
@@ -70,6 +73,7 @@ const sampleProperties: Property[] = [
     area: "3,100 sq ft",
     type: "House",
     image: property4,
+    images: [property4],
     featured: true,
     status: 'available',
     user_id: 'sample',
@@ -84,6 +88,7 @@ const sampleProperties: Property[] = [
     area: "8,500 sq ft",
     type: "Commercial",
     image: property5,
+    images: [property5],
     featured: false,
     status: 'available',
     user_id: 'sample',
@@ -100,6 +105,7 @@ const sampleProperties: Property[] = [
     area: "1,800 sq ft",
     type: "House",
     image: property6,
+    images: [property6],
     featured: false,
     status: 'available',
     user_id: 'sample',
@@ -245,7 +251,11 @@ export const PropertyGrid = () => {
                   : "grid-cols-1"
               } animate-fade-in`}>
                 {filteredProperties.map((property) => (
-                  <PropertyCard key={property.id} {...property} />
+                  <PropertyCard 
+                    key={property.id} 
+                    {...property} 
+                    images={property.images}
+                  />
                 ))}
               </div>
 

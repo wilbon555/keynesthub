@@ -25,6 +25,7 @@ export type Database = {
           featured: boolean | null
           id: string
           image: string | null
+          images: string[] | null
           location: string
           phone: string | null
           price: string
@@ -45,6 +46,7 @@ export type Database = {
           featured?: boolean | null
           id?: string
           image?: string | null
+          images?: string[] | null
           location: string
           phone?: string | null
           price: string
@@ -65,6 +67,7 @@ export type Database = {
           featured?: boolean | null
           id?: string
           image?: string | null
+          images?: string[] | null
           location?: string
           phone?: string | null
           price?: string

@@ -109,6 +109,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       area: "TBD", // Can be enhanced later
       type: values.propertyType,
       image: selectedFiles.length > 0 ? URL.createObjectURL(selectedFiles[0]) : "/placeholder.svg",
+      images: selectedFiles.length > 0 ? [URL.createObjectURL(selectedFiles[0])] : ["/placeholder.svg"], // Add images array
       featured: true,
       region: values.region,
       country: values.country,

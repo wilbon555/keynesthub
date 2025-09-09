@@ -15,6 +15,7 @@ interface PropertyCardProps {
   area: string;
   type: string;
   image: string;
+  images?: string[];
   featured?: boolean;
   phone?: string;
 }
@@ -28,21 +29,29 @@ export const PropertyCard = ({
   area,
   type,
   image,
+  images: propertyImages,
   featured = false,
   phone
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   
-  // Convert single image to array for gallery component
-  const images = [image];
+  // Use multiple images if available, fallback to single image
+  const images = propertyImages && propertyImages.length > 0 ? propertyImages : [image];
   return (
     <Card className="group cursor-pointer transition-smooth hover:shadow-elegant hover:-translate-y-1 overflow-hidden bg-gradient-card">
       <div className="relative overflow-hidden">
-        <img 
-          src={image} 
-          alt={title}
-          className="w-full h-48 object-cover transition-smooth group-hover:scale-105"
-        />
+        <div className="relative">
+          <img 
+            src={images[0]} 
+            alt={title}
+            className="w-full h-48 object-cover transition-smooth group-hover:scale-105"
+          />
+          {images.length > 1 && (
+            <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
+              +{images.length - 1} photos
+            </div>
+          )}
+        </div>
         {featured && (
           <Badge className="absolute top-3 left-3 bg-gradient-primary border-0 text-primary-foreground">
             Featured

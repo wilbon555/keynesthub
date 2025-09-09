@@ -12,7 +12,8 @@ export interface Property {
   bathrooms?: number;
   area: string;
   type: string;
-  image: string;
+  image: string; // Keep for backward compatibility
+  images?: string[]; // Make optional for backward compatibility
   featured: boolean;
   region?: string;
   country?: string;
@@ -42,7 +43,8 @@ export const useProperties = () => {
       if (error) throw error;
       const propertiesWithImages = (data || []).map(property => ({
         ...property,
-        image: property.image || "/placeholder.svg"
+        image: property.images?.[0] || property.image || "/placeholder.svg",
+        images: property.images || [property.image || "/placeholder.svg"]
       }));
       setProperties(propertiesWithImages as Property[]);
     } catch (error) {
