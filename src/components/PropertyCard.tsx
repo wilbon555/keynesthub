@@ -2,8 +2,11 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Bed, Bath, Square, Phone, MessageCircle } from "lucide-react";
+import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Trash2 } from "lucide-react";
 import { PhotoGallery } from "./PhotoGallery";
+import { useProperties } from "@/hooks/useProperties";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 interface PropertyCardProps {
   id: string;
@@ -18,9 +21,11 @@ interface PropertyCardProps {
   images?: string[];
   featured?: boolean;
   phone?: string;
+  user_id?: string;
 }
 
 export const PropertyCard = ({
+  id,
   title,
   price,
   location,
@@ -31,9 +36,26 @@ export const PropertyCard = ({
   image,
   images: propertyImages,
   featured = false,
-  phone
+  phone,
+  user_id
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const { deleteProperty } = useProperties();
+  const { user } = useAuth();
+  
+  // Check if current user is the owner of this property
+  const isOwner = user && user_id && user.id === user_id;
+  
+  const handleRemoveProperty = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent opening gallery
+    
+    if (window.confirm('Are you sure you want to remove this property? This action cannot be undone.')) {
+      const success = await deleteProperty(id);
+      if (success) {
+        toast.success('Property removed successfully');
+      }
+    }
+  };
   
   // Use multiple images if available, fallback to single image
   const images = propertyImages && propertyImages.length > 0 ? propertyImages : [image];
@@ -126,6 +148,20 @@ export const PropertyCard = ({
               >
                 <MessageCircle className="w-4 h-4 mr-2" />
                 Message
+              </Button>
+            </div>
+          )}
+
+          {isOwner && (
+            <div className="pt-2">
+              <Button 
+                size="sm" 
+                variant="destructive" 
+                className="w-full"
+                onClick={handleRemoveProperty}
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Remove Property
               </Button>
             </div>
           )}
