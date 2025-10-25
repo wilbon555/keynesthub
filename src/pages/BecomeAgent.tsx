@@ -84,7 +84,7 @@ const BecomeAgent = () => {
             <CardHeader>
               <CardTitle>Agent Registration</CardTitle>
               <CardDescription>
-                Fill out the form below to apply as an agent with Acres and Beyond
+                Fill out the form below to apply as an agent with KeyNestHub
               </CardDescription>
             </CardHeader>
             <CardContent>

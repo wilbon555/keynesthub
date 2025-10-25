@@ -87,7 +87,7 @@ const Auth = () => {
         
         <Card>
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">Welcome to Acres & Beyond</CardTitle>
+            <CardTitle className="text-2xl text-center">Welcome to KeyNestHub</CardTitle>
             <CardDescription className="text-center">
               Sign in to your account or create a new one
             </CardDescription>

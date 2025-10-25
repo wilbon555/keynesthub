@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 const Dashboard = () => {
   useEffect(() => {
-    document.title = "Dashboard | Acres and Beyond";
+    document.title = "Dashboard | KeyNestHub";
   }, []);
 
   return (

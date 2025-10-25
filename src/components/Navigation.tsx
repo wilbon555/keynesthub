@@ -37,9 +37,9 @@ export const Navigation = () => {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 flex items-center justify-center">
-              <img src="/lovable-uploads/8213b813-2daf-4854-8610-bcd75cb3bdfb.png" alt="Acres and Beyond logo icon" className="w-full h-full object-contain" loading="lazy" />
+              <img src="/lovable-uploads/8213b813-2daf-4854-8610-bcd75cb3bdfb.png" alt="KeyNestHub logo icon" className="w-full h-full object-contain" loading="lazy" />
             </div>
-            <span className="text-xl font-extrabold text-foreground tracking-tight">Acres and Beyond</span>
+            <span className="text-xl font-extrabold text-foreground tracking-tight">KeyNestHub</span>
           </div>
 
           {/* Desktop Navigation */}

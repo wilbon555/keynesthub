@@ -38,13 +38,13 @@ export const ContactDropdown = ({ variant = "ghost", size = "sm", className = ""
   };
 
   const handleWhatsApp = () => {
-    const message = encodeURIComponent("Hi! I'm interested in your property listings on Acres and Beyond.");
+    const message = encodeURIComponent("Hi! I'm interested in your property listings on KeyNestHub.");
     window.open(`https://wa.me/${contactInfo.whatsapp.replace('+', '')}?text=${message}`, '_blank');
     setIsOpen(false);
   };
 
   const handleEmail = () => {
-    const subject = encodeURIComponent("Property Inquiry - Acres and Beyond");
+    const subject = encodeURIComponent("Property Inquiry - KeyNestHub");
     const body = encodeURIComponent("Hi,\n\nI'm interested in learning more about your property listings.\n\nBest regards");
     window.open(`mailto:${contactInfo.email}?subject=${subject}&body=${body}`, '_self');
     setIsOpen(false);
@@ -62,7 +62,7 @@ export const ContactDropdown = ({ variant = "ghost", size = "sm", className = ""
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Acres and Beyond - Premium Real Estate',
+          title: 'KeyNestHub - Premium Real Estate',
           text: 'Check out this amazing real estate platform!',
           url: window.location.origin
         });
