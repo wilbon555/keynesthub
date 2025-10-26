@@ -114,16 +114,21 @@ const sampleProperties: Property[] = [
   }
 ];
 
-export const PropertyGrid = () => {
+interface PropertyGridProps {
+  defaultType?: string;
+  defaultStatus?: string;
+}
+
+export const PropertyGrid = ({ defaultType, defaultStatus }: PropertyGridProps = {}) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [selectedType, setSelectedType] = useState<string>("all");
+  const [selectedType, setSelectedType] = useState<string>(defaultType || "all");
   const [searchParams] = useSearchParams();
   const { properties, loading } = useProperties();
 
   useEffect(() => {
-    const typeParam = (searchParams.get("type") || "all").toLowerCase();
+    const typeParam = (searchParams.get("type") || defaultType || "all").toLowerCase();
     setSelectedType(typeParam);
-  }, [searchParams]);
+  }, [searchParams, defaultType]);
 
   const query = (searchParams.get("q") || "").toLowerCase();
   const priceParam = searchParams.get("price") || "";
@@ -156,6 +161,9 @@ export const PropertyGrid = () => {
   const allProperties = [...properties, ...sampleProperties];
   
   const filteredProperties = allProperties
+    .filter((property) => 
+      defaultStatus ? property.status === defaultStatus : true
+    )
     .filter((property) =>
       selectedType === "all"
         ? true
