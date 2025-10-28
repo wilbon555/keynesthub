@@ -133,7 +133,7 @@ export const PropertyGrid = ({ defaultType, defaultStatus }: PropertyGridProps =
   const query = (searchParams.get("q") || "").toLowerCase();
   const priceParam = searchParams.get("price") || "";
 
-  const propertyTypes = ["all", "house", "apartment", "land", "commercial"];
+  const propertyTypes = ["all", "residential", "house", "apartment", "land", "commercial"];
 
   const priceToNumber = (price: string) => {
     const num = Number(price.replace(/[^0-9]/g, ""));
@@ -164,11 +164,13 @@ export const PropertyGrid = ({ defaultType, defaultStatus }: PropertyGridProps =
     .filter((property) => 
       defaultStatus ? property.status === defaultStatus : true
     )
-    .filter((property) =>
-      selectedType === "all"
-        ? true
-        : property.type.toLowerCase() === selectedType
-    )
+    .filter((property) => {
+      if (selectedType === "all") return true;
+      if (selectedType === "residential") {
+        return property.type.toLowerCase() === "house" || property.type.toLowerCase() === "apartment";
+      }
+      return property.type.toLowerCase() === selectedType;
+    })
     .filter((property) => {
       if (!query) return true;
       const text = `${property.title} ${property.location}`.toLowerCase();
