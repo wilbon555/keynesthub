@@ -78,7 +78,7 @@ const OfficeSpaces = () => {
           </Card>
         </div>
 
-        <PropertyGrid />
+        <PropertyGrid defaultType="office" defaultStatus="available" defaultListingType="rent" />
       </main>
     </div>
   );

@@ -27,6 +27,7 @@ const sampleProperties: Property[] = [
     images: [property1],
     featured: true,
     status: 'available',
+    listing_type: 'sale',
     user_id: 'sample',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -44,6 +45,7 @@ const sampleProperties: Property[] = [
     images: [property2],
     featured: false,
     status: 'available',
+    listing_type: 'sale',
     user_id: 'sample',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -59,6 +61,7 @@ const sampleProperties: Property[] = [
     images: [property3],
     featured: false,
     status: 'available',
+    listing_type: 'sale',
     user_id: 'sample',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -76,6 +79,7 @@ const sampleProperties: Property[] = [
     images: [property4],
     featured: true,
     status: 'available',
+    listing_type: 'sale',
     user_id: 'sample',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -91,6 +95,7 @@ const sampleProperties: Property[] = [
     images: [property5],
     featured: false,
     status: 'available',
+    listing_type: 'sale',
     user_id: 'sample',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -108,6 +113,7 @@ const sampleProperties: Property[] = [
     images: [property6],
     featured: false,
     status: 'available',
+    listing_type: 'sale',
     user_id: 'sample',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
@@ -117,9 +123,10 @@ const sampleProperties: Property[] = [
 interface PropertyGridProps {
   defaultType?: string;
   defaultStatus?: string;
+  defaultListingType?: 'sale' | 'rent';
 }
 
-export const PropertyGrid = ({ defaultType, defaultStatus }: PropertyGridProps = {}) => {
+export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }: PropertyGridProps = {}) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [selectedType, setSelectedType] = useState<string>(defaultType || "all");
   const [searchParams] = useSearchParams();
@@ -163,6 +170,9 @@ export const PropertyGrid = ({ defaultType, defaultStatus }: PropertyGridProps =
   const filteredProperties = allProperties
     .filter((property) => 
       defaultStatus ? property.status === defaultStatus : true
+    )
+    .filter((property) =>
+      defaultListingType ? property.listing_type === defaultListingType : true
     )
     .filter((property) => {
       if (selectedType === "all") return true;

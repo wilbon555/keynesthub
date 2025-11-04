@@ -20,6 +20,7 @@ export interface Property {
   phone?: string;
   description?: string;
   status: 'available' | 'sold' | 'rented';
+  listing_type: 'sale' | 'rent';
   user_id: string;
   created_at: string;
   updated_at: string;

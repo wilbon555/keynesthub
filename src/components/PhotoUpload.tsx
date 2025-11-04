@@ -32,6 +32,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       country: z.string().min(2, "Country is required"),
       location: z.string().min(2, "Location is required"),
       propertyType: z.string().min(1, "Property type is required"),
+      listingType: z.enum(['sale', 'rent'], { required_error: "Please select listing type" }),
       priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       phone: z
@@ -54,6 +55,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       country: "",
       location: "",
       propertyType: "",
+      listingType: "sale",
       priceMin: 1,
       priceMax: 1,
       phone: "",
@@ -115,7 +117,8 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       country: values.country,
       phone: values.phone,
       description: values.description,
-      status: 'available' as const
+      status: 'available' as const,
+      listing_type: values.listingType
     };
 
     // Add to database
@@ -331,7 +334,29 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                 <SelectItem value="Land">Land</SelectItem>
                                 <SelectItem value="Condo">Condo</SelectItem>
                                 <SelectItem value="Villa">Villa</SelectItem>
-                                <SelectItem value="Rentals">Rentals</SelectItem>
+                                <SelectItem value="Office">Office Space</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="listingType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Listing Type</FormLabel>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="For Sale or Rent" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="sale">For Sale</SelectItem>
+                                <SelectItem value="rent">For Rent</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />

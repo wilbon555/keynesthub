@@ -78,7 +78,7 @@ const Land = () => {
           </Card>
         </div>
 
-        <PropertyGrid defaultType="land" defaultStatus="available" />
+        <PropertyGrid defaultType="land" defaultStatus="available" defaultListingType="sale" />
       </main>
     </div>
   );

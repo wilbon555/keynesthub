@@ -78,7 +78,7 @@ const Commercial = () => {
           </Card>
         </div>
 
-        <PropertyGrid defaultType="commercial" defaultStatus="available" />
+        <PropertyGrid defaultType="commercial" defaultStatus="available" defaultListingType="sale" />
       </main>
     </div>
   );

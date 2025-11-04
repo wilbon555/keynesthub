@@ -78,7 +78,7 @@ const Apartments = () => {
           </Card>
         </div>
 
-        <PropertyGrid />
+        <PropertyGrid defaultType="apartment" defaultStatus="available" defaultListingType="rent" />
       </main>
     </div>
   );

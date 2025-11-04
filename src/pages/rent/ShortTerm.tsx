@@ -78,7 +78,7 @@ const ShortTerm = () => {
           </Card>
         </div>
 
-        <PropertyGrid />
+        <PropertyGrid defaultType="residential" defaultStatus="available" defaultListingType="rent" />
       </main>
     </div>
   );
