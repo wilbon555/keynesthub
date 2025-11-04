@@ -78,7 +78,7 @@ const NewDevelopments = () => {
           </Card>
         </div>
 
-        <PropertyGrid />
+        <PropertyGrid defaultType="residential" defaultStatus="available" />
       </main>
     </div>
   );

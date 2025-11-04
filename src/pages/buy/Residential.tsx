@@ -64,7 +64,7 @@ const Residential = () => {
           </Card>
         </div>
 
-        <PropertyGrid defaultType="house" defaultStatus="available" />
+        <PropertyGrid defaultType="residential" defaultStatus="available" />
       </main>
     </div>
   );
