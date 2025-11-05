@@ -62,15 +62,81 @@ export const PropertyCard = ({
   return (
     <Card className="group cursor-pointer transition-smooth hover:shadow-elegant hover:-translate-y-1 overflow-hidden bg-gradient-card">
       <div className="relative overflow-hidden">
+        {/* Image Grid */}
         <div className="relative">
-          <img 
-            src={images[0]} 
-            alt={title}
-            className="w-full h-48 object-cover transition-smooth group-hover:scale-105"
-          />
-          {images.length > 1 && (
-            <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
-              +{images.length - 1} photos
+          {images.length === 1 ? (
+            <img 
+              src={images[0]} 
+              alt={title}
+              className="w-full h-48 object-cover transition-smooth group-hover:scale-105"
+              onClick={() => setIsGalleryOpen(true)}
+            />
+          ) : images.length === 2 ? (
+            <div className="grid grid-cols-2 gap-1 h-48">
+              {images.slice(0, 2).map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={`${title} - Photo ${idx + 1}`}
+                  className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
+                  onClick={() => setIsGalleryOpen(true)}
+                />
+              ))}
+            </div>
+          ) : images.length === 3 ? (
+            <div className="grid grid-cols-2 gap-1 h-48">
+              <img
+                src={images[0]}
+                alt={`${title} - Photo 1`}
+                className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
+                onClick={() => setIsGalleryOpen(true)}
+              />
+              <div className="grid grid-rows-2 gap-1">
+                {images.slice(1, 3).map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`${title} - Photo ${idx + 2}`}
+                    className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
+                    onClick={() => setIsGalleryOpen(true)}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-1 h-48">
+              <img
+                src={images[0]}
+                alt={`${title} - Photo 1`}
+                className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
+                onClick={() => setIsGalleryOpen(true)}
+              />
+              <div className="grid grid-rows-2 gap-1">
+                {images.slice(1, 3).map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`${title} - Photo ${idx + 2}`}
+                    className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
+                    onClick={() => setIsGalleryOpen(true)}
+                  />
+                ))}
+                {images.length > 3 && (
+                  <div 
+                    className="relative cursor-pointer"
+                    onClick={() => setIsGalleryOpen(true)}
+                  >
+                    <img
+                      src={images[3]}
+                      alt={`${title} - Photo 4`}
+                      className="w-full h-full object-cover transition-smooth group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-white font-semibold text-lg">
+                      +{images.length - 3} more
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -82,10 +148,10 @@ export const PropertyCard = ({
         <Badge variant="secondary" className="absolute top-3 right-3">
           {type}
         </Badge>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-smooth flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-smooth flex items-center justify-center pointer-events-none">
           <div className="text-white text-center">
             <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/30">
-              <span className="text-sm font-medium">📸 View & Zoom {images.length} Photo{images.length !== 1 ? 's' : ''}</span>
+              <span className="text-sm font-medium">📸 Click to View & Zoom</span>
             </div>
           </div>
         </div>
