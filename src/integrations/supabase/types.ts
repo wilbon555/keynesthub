@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_requests: {
+        Row: {
+          created_at: string
+          id: string
+          message: string | null
+          property_id: string
+          requester_email: string
+          requester_name: string
+          requester_phone: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          property_id: string
+          requester_email: string
+          requester_name: string
+          requester_phone?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string | null
+          property_id?: string
+          requester_email?: string
+          requester_name?: string
+          requester_phone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_requests_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       properties: {
         Row: {
           area: string

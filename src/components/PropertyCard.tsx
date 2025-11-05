@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Bed, Bath, Square, Phone, MessageCircle, Trash2 } from "lucide-react";
+import { MapPin, Bed, Bath, Square, MessageCircle, Trash2 } from "lucide-react";
 import { PhotoGallery } from "./PhotoGallery";
+import ContactDialog from "./ContactDialog";
 import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -40,6 +41,7 @@ export const PropertyCard = ({
   user_id
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
+  const [showContactDialog, setShowContactDialog] = useState(false);
   const { deleteProperty } = useProperties();
   const { user } = useAuth();
   
@@ -59,6 +61,15 @@ export const PropertyCard = ({
   
   // Use multiple images if available, fallback to single image
   const images = propertyImages && propertyImages.length > 0 ? propertyImages : [image];
+  
+  // Mask phone number for display
+  const maskPhoneNumber = (phone: string) => {
+    if (!phone || phone.length < 6) return phone;
+    const cleaned = phone.replace(/\D/g, '');
+    if (cleaned.length < 6) return phone;
+    return `${cleaned.slice(0, 3)}-***-**${cleaned.slice(-2)}`;
+  };
+  
   return (
     <Card className="group cursor-pointer transition-smooth hover:shadow-elegant hover:-translate-y-1 overflow-hidden bg-gradient-card">
       <div className="relative overflow-hidden">
@@ -195,25 +206,22 @@ export const PropertyCard = ({
             </div>
           </div>
 
-          {phone && (
-            <div className="flex gap-2 pt-2">
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="flex-1" 
-                onClick={() => window.open(`tel:${phone}`, '_self')}
+          {phone && !isOwner && (
+            <div className="space-y-2 pt-2">
+              <div className="text-sm text-muted-foreground flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                <span>Contact: {maskPhoneNumber(phone)}</span>
+              </div>
+              <Button
+                size="sm"
+                className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowContactDialog(true);
+                }}
               >
-                <Phone className="w-4 h-4 mr-2" />
-                Call
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="flex-1"
-                onClick={() => window.open(`sms:${phone}?body=Hi, I'm interested in your property: ${title}`, '_self')}
-              >
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Message
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Contact via WhatsApp
               </Button>
             </div>
           )}
@@ -239,6 +247,14 @@ export const PropertyCard = ({
         isOpen={isGalleryOpen}
         onClose={() => setIsGalleryOpen(false)}
         title={title}
+      />
+      
+      <ContactDialog
+        isOpen={showContactDialog}
+        onClose={() => setShowContactDialog(false)}
+        propertyId={id}
+        propertyTitle={title}
+        phoneNumber={phone || ''}
       />
     </Card>
   );
