@@ -7,7 +7,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       <HeroSection />
-      <PropertyGrid defaultType="residential" defaultStatus="available" defaultListingType="sale" />
+      <PropertyGrid defaultStatus="available" defaultListingType="sale" />
     </div>
   );
 };
