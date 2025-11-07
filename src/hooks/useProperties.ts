@@ -12,7 +12,7 @@ export interface Property {
   bathrooms?: number;
   area: string;
   type: string;
-  image: string; // Keep for backward compatibility
+  image?: string; // Make optional
   images?: string[]; // Make optional for backward compatibility
   featured: boolean;
   region?: string;
@@ -24,6 +24,7 @@ export interface Property {
   user_id: string;
   created_at: string;
   updated_at: string;
+  uploadedFiles?: File[]; // For file uploads
 }
 
 export const useProperties = () => {
@@ -84,10 +85,43 @@ export const useProperties = () => {
     }
 
     try {
+      let imageUrls: string[] = [];
+      
+      // Upload images to storage if provided
+      if (propertyData.uploadedFiles && propertyData.uploadedFiles.length > 0) {
+        const uploadPromises = propertyData.uploadedFiles.map(async (file, index) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${user.id}/${Date.now()}-${index}.${fileExt}`;
+          
+          const { data, error } = await supabase.storage
+            .from('property-images')
+            .upload(fileName, file, {
+              cacheControl: '3600',
+              upsert: false
+            });
+
+          if (error) throw error;
+
+          // Get public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from('property-images')
+            .getPublicUrl(fileName);
+
+          return publicUrl;
+        });
+
+        imageUrls = await Promise.all(uploadPromises);
+      }
+
+      // Remove uploadedFiles from data and use the uploaded URLs
+      const { uploadedFiles, ...dataWithoutFiles } = propertyData;
+      
       const { data, error } = await supabase
         .from('properties')
         .insert([{
-          ...propertyData,
+          ...dataWithoutFiles,
+          image: imageUrls[0] || '/placeholder.svg',
+          images: imageUrls.length > 0 ? imageUrls : ['/placeholder.svg'],
           user_id: user.id,
           status: 'available'
         }])

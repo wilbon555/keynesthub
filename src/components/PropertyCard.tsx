@@ -18,7 +18,7 @@ interface PropertyCardProps {
   bathrooms?: number;
   area: string;
   type: string;
-  image: string;
+  image?: string;
   images?: string[];
   featured?: boolean;
   phone?: string;
@@ -59,8 +59,10 @@ export const PropertyCard = ({
     }
   };
   
-  // Use multiple images if available, fallback to single image
-  const images = propertyImages && propertyImages.length > 0 ? propertyImages : [image];
+  // Use multiple images if available, fallback to single image or placeholder
+  const images = propertyImages && propertyImages.length > 0 
+    ? propertyImages 
+    : (image ? [image] : ['/placeholder.svg']);
   
   // Mask phone number for display
   const maskPhoneNumber = (phone: string) => {

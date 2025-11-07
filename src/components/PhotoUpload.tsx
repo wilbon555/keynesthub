@@ -103,25 +103,24 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
 
     const currency = getCurrencyInfo(values.country);
     
-    // Create property from form data
+    // Create property from form data (without images first)
     const newProperty = {
       title: values.description.split('.')[0] || "New Property Listing",
       price: `${currency.symbol}${values.priceMin.toLocaleString()} - ${currency.symbol}${values.priceMax.toLocaleString()}`,
       location: `${values.location}, ${values.region}`,
       area: "TBD", // Can be enhanced later
       type: values.propertyType,
-      image: selectedFiles.length > 0 ? URL.createObjectURL(selectedFiles[0]) : "/placeholder.svg",
-      images: selectedFiles.length > 0 ? [URL.createObjectURL(selectedFiles[0])] : ["/placeholder.svg"], // Add images array
       featured: true,
       region: values.region,
       country: values.country,
       phone: values.phone,
       description: values.description,
       status: 'available' as const,
-      listing_type: values.listingType
+      listing_type: values.listingType,
+      uploadedFiles: selectedFiles // Pass files to be uploaded
     };
 
-    // Add to database
+    // Add to database (this will handle storage upload)
     const result = await addProperty(newProperty);
     
     if (result) {
