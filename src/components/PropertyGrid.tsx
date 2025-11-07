@@ -29,6 +29,7 @@ const sampleProperties: Property[] = [
     status: 'available',
     listing_type: 'sale',
     user_id: 'sample',
+    phone: '5551234567',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   },
@@ -47,6 +48,7 @@ const sampleProperties: Property[] = [
     status: 'available',
     listing_type: 'sale',
     user_id: 'sample',
+    phone: '5552345678',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   },
@@ -63,6 +65,7 @@ const sampleProperties: Property[] = [
     status: 'available',
     listing_type: 'sale',
     user_id: 'sample',
+    phone: '5553456789',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   },
@@ -81,6 +84,7 @@ const sampleProperties: Property[] = [
     status: 'available',
     listing_type: 'sale',
     user_id: 'sample',
+    phone: '5554567890',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   },
@@ -97,6 +101,7 @@ const sampleProperties: Property[] = [
     status: 'available',
     listing_type: 'sale',
     user_id: 'sample',
+    phone: '5555678901',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   },
@@ -115,6 +120,7 @@ const sampleProperties: Property[] = [
     status: 'available',
     listing_type: 'sale',
     user_id: 'sample',
+    phone: '5556789012',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
   }
