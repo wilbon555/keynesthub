@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Bed, Bath, Square, MessageCircle, Trash2 } from "lucide-react";
+import { MapPin, Bed, Bath, Square, MessageCircle, Trash2, Edit } from "lucide-react";
 import { PhotoGallery } from "./PhotoGallery";
 import ContactDialog from "./ContactDialog";
-import { useProperties } from "@/hooks/useProperties";
+import { EditPropertyDialog } from "./EditPropertyDialog";
+import { useProperties, Property } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
@@ -42,14 +43,15 @@ export const PropertyCard = ({
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
-  const { deleteProperty } = useProperties();
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const { deleteProperty, updateProperty } = useProperties();
   const { user } = useAuth();
   
   // Check if current user is the owner of this property
   const isOwner = user && user_id && user.id === user_id;
   
   const handleRemoveProperty = async (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent opening gallery
+    e.stopPropagation();
     
     if (window.confirm('Are you sure you want to remove this property? This action cannot be undone.')) {
       const success = await deleteProperty(id);
@@ -57,6 +59,30 @@ export const PropertyCard = ({
         toast.success('Property removed successfully');
       }
     }
+  };
+
+  const handleEditProperty = async (updatedData: Partial<Property> & { uploadedFiles?: File[] }) => {
+    await updateProperty(id, updatedData);
+  };
+
+  const currentProperty: Property = {
+    id,
+    title,
+    price,
+    location,
+    bedrooms,
+    bathrooms,
+    area,
+    type,
+    image,
+    images: propertyImages,
+    featured: featured || false,
+    phone,
+    user_id: user_id || '',
+    status: 'available',
+    listing_type: 'sale',
+    created_at: '',
+    updated_at: '',
   };
   
   // Use multiple images if available, fallback to single image or placeholder
@@ -229,7 +255,19 @@ export const PropertyCard = ({
           )}
 
           {isOwner && (
-            <div className="pt-2">
+            <div className="pt-2 space-y-2">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="w-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowEditDialog(true);
+                }}
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Property
+              </Button>
               <Button 
                 size="sm" 
                 variant="destructive" 
@@ -257,6 +295,13 @@ export const PropertyCard = ({
         propertyId={id}
         propertyTitle={title}
         phoneNumber={phone || ''}
+      />
+      
+      <EditPropertyDialog
+        isOpen={showEditDialog}
+        onClose={() => setShowEditDialog(false)}
+        property={currentProperty}
+        onSave={handleEditProperty}
       />
     </Card>
   );

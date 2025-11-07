@@ -168,6 +168,69 @@ export const useProperties = () => {
     }
   };
 
+  // Update property
+  const updateProperty = async (propertyId: string, propertyData: Partial<Omit<Property, 'id' | 'user_id' | 'created_at' | 'updated_at'>>) => {
+    if (!user) {
+      toast.error('You must be logged in to update properties');
+      return false;
+    }
+
+    try {
+      let imageUrls: string[] | undefined;
+      
+      // Upload new images to storage if provided
+      if (propertyData.uploadedFiles && propertyData.uploadedFiles.length > 0) {
+        const uploadPromises = propertyData.uploadedFiles.map(async (file, index) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${user.id}/${Date.now()}-${index}.${fileExt}`;
+          
+          const { data, error } = await supabase.storage
+            .from('property-images')
+            .upload(fileName, file, {
+              cacheControl: '3600',
+              upsert: false
+            });
+
+          if (error) throw error;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('property-images')
+            .getPublicUrl(fileName);
+
+          return publicUrl;
+        });
+
+        imageUrls = await Promise.all(uploadPromises);
+      }
+
+      const { uploadedFiles, ...dataWithoutFiles } = propertyData;
+      
+      const updateData: any = { ...dataWithoutFiles };
+      
+      // Only update images if new ones were uploaded
+      if (imageUrls && imageUrls.length > 0) {
+        updateData.image = imageUrls[0];
+        updateData.images = imageUrls;
+      }
+
+      const { error } = await supabase
+        .from('properties')
+        .update(updateData)
+        .eq('id', propertyId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      
+      await fetchProperties();
+      toast.success('Property updated successfully!');
+      return true;
+    } catch (error) {
+      console.error('Error updating property:', error);
+      toast.error('Failed to update property');
+      return false;
+    }
+  };
+
   // Delete property
   const deleteProperty = async (propertyId: string) => {
     if (!user) {
@@ -184,7 +247,6 @@ export const useProperties = () => {
 
       if (error) throw error;
       
-      // Refresh properties list
       await fetchProperties();
       toast.success('Property deleted successfully');
       return true;
@@ -203,6 +265,7 @@ export const useProperties = () => {
     properties,
     loading,
     addProperty,
+    updateProperty,
     updatePropertyStatus,
     deleteProperty,
     fetchProperties,
