@@ -6,6 +6,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { z } from 'zod';
+
+const contactSchema = z.object({
+  name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
+  email: z.string().trim().email('Invalid email address').max(255, 'Email must be less than 255 characters'),
+  phone: z.string().trim().max(20, 'Phone number must be less than 20 characters').optional().or(z.literal('')),
+  message: z.string().trim().max(1000, 'Message must be less than 1000 characters').optional().or(z.literal(''))
+});
 
 interface ContactDialogProps {
   isOpen: boolean;
@@ -31,13 +39,16 @@ const ContactDialog = ({ isOpen, onClose, propertyId, propertyTitle, phoneNumber
     setIsSubmitting(true);
 
     try {
+      // Validate input data
+      const validated = contactSchema.parse(formData);
+
       // Log the contact request
       const { error } = await supabase.from('contact_requests').insert({
         property_id: propertyId,
-        requester_name: formData.name,
-        requester_email: formData.email,
-        requester_phone: formData.phone,
-        message: formData.message
+        requester_name: validated.name,
+        requester_email: validated.email,
+        requester_phone: validated.phone || null,
+        message: validated.message || null
       });
 
       if (error) throw error;
@@ -48,12 +59,20 @@ const ContactDialog = ({ isOpen, onClose, propertyId, propertyTitle, phoneNumber
         description: "Click the WhatsApp button below to continue the conversation"
       });
     } catch (error) {
-      console.error('Error submitting contact request:', error);
-      toast({
-        title: "Error",
-        description: "Failed to submit contact request. Please try again.",
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Validation Error",
+          description: error.errors[0].message,
+          variant: "destructive"
+        });
+      } else {
+        console.error('Error submitting contact request:', error);
+        toast({
+          title: "Error",
+          description: "Failed to submit contact request. Please try again.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
