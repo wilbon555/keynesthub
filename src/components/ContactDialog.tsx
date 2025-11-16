@@ -65,6 +65,13 @@ const ContactDialog = ({ isOpen, onClose, propertyId, propertyTitle, phoneNumber
           description: error.errors[0].message,
           variant: "destructive"
         });
+      } else if (error && typeof error === 'object' && 'message' in error && 
+                 typeof error.message === 'string' && error.message.includes('Rate limit exceeded')) {
+        toast({
+          title: "Too Many Requests",
+          description: "You've reached the maximum of 5 contact requests per hour. Please try again later.",
+          variant: "destructive"
+        });
       } else {
         console.error('Error submitting contact request:', error);
         toast({
