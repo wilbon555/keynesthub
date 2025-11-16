@@ -33,6 +33,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       location: z.string().min(2, "Location is required"),
       propertyType: z.string().min(1, "Property type is required"),
       listingType: z.enum(['sale', 'rent'], { required_error: "Please select listing type" }),
+      bedrooms: z.coerce.number().min(0, "Bedrooms must be 0 or more").optional(),
+      bathrooms: z.coerce.number().min(0, "Bathrooms must be 0 or more").optional(),
+      area: z.string().min(1, "Area/Square footage is required"),
       priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       phone: z
@@ -56,6 +59,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       location: "",
       propertyType: "",
       listingType: "sale",
+      bedrooms: undefined,
+      bathrooms: undefined,
+      area: "",
       priceMin: 1,
       priceMax: 1,
       phone: "",
@@ -375,6 +381,86 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                         )}
                       />
                     </div>
+
+                    {/* Bedrooms, Bathrooms, Area fields for applicable property types */}
+                    {["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType")) && (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="bedrooms"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Bedrooms</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min={0} 
+                                  placeholder="e.g., 3" 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="bathrooms"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Bathrooms</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min={0} 
+                                  placeholder="e.g., 2" 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="area"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Area (sq ft)</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  placeholder="e.g., 2500 sq ft" 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
+
+                    {/* Area field for other property types */}
+                    {!["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType")) && (
+                      <FormField
+                        control={form.control}
+                        name="area"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Area/Size</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="e.g., 1 acre, 5000 sq ft" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <FormField
