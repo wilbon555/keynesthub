@@ -101,34 +101,46 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       return;
     }
 
-    const currency = getCurrencyInfo(values.country);
-    
-    // Create property from form data (without images first)
-    const newProperty = {
-      title: values.description.split('.')[0] || "New Property Listing",
-      price: `${currency.symbol}${values.priceMin.toLocaleString()} - ${currency.symbol}${values.priceMax.toLocaleString()}`,
-      location: `${values.location}, ${values.region}`,
-      area: "TBD", // Can be enhanced later
-      type: values.propertyType,
-      featured: true,
-      region: values.region,
-      country: values.country,
-      phone: values.phone,
-      description: values.description,
-      status: 'available' as const,
-      listing_type: values.listingType,
-      uploadedFiles: selectedFiles // Pass files to be uploaded
-    };
+    console.log('Submitting property form with values:', { ...values, uploadedFiles: selectedFiles.length });
 
-    // Add to database (this will handle storage upload)
-    const result = await addProperty(newProperty);
-    
-    if (result) {
-      // Reset and close on success
-      onOpenChange(false);
-      setSelectedFiles([]);
-      setStep("select");
-      form.reset();
+    try {
+      const currency = getCurrencyInfo(values.country);
+      
+      // Create property from form data (without images first)
+      const newProperty = {
+        title: values.description.split('.')[0] || "New Property Listing",
+        price: `${currency.symbol}${values.priceMin.toLocaleString()} - ${currency.symbol}${values.priceMax.toLocaleString()}`,
+        location: `${values.location}, ${values.region}`,
+        area: "TBD", // Can be enhanced later
+        type: values.propertyType,
+        featured: true,
+        region: values.region,
+        country: values.country,
+        phone: values.phone,
+        description: values.description,
+        status: 'available' as const,
+        listing_type: values.listingType,
+        uploadedFiles: selectedFiles // Pass files to be uploaded
+      };
+
+      console.log('Calling addProperty with data:', newProperty);
+
+      // Add to database (this will handle storage upload)
+      const result = await addProperty(newProperty);
+      
+      if (result) {
+        console.log('Property added successfully, resetting form');
+        // Reset and close on success
+        onOpenChange(false);
+        setSelectedFiles([]);
+        setStep("select");
+        form.reset();
+      } else {
+        console.error('addProperty returned null - property was not created');
+      }
+    } catch (error) {
+      console.error('Unexpected error in onSubmit:', error);
+      toast.error('An unexpected error occurred. Please try again.');
     }
   };
 
