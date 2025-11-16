@@ -84,15 +84,20 @@ export const useProperties = () => {
       return null;
     }
 
+    console.log('Starting property upload for user:', user.id);
+
     try {
       let imageUrls: string[] = [];
       
       // Upload images to storage if provided
       if (propertyData.uploadedFiles && propertyData.uploadedFiles.length > 0) {
+        console.log(`Uploading ${propertyData.uploadedFiles.length} files to storage...`);
+        
         const uploadPromises = propertyData.uploadedFiles.map(async (file, index) => {
           const fileExt = file.name.split('.').pop();
           const fileName = `${user.id}/${Date.now()}-${index}.${fileExt}`;
           
+          console.log(`Uploading file: ${fileName}`);
           const { data, error } = await supabase.storage
             .from('property-images')
             .upload(fileName, file, {
@@ -100,22 +105,28 @@ export const useProperties = () => {
               upsert: false
             });
 
-          if (error) throw error;
+          if (error) {
+            console.error(`Storage upload error for ${fileName}:`, error);
+            throw error;
+          }
 
           // Get public URL
           const { data: { publicUrl } } = supabase.storage
             .from('property-images')
             .getPublicUrl(fileName);
 
+          console.log(`File uploaded successfully: ${publicUrl}`);
           return publicUrl;
         });
 
         imageUrls = await Promise.all(uploadPromises);
+        console.log('All files uploaded successfully:', imageUrls);
       }
 
       // Remove uploadedFiles from data and use the uploaded URLs
       const { uploadedFiles, ...dataWithoutFiles } = propertyData;
       
+      console.log('Inserting property into database...');
       const { data, error } = await supabase
         .from('properties')
         .insert([{
@@ -128,15 +139,31 @@ export const useProperties = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database insertion error:', error);
+        throw error;
+      }
+      
+      console.log('Property added successfully:', data);
       
       // Refresh properties list
       await fetchProperties();
       toast.success('Property listed successfully!');
       return data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding property:', error);
-      toast.error('Failed to add property');
+      
+      // Provide more detailed error messages
+      if (error?.message?.includes('storage')) {
+        toast.error('Failed to upload images. Please check file size and format.');
+      } else if (error?.message?.includes('row-level security')) {
+        toast.error('Authentication error. Please log out and log in again.');
+      } else if (error?.message) {
+        toast.error(`Failed to add property: ${error.message}`);
+      } else {
+        toast.error('Failed to add property. Please try again.');
+      }
+      
       return null;
     }
   };
