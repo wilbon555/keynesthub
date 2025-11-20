@@ -108,6 +108,8 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
     }
 
     console.log('Submitting property form with values:', { ...values, uploadedFiles: selectedFiles.length });
+    console.log('Current user:', user?.id);
+    console.log('User auth state:', user);
 
     try {
       const currency = getCurrencyInfo(values.country);
@@ -117,7 +119,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
         title: values.description.split('.')[0] || "New Property Listing",
         price: `${currency.symbol}${values.priceMin.toLocaleString()} - ${currency.symbol}${values.priceMax.toLocaleString()}`,
         location: `${values.location}, ${values.region}`,
-        area: "TBD", // Can be enhanced later
+        area: values.area || "TBD",
+        bedrooms: values.bedrooms,
+        bathrooms: values.bathrooms,
         type: values.propertyType,
         featured: true,
         region: values.region,
@@ -143,6 +147,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
         form.reset();
       } else {
         console.error('addProperty returned null - property was not created');
+        toast.error('Failed to upload property. Please check console for details.');
       }
     } catch (error) {
       console.error('Unexpected error in onSubmit:', error);
