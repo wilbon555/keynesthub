@@ -101,6 +101,14 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
     return { symbol: "$", code: "USD" };
   };
 
+  const handleFormError = (errors: any) => {
+    console.error('Form validation errors:', errors);
+    const errorMessages = Object.entries(errors).map(([field, error]: [string, any]) => 
+      `${field}: ${error?.message || 'Invalid'}`
+    ).join(', ');
+    toast.error(`Please fix: ${errorMessages}`);
+  };
+
   const onSubmit = async (values: DetailsForm) => {
     if (!user) {
       toast.error("Please log in to list a property");
@@ -293,7 +301,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
               <div className="space-y-4">
                 <h3 className="font-medium">Property Details</h3>
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <form onSubmit={form.handleSubmit(onSubmit, handleFormError)} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
