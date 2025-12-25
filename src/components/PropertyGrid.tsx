@@ -2,8 +2,9 @@ import { PropertyCard } from "./PropertyCard";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { useProperties, Property } from "@/hooks/useProperties";
+import PropertyMap from "./PropertyMap";
 
-import { SlidersHorizontal, Grid, List } from "lucide-react";
+import { SlidersHorizontal, Grid, List, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import property1 from "@/assets/property-1.jpg";
@@ -133,7 +134,7 @@ interface PropertyGridProps {
 }
 
 export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }: PropertyGridProps = {}) => {
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
   const [selectedType, setSelectedType] = useState<string>(defaultType || "all");
   const [searchParams] = useSearchParams();
   const { properties, loading } = useProperties();
@@ -247,6 +248,14 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
               >
                 <List className="w-4 h-4" />
               </Button>
+              <Button
+                variant={viewMode === "map" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setViewMode("map")}
+                className="rounded-none"
+              >
+                <MapPin className="w-4 h-4" />
+              </Button>
             </div>
           </div>
         </div>
@@ -268,6 +277,8 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
             <div className="text-center text-muted-foreground py-12">
               <p>No properties found matching your criteria.</p>
             </div>
+          ) : viewMode === "map" ? (
+            <PropertyMap properties={filteredProperties} />
           ) : (
             <>
               {/* Property Grid */}
