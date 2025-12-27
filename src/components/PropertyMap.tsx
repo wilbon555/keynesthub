@@ -1,7 +1,7 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { GoogleMap, useJsApiLoader, OverlayView, InfoWindow } from '@react-google-maps/api';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Home } from 'lucide-react';
 
 interface Property {
   id: string;
@@ -31,6 +31,40 @@ const containerStyle = {
 const defaultCenter = {
   lat: 20,
   lng: 0
+};
+
+// Custom marker component
+const CustomMarker: React.FC<{
+  position: google.maps.LatLngLiteral;
+  onClick: () => void;
+  isSelected: boolean;
+}> = ({ position, onClick, isSelected }) => {
+  return (
+    <OverlayView
+      position={position}
+      mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+      getPixelPositionOffset={(width, height) => ({
+        x: -(width / 2),
+        y: -height,
+      })}
+    >
+      <button
+        onClick={onClick}
+        className={`
+          flex items-center justify-center w-10 h-10 rounded-full 
+          shadow-lg cursor-pointer transition-all duration-200 
+          hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2
+          ${isSelected 
+            ? 'bg-primary scale-110 ring-2 ring-primary/50' 
+            : 'bg-primary hover:bg-primary/90'
+          }
+        `}
+        aria-label="Property location"
+      >
+        <Home className="w-5 h-5 text-primary-foreground" />
+      </button>
+    </OverlayView>
+  );
 };
 
 // Inner component that only renders after API key is available
@@ -133,10 +167,11 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
           }}
         >
           {markers.map((marker) => (
-            <Marker
+            <CustomMarker
               key={marker.property.id}
               position={marker.position}
               onClick={() => setSelectedMarker(marker)}
+              isSelected={selectedMarker?.property.id === marker.property.id}
             />
           ))}
 
