@@ -1,7 +1,9 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { GoogleMap, useJsApiLoader, OverlayView, InfoWindow } from '@react-google-maps/api';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import { GoogleMap, useJsApiLoader, OverlayView, InfoWindow, Autocomplete } from '@react-google-maps/api';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Home } from 'lucide-react';
+import { Loader2, Home, Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 interface Property {
   id: string;
@@ -32,6 +34,8 @@ const defaultCenter = {
   lat: 20,
   lng: 0
 };
+
+const libraries: ("places")[] = ["places"];
 
 // Custom marker component
 const CustomMarker: React.FC<{
@@ -67,6 +71,79 @@ const CustomMarker: React.FC<{
   );
 };
 
+// Search box component
+const MapSearchBox: React.FC<{
+  onPlaceSelected: (location: google.maps.LatLngLiteral, zoom: number) => void;
+}> = ({ onPlaceSelected }) => {
+  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const onLoad = useCallback((autocompleteInstance: google.maps.places.Autocomplete) => {
+    setAutocomplete(autocompleteInstance);
+  }, []);
+
+  const onPlaceChanged = useCallback(() => {
+    if (autocomplete) {
+      const place = autocomplete.getPlace();
+      if (place.geometry?.location) {
+        const location = {
+          lat: place.geometry.location.lat(),
+          lng: place.geometry.location.lng()
+        };
+        
+        // Determine zoom level based on place type
+        let zoom = 12;
+        if (place.types?.includes('country')) {
+          zoom = 5;
+        } else if (place.types?.includes('administrative_area_level_1')) {
+          zoom = 7;
+        } else if (place.types?.includes('locality')) {
+          zoom = 12;
+        } else if (place.types?.includes('neighborhood') || place.types?.includes('sublocality')) {
+          zoom = 14;
+        } else if (place.types?.includes('street_address') || place.types?.includes('premise')) {
+          zoom = 16;
+        }
+        
+        onPlaceSelected(location, zoom);
+      }
+    }
+  }, [autocomplete, onPlaceSelected]);
+
+  const clearSearch = useCallback(() => {
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+  }, []);
+
+  return (
+    <div className="absolute top-4 left-4 z-20 w-72">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+        <Autocomplete
+          onLoad={onLoad}
+          onPlaceChanged={onPlaceChanged}
+        >
+          <Input
+            ref={inputRef}
+            type="text"
+            placeholder="Search locations..."
+            className="pl-9 pr-9 bg-background/95 backdrop-blur-sm shadow-lg border-border/50"
+          />
+        </Autocomplete>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+          onClick={clearSearch}
+        >
+          <X className="w-3 h-3" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 // Inner component that only renders after API key is available
 const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = ({ apiKey, properties }) => {
   const [markers, setMarkers] = useState<MarkerData[]>([]);
@@ -77,6 +154,7 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
     googleMapsApiKey: apiKey,
+    libraries,
   });
 
   // Geocode properties when map is loaded
@@ -139,6 +217,13 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
     setMap(null);
   }, []);
 
+  const handlePlaceSelected = useCallback((location: google.maps.LatLngLiteral, zoom: number) => {
+    if (map) {
+      map.panTo(location);
+      map.setZoom(zoom);
+    }
+  }, [map]);
+
   if (loadError) {
     return (
       <div className="w-full h-[500px] bg-muted rounded-lg flex items-center justify-center">
@@ -155,50 +240,53 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
         </div>
       )}
       {isLoaded && (
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={defaultCenter}
-          zoom={2}
-          onLoad={onLoad}
-          onUnmount={onUnmount}
-          options={{
-            streetViewControl: false,
-            mapTypeControl: false,
-          }}
-        >
-          {markers.map((marker) => (
-            <CustomMarker
-              key={marker.property.id}
-              position={marker.position}
-              onClick={() => setSelectedMarker(marker)}
-              isSelected={selectedMarker?.property.id === marker.property.id}
-            />
-          ))}
+        <>
+          <MapSearchBox onPlaceSelected={handlePlaceSelected} />
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={defaultCenter}
+            zoom={2}
+            onLoad={onLoad}
+            onUnmount={onUnmount}
+            options={{
+              streetViewControl: false,
+              mapTypeControl: false,
+            }}
+          >
+            {markers.map((marker) => (
+              <CustomMarker
+                key={marker.property.id}
+                position={marker.position}
+                onClick={() => setSelectedMarker(marker)}
+                isSelected={selectedMarker?.property.id === marker.property.id}
+              />
+            ))}
 
-          {selectedMarker && (
-            <InfoWindow
-              position={selectedMarker.position}
-              onCloseClick={() => setSelectedMarker(null)}
-            >
-              <div className="p-2 max-w-[200px]">
-                {selectedMarker.property.image && (
-                  <img 
-                    src={selectedMarker.property.image} 
-                    alt={selectedMarker.property.title} 
-                    className="w-full h-24 object-cover rounded mb-2" 
-                  />
-                )}
-                <h3 className="font-semibold text-sm">{selectedMarker.property.title}</h3>
-                <p className="font-bold text-sm text-green-600">{selectedMarker.property.price}</p>
-                <p className="text-xs text-gray-500">{selectedMarker.property.location}</p>
-                <div className="flex gap-2 text-xs text-gray-500 mt-1">
-                  {selectedMarker.property.bedrooms && <span>{selectedMarker.property.bedrooms} beds</span>}
-                  {selectedMarker.property.bathrooms && <span>{selectedMarker.property.bathrooms} baths</span>}
+            {selectedMarker && (
+              <InfoWindow
+                position={selectedMarker.position}
+                onCloseClick={() => setSelectedMarker(null)}
+              >
+                <div className="p-2 max-w-[200px]">
+                  {selectedMarker.property.image && (
+                    <img 
+                      src={selectedMarker.property.image} 
+                      alt={selectedMarker.property.title} 
+                      className="w-full h-24 object-cover rounded mb-2" 
+                    />
+                  )}
+                  <h3 className="font-semibold text-sm">{selectedMarker.property.title}</h3>
+                  <p className="font-bold text-sm text-green-600">{selectedMarker.property.price}</p>
+                  <p className="text-xs text-gray-500">{selectedMarker.property.location}</p>
+                  <div className="flex gap-2 text-xs text-gray-500 mt-1">
+                    {selectedMarker.property.bedrooms && <span>{selectedMarker.property.bedrooms} beds</span>}
+                    {selectedMarker.property.bathrooms && <span>{selectedMarker.property.bathrooms} baths</span>}
+                  </div>
                 </div>
-              </div>
-            </InfoWindow>
-          )}
-        </GoogleMap>
+              </InfoWindow>
+            )}
+          </GoogleMap>
+        </>
       )}
     </div>
   );
