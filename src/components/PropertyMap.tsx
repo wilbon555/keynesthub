@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import React, { useState, useCallback, useEffect } from 'react';
+import { GoogleMap, useJsApiLoader, Marker, InfoWindow } from '@react-google-maps/api';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2 } from 'lucide-react';
 
@@ -19,151 +18,184 @@ interface PropertyMapProps {
   properties: Property[];
 }
 
+interface MarkerData {
+  property: Property;
+  position: google.maps.LatLngLiteral;
+}
+
+const containerStyle = {
+  width: '100%',
+  height: '500px'
+};
+
+const defaultCenter = {
+  lat: 20,
+  lng: 0
+};
+
 const PropertyMap: React.FC<PropertyMapProps> = ({ properties }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
+  const [apiKey, setApiKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [markers, setMarkers] = useState<MarkerData[]>([]);
+  const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
 
+  // Fetch API key from edge function
   useEffect(() => {
-    const initializeMap = async () => {
-      if (!mapContainer.current) return;
-
+    const fetchApiKey = async () => {
       try {
-        // Fetch the Mapbox token from edge function
-        const { data, error: fetchError } = await supabase.functions.invoke('get-mapbox-token');
+        const { data, error: fetchError } = await supabase.functions.invoke('get-google-maps-key');
         
-        if (fetchError || !data?.token) {
+        if (fetchError || !data?.apiKey) {
           throw new Error('Failed to load map configuration');
         }
-
-        mapboxgl.accessToken = data.token;
-
-        map.current = new mapboxgl.Map({
-          container: mapContainer.current,
-          style: 'mapbox://styles/mapbox/streets-v12',
-          zoom: 2,
-          center: [0, 20],
-        });
-
-        map.current.addControl(
-          new mapboxgl.NavigationControl({
-            visualizePitch: true,
-          }),
-          'top-right'
-        );
-
-        map.current.on('load', () => {
-          setLoading(false);
-          addPropertyMarkers();
-        });
-
+        
+        setApiKey(data.apiKey);
       } catch (err) {
-        console.error('Map initialization error:', err);
+        console.error('Failed to fetch Google Maps API key:', err);
         setError(err instanceof Error ? err.message : 'Failed to load map');
         setLoading(false);
       }
     };
 
-    const addPropertyMarkers = async () => {
-      if (!map.current) return;
+    fetchApiKey();
+  }, []);
 
-      // Geocode and add markers for each property
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: 'google-map-script',
+    googleMapsApiKey: apiKey || '',
+  });
+
+  // Geocode properties when map is loaded
+  useEffect(() => {
+    if (!isLoaded || !apiKey || !map) return;
+
+    const geocodeProperties = async () => {
+      const geocoder = new google.maps.Geocoder();
+      const newMarkers: MarkerData[] = [];
+      const bounds = new google.maps.LatLngBounds();
+
       for (const property of properties) {
         try {
-          const response = await fetch(
-            `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(property.location)}.json?access_token=${mapboxgl.accessToken}`
-          );
-          const geoData = await response.json();
+          const result = await new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
+            geocoder.geocode({ address: property.location }, (results, status) => {
+              if (status === 'OK' && results) {
+                resolve(results);
+              } else {
+                reject(new Error(`Geocoding failed: ${status}`));
+              }
+            });
+          });
 
-          if (geoData.features && geoData.features.length > 0) {
-            const [lng, lat] = geoData.features[0].center;
-
-            // Create custom marker element
-            const markerEl = document.createElement('div');
-            markerEl.className = 'property-marker';
-            markerEl.innerHTML = `
-              <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:scale-110 transition-transform">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                  <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                </svg>
-              </div>
-            `;
-
-            // Create popup
-            const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
-              <div class="p-2 max-w-[200px]">
-                ${property.image ? `<img src="${property.image}" alt="${property.title}" class="w-full h-24 object-cover rounded mb-2" />` : ''}
-                <h3 class="font-semibold text-sm text-foreground">${property.title}</h3>
-                <p class="text-primary font-bold text-sm">${property.price}</p>
-                <p class="text-xs text-muted-foreground">${property.location}</p>
-                <div class="flex gap-2 text-xs text-muted-foreground mt-1">
-                  ${property.bedrooms ? `<span>${property.bedrooms} beds</span>` : ''}
-                  ${property.bathrooms ? `<span>${property.bathrooms} baths</span>` : ''}
-                </div>
-              </div>
-            `);
-
-            new mapboxgl.Marker(markerEl)
-              .setLngLat([lng, lat])
-              .setPopup(popup)
-              .addTo(map.current!);
+          if (result[0]) {
+            const position = {
+              lat: result[0].geometry.location.lat(),
+              lng: result[0].geometry.location.lng()
+            };
+            newMarkers.push({ property, position });
+            bounds.extend(position);
           }
         } catch (err) {
           console.error(`Failed to geocode: ${property.location}`, err);
         }
       }
 
-      // Fit map to show all markers if there are properties
-      if (properties.length > 0) {
-        const bounds = new mapboxgl.LngLatBounds();
-        let hasValidBounds = false;
-
-        for (const property of properties) {
-          try {
-            const response = await fetch(
-              `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(property.location)}.json?access_token=${mapboxgl.accessToken}`
-            );
-            const geoData = await response.json();
-            if (geoData.features && geoData.features.length > 0) {
-              bounds.extend(geoData.features[0].center);
-              hasValidBounds = true;
-            }
-          } catch (err) {
-            // Skip properties that can't be geocoded
+      setMarkers(newMarkers);
+      
+      if (newMarkers.length > 0) {
+        map.fitBounds(bounds, 50);
+        
+        // Limit max zoom
+        const listener = google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
+          if (map.getZoom()! > 12) {
+            map.setZoom(12);
           }
-        }
-
-        if (hasValidBounds) {
-          map.current.fitBounds(bounds, { padding: 50, maxZoom: 12 });
-        }
+        });
       }
+      
+      setLoading(false);
     };
 
-    initializeMap();
+    geocodeProperties();
+  }, [isLoaded, apiKey, properties, map]);
 
-    return () => {
-      map.current?.remove();
-    };
-  }, [properties]);
+  const onLoad = useCallback((map: google.maps.Map) => {
+    setMap(map);
+  }, []);
 
-  if (error) {
+  const onUnmount = useCallback(() => {
+    setMap(null);
+  }, []);
+
+  if (loadError || error) {
     return (
       <div className="w-full h-[500px] bg-muted rounded-lg flex items-center justify-center">
-        <p className="text-muted-foreground">{error}</p>
+        <p className="text-muted-foreground">{error || 'Failed to load map'}</p>
+      </div>
+    );
+  }
+
+  if (!apiKey) {
+    return (
+      <div className="w-full h-[500px] bg-muted rounded-lg flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
     <div className="relative w-full h-[500px] rounded-lg overflow-hidden shadow-lg">
-      {loading && (
+      {(loading || !isLoaded) && (
         <div className="absolute inset-0 bg-muted flex items-center justify-center z-10">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       )}
-      <div ref={mapContainer} className="absolute inset-0" />
+      {isLoaded && (
+        <GoogleMap
+          mapContainerStyle={containerStyle}
+          center={defaultCenter}
+          zoom={2}
+          onLoad={onLoad}
+          onUnmount={onUnmount}
+          options={{
+            streetViewControl: false,
+            mapTypeControl: false,
+          }}
+        >
+          {markers.map((marker) => (
+            <Marker
+              key={marker.property.id}
+              position={marker.position}
+              onClick={() => setSelectedMarker(marker)}
+            />
+          ))}
+
+          {selectedMarker && (
+            <InfoWindow
+              position={selectedMarker.position}
+              onCloseClick={() => setSelectedMarker(null)}
+            >
+              <div className="p-2 max-w-[200px]">
+                {selectedMarker.property.image && (
+                  <img 
+                    src={selectedMarker.property.image} 
+                    alt={selectedMarker.property.title} 
+                    className="w-full h-24 object-cover rounded mb-2" 
+                  />
+                )}
+                <h3 className="font-semibold text-sm">{selectedMarker.property.title}</h3>
+                <p className="font-bold text-sm text-green-600">{selectedMarker.property.price}</p>
+                <p className="text-xs text-gray-500">{selectedMarker.property.location}</p>
+                <div className="flex gap-2 text-xs text-gray-500 mt-1">
+                  {selectedMarker.property.bedrooms && <span>{selectedMarker.property.bedrooms} beds</span>}
+                  {selectedMarker.property.bathrooms && <span>{selectedMarker.property.bathrooms} baths</span>}
+                </div>
+              </div>
+            </InfoWindow>
+          )}
+        </GoogleMap>
+      )}
     </div>
   );
 };
