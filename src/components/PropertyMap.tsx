@@ -1,10 +1,37 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { GoogleMap, useJsApiLoader, OverlayView, InfoWindow, Autocomplete } from '@react-google-maps/api';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Home, Search, X, Locate } from 'lucide-react';
+import { Loader2, Home, Search, X, Locate, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+// Calculate distance between two coordinates using Haversine formula (returns km)
+const calculateDistance = (
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+): number => {
+  const R = 6371; // Earth's radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
 interface Property {
   id: string;
   title: string;
@@ -42,7 +69,8 @@ const CustomMarker: React.FC<{
   position: google.maps.LatLngLiteral;
   onClick: () => void;
   isSelected: boolean;
-}> = ({ position, onClick, isSelected }) => {
+  isNearby?: boolean;
+}> = ({ position, onClick, isSelected, isNearby }) => {
   return (
     <OverlayView
       position={position}
@@ -60,6 +88,8 @@ const CustomMarker: React.FC<{
           hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2
           ${isSelected 
             ? 'bg-primary scale-110 ring-2 ring-primary/50' 
+            : isNearby
+            ? 'bg-green-500 hover:bg-green-600 ring-2 ring-green-300'
             : 'bg-primary hover:bg-primary/90'
           }
         `}
@@ -241,13 +271,92 @@ const LocateMeButton: React.FC<{
   );
 };
 
+// Radius options in km
+const RADIUS_OPTIONS = [
+  { value: '5', label: '5 km' },
+  { value: '10', label: '10 km' },
+  { value: '25', label: '25 km' },
+  { value: '50', label: '50 km' },
+  { value: '100', label: '100 km' },
+];
+
+// Nearby properties control component
+const NearbyPropertiesControl: React.FC<{
+  userLocation: google.maps.LatLngLiteral | null;
+  showNearby: boolean;
+  radius: number;
+  nearbyCount: number;
+  onToggleNearby: () => void;
+  onRadiusChange: (radius: number) => void;
+}> = ({ userLocation, showNearby, radius, nearbyCount, onToggleNearby, onRadiusChange }) => {
+  if (!userLocation) return null;
+
+  return (
+    <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
+      <Button
+        variant={showNearby ? "default" : "outline"}
+        size="sm"
+        className="bg-background/95 backdrop-blur-sm shadow-lg border-border/50"
+        onClick={onToggleNearby}
+      >
+        <MapPin className="w-4 h-4 mr-2" />
+        {showNearby ? `Nearby (${nearbyCount})` : 'Show Nearby'}
+      </Button>
+      {showNearby && (
+        <Select
+          value={radius.toString()}
+          onValueChange={(value) => onRadiusChange(parseInt(value))}
+        >
+          <SelectTrigger className="w-24 bg-background/95 backdrop-blur-sm shadow-lg border-border/50">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {RADIUS_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+    </div>
+  );
+};
+
 // Inner component that only renders after API key is available
 const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = ({ apiKey, properties }) => {
   const [markers, setMarkers] = useState<MarkerData[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral | null>(null);
+  const [showNearby, setShowNearby] = useState(false);
+  const [radius, setRadius] = useState(25); // Default 25km
   const [geocoding, setGeocoding] = useState(true);
+
+  // Calculate nearby properties
+  const nearbyMarkerIds = React.useMemo(() => {
+    if (!userLocation || !showNearby) return new Set<string>();
+    
+    const nearby = new Set<string>();
+    markers.forEach((marker) => {
+      const distance = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        marker.position.lat,
+        marker.position.lng
+      );
+      if (distance <= radius) {
+        nearby.add(marker.property.id);
+      }
+    });
+    return nearby;
+  }, [userLocation, showNearby, radius, markers]);
+
+  // Filter markers to show only nearby when filter is active
+  const visibleMarkers = React.useMemo(() => {
+    if (!showNearby || !userLocation) return markers;
+    return markers.filter((marker) => nearbyMarkerIds.has(marker.property.id));
+  }, [markers, showNearby, userLocation, nearbyMarkerIds]);
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
@@ -324,11 +433,20 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
 
   const handleLocate = useCallback((location: google.maps.LatLngLiteral) => {
     setUserLocation(location);
+    setShowNearby(true); // Auto-enable nearby filter when locating
     if (map) {
       map.panTo(location);
       map.setZoom(14);
     }
   }, [map]);
+
+  const handleToggleNearby = useCallback(() => {
+    setShowNearby((prev) => !prev);
+  }, []);
+
+  const handleRadiusChange = useCallback((newRadius: number) => {
+    setRadius(newRadius);
+  }, []);
 
   if (loadError) {
     return (
@@ -360,18 +478,28 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
               mapTypeControl: false,
             }}
           >
-            {markers.map((marker) => (
+            {visibleMarkers.map((marker) => (
               <CustomMarker
                 key={marker.property.id}
                 position={marker.position}
                 onClick={() => setSelectedMarker(marker)}
                 isSelected={selectedMarker?.property.id === marker.property.id}
+                isNearby={nearbyMarkerIds.has(marker.property.id)}
               />
             ))}
 
             {userLocation && (
               <UserLocationMarker position={userLocation} />
             )}
+
+            <NearbyPropertiesControl
+              userLocation={userLocation}
+              showNearby={showNearby}
+              radius={radius}
+              nearbyCount={nearbyMarkerIds.size}
+              onToggleNearby={handleToggleNearby}
+              onRadiusChange={handleRadiusChange}
+            />
 
             {selectedMarker && (
               <InfoWindow
