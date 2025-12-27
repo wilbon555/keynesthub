@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { GoogleMap, useJsApiLoader, OverlayView, InfoWindow, Autocomplete } from '@react-google-maps/api';
 import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Home, Search, X } from 'lucide-react';
+import { Loader2, Home, Search, X, Locate } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-
+import { useToast } from '@/hooks/use-toast';
 interface Property {
   id: string;
   title: string;
@@ -144,11 +144,109 @@ const MapSearchBox: React.FC<{
   );
 };
 
+// User location marker component
+const UserLocationMarker: React.FC<{
+  position: google.maps.LatLngLiteral;
+}> = ({ position }) => {
+  return (
+    <OverlayView
+      position={position}
+      mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+      getPixelPositionOffset={(width, height) => ({
+        x: -(width / 2),
+        y: -(height / 2),
+      })}
+    >
+      <div className="relative">
+        <div className="w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-lg" />
+        <div className="absolute inset-0 w-4 h-4 bg-blue-500 rounded-full animate-ping opacity-75" />
+      </div>
+    </OverlayView>
+  );
+};
+
+// Locate Me button component
+const LocateMeButton: React.FC<{
+  onLocate: (position: google.maps.LatLngLiteral) => void;
+}> = ({ onLocate }) => {
+  const [isLocating, setIsLocating] = useState(false);
+  const { toast } = useToast();
+
+  const handleLocateMe = useCallback(() => {
+    if (!navigator.geolocation) {
+      toast({
+        title: "Geolocation not supported",
+        description: "Your browser doesn't support geolocation.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLocating(true);
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        onLocate(location);
+        setIsLocating(false);
+      },
+      (error) => {
+        setIsLocating(false);
+        let message = "Unable to get your location.";
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            message = "Location permission was denied.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            message = "Location information is unavailable.";
+            break;
+          case error.TIMEOUT:
+            message = "Location request timed out.";
+            break;
+        }
+        
+        toast({
+          title: "Location error",
+          description: message,
+          variant: "destructive",
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  }, [onLocate, toast]);
+
+  return (
+    <Button
+      variant="outline"
+      size="icon"
+      className="absolute top-4 right-4 z-20 bg-background/95 backdrop-blur-sm shadow-lg border-border/50"
+      onClick={handleLocateMe}
+      disabled={isLocating}
+      aria-label="Locate me"
+    >
+      {isLocating ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
+        <Locate className="w-4 h-4" />
+      )}
+    </Button>
+  );
+};
+
 // Inner component that only renders after API key is available
 const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = ({ apiKey, properties }) => {
   const [markers, setMarkers] = useState<MarkerData[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
+  const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral | null>(null);
   const [geocoding, setGeocoding] = useState(true);
 
   const { isLoaded, loadError } = useJsApiLoader({
@@ -224,6 +322,14 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
     }
   }, [map]);
 
+  const handleLocate = useCallback((location: google.maps.LatLngLiteral) => {
+    setUserLocation(location);
+    if (map) {
+      map.panTo(location);
+      map.setZoom(14);
+    }
+  }, [map]);
+
   if (loadError) {
     return (
       <div className="w-full h-[500px] bg-muted rounded-lg flex items-center justify-center">
@@ -242,6 +348,7 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
       {isLoaded && (
         <>
           <MapSearchBox onPlaceSelected={handlePlaceSelected} />
+          <LocateMeButton onLocate={handleLocate} />
           <GoogleMap
             mapContainerStyle={containerStyle}
             center={defaultCenter}
@@ -261,6 +368,10 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
                 isSelected={selectedMarker?.property.id === marker.property.id}
               />
             ))}
+
+            {userLocation && (
+              <UserLocationMarker position={userLocation} />
+            )}
 
             {selectedMarker && (
               <InfoWindow
