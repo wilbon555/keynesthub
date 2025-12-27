@@ -33,43 +33,21 @@ const defaultCenter = {
   lng: 0
 };
 
-const PropertyMap: React.FC<PropertyMapProps> = ({ properties }) => {
-  const [apiKey, setApiKey] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// Inner component that only renders after API key is available
+const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = ({ apiKey, properties }) => {
   const [markers, setMarkers] = useState<MarkerData[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<MarkerData | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-
-  // Fetch API key from edge function
-  useEffect(() => {
-    const fetchApiKey = async () => {
-      try {
-        const { data, error: fetchError } = await supabase.functions.invoke('get-google-maps-key');
-        
-        if (fetchError || !data?.apiKey) {
-          throw new Error('Failed to load map configuration');
-        }
-        
-        setApiKey(data.apiKey);
-      } catch (err) {
-        console.error('Failed to fetch Google Maps API key:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load map');
-        setLoading(false);
-      }
-    };
-
-    fetchApiKey();
-  }, []);
+  const [geocoding, setGeocoding] = useState(true);
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
-    googleMapsApiKey: apiKey || '',
+    googleMapsApiKey: apiKey,
   });
 
   // Geocode properties when map is loaded
   useEffect(() => {
-    if (!isLoaded || !apiKey || !map) return;
+    if (!isLoaded || !map) return;
 
     const geocodeProperties = async () => {
       const geocoder = new google.maps.Geocoder();
@@ -106,19 +84,18 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ properties }) => {
       if (newMarkers.length > 0) {
         map.fitBounds(bounds, 50);
         
-        // Limit max zoom
-        const listener = google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
+        google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
           if (map.getZoom()! > 12) {
             map.setZoom(12);
           }
         });
       }
       
-      setLoading(false);
+      setGeocoding(false);
     };
 
     geocodeProperties();
-  }, [isLoaded, apiKey, properties, map]);
+  }, [isLoaded, properties, map]);
 
   const onLoad = useCallback((map: google.maps.Map) => {
     setMap(map);
@@ -128,25 +105,17 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ properties }) => {
     setMap(null);
   }, []);
 
-  if (loadError || error) {
+  if (loadError) {
     return (
       <div className="w-full h-[500px] bg-muted rounded-lg flex items-center justify-center">
-        <p className="text-muted-foreground">{error || 'Failed to load map'}</p>
-      </div>
-    );
-  }
-
-  if (!apiKey) {
-    return (
-      <div className="w-full h-[500px] bg-muted rounded-lg flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <p className="text-muted-foreground">Failed to load map</p>
       </div>
     );
   }
 
   return (
     <div className="relative w-full h-[500px] rounded-lg overflow-hidden shadow-lg">
-      {(loading || !isLoaded) && (
+      {(!isLoaded || geocoding) && (
         <div className="absolute inset-0 bg-muted flex items-center justify-center z-10">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
@@ -198,6 +167,49 @@ const PropertyMap: React.FC<PropertyMapProps> = ({ properties }) => {
       )}
     </div>
   );
+};
+
+// Main component that fetches API key first
+const PropertyMap: React.FC<PropertyMapProps> = ({ properties }) => {
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchApiKey = async () => {
+      try {
+        const { data, error: fetchError } = await supabase.functions.invoke('get-google-maps-key');
+        
+        if (fetchError || !data?.apiKey) {
+          throw new Error('Failed to load map configuration');
+        }
+        
+        setApiKey(data.apiKey);
+      } catch (err) {
+        console.error('Failed to fetch Google Maps API key:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load map');
+      }
+    };
+
+    fetchApiKey();
+  }, []);
+
+  if (error) {
+    return (
+      <div className="w-full h-[500px] bg-muted rounded-lg flex items-center justify-center">
+        <p className="text-muted-foreground">{error}</p>
+      </div>
+    );
+  }
+
+  if (!apiKey) {
+    return (
+      <div className="w-full h-[500px] bg-muted rounded-lg flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return <GoogleMapWrapper apiKey={apiKey} properties={properties} />;
 };
 
 export default PropertyMap;
