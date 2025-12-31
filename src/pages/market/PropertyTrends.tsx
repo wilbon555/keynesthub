@@ -1,6 +1,6 @@
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent } from "lucide-react";
 
 const PropertyTrends = () => {
   const trends = [
@@ -188,6 +188,117 @@ const PropertyTrends = () => {
                   </Card>
                 );
               })}
+            </div>
+          </div>
+
+          {/* NOI & Cap Rate Calculators */}
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Investment Calculation Guides</h2>
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* NOI Calculator Guide */}
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calculator className="w-5 h-5 text-primary" />
+                    Net Operating Income (NOI)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    NOI measures a property's profitability before financing costs and taxes.
+                  </p>
+                  
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <p className="font-mono text-sm text-foreground font-semibold mb-2">
+                      NOI = Gross Rental Income - Operating Expenses
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-semibold text-foreground text-sm mb-1">Gross Rental Income includes:</h4>
+                      <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                        <li>Monthly/annual rent collected</li>
+                        <li>Parking fees</li>
+                        <li>Laundry income</li>
+                        <li>Other tenant charges</li>
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-semibold text-foreground text-sm mb-1">Operating Expenses include:</h4>
+                      <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                        <li>Property management fees</li>
+                        <li>Insurance premiums</li>
+                        <li>Property taxes</li>
+                        <li>Maintenance & repairs</li>
+                        <li>Utilities (if landlord-paid)</li>
+                        <li>Vacancy allowance</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
+                    <h4 className="font-semibold text-foreground text-sm mb-2">Example Calculation:</h4>
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      <p>Annual Rent: KSh 1,200,000</p>
+                      <p>Operating Expenses: KSh 360,000</p>
+                      <p className="font-semibold text-foreground pt-2">NOI = KSh 1,200,000 - KSh 360,000 = <span className="text-primary">KSh 840,000</span></p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Cap Rate Calculator Guide */}
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Percent className="w-5 h-5 text-primary" />
+                    Capitalization Rate (Cap Rate)
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Cap Rate measures the rate of return on a real estate investment property.
+                  </p>
+                  
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <p className="font-mono text-sm text-foreground font-semibold mb-2">
+                      Cap Rate = (NOI ÷ Property Value) × 100
+                    </p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <h4 className="font-semibold text-foreground text-sm mb-1">What Cap Rate tells you:</h4>
+                      <ul className="text-sm text-muted-foreground list-disc list-inside space-y-1">
+                        <li>Expected annual return on investment</li>
+                        <li>Comparison tool between properties</li>
+                        <li>Risk indicator (higher = more risk/reward)</li>
+                        <li>Market condition snapshot</li>
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-semibold text-foreground text-sm mb-1">Cap Rate Ranges:</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1">
+                        <li><span className="font-medium text-foreground">4-6%:</span> Lower risk, prime locations</li>
+                        <li><span className="font-medium text-foreground">6-8%:</span> Moderate risk, good returns</li>
+                        <li><span className="font-medium text-foreground">8-10%+:</span> Higher risk, emerging areas</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
+                    <h4 className="font-semibold text-foreground text-sm mb-2">Example Calculation:</h4>
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      <p>NOI: KSh 840,000</p>
+                      <p>Property Value: KSh 12,000,000</p>
+                      <p className="font-semibold text-foreground pt-2">Cap Rate = (840,000 ÷ 12,000,000) × 100 = <span className="text-primary">7%</span></p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
 
