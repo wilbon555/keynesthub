@@ -3,7 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent, Banknote } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent, Banknote, Building } from "lucide-react";
 
 const PropertyTrends = () => {
   // NOI Calculator State
@@ -17,6 +17,10 @@ const PropertyTrends = () => {
   // Cash-on-Cash Return Calculator State
   const [annualCashFlow, setAnnualCashFlow] = useState<string>("");
   const [totalCashInvested, setTotalCashInvested] = useState<string>("");
+
+  // GRM Calculator State
+  const [grmPropertyPrice, setGrmPropertyPrice] = useState<string>("");
+  const [grossAnnualRent, setGrossAnnualRent] = useState<string>("");
 
   // Calculate NOI
   const calculatedNOI = useMemo(() => {
@@ -41,6 +45,23 @@ const PropertyTrends = () => {
     if (cashInvested === 0) return null;
     return (cashFlow / cashInvested) * 100;
   }, [annualCashFlow, totalCashInvested]);
+
+  // Calculate GRM
+  const calculatedGRM = useMemo(() => {
+    const price = parseFloat(grmPropertyPrice) || 0;
+    const rent = parseFloat(grossAnnualRent) || 0;
+    if (price === 0 || rent === 0) return null;
+    return price / rent;
+  }, [grmPropertyPrice, grossAnnualRent]);
+
+  // Get GRM category
+  const getGRMCategory = (grm: number) => {
+    if (grm < 4) return { label: "Excellent Value - High Cash Flow", color: "text-emerald-600" };
+    if (grm < 8) return { label: "Good Value - Strong Returns", color: "text-green-600" };
+    if (grm < 12) return { label: "Fair Value - Average Returns", color: "text-yellow-600" };
+    if (grm < 16) return { label: "Below Average Value", color: "text-orange-600" };
+    return { label: "Poor Value - Low Cash Flow", color: "text-red-600" };
+  };
 
   // Get Cash-on-Cash Return category
   const getCashOnCashCategory = (rate: number) => {
@@ -259,7 +280,7 @@ const PropertyTrends = () => {
           {/* Interactive Calculators */}
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">Investment Calculators</h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {/* NOI Calculator */}
               <Card className="border-border">
                 <CardHeader>
@@ -448,6 +469,70 @@ const PropertyTrends = () => {
                   <div className="text-xs text-muted-foreground space-y-1 border-t border-border pt-3">
                     <p className="font-medium">Cash invested includes:</p>
                     <p>Down payment, closing costs, renovation costs</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* GRM Calculator */}
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="w-5 h-5 text-primary" />
+                    Gross Rent Multiplier
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Quick valuation metric for rental properties
+                  </p>
+                  
+                  <div className="bg-muted/50 p-3 rounded-lg">
+                    <p className="font-mono text-xs text-foreground">
+                      GRM = Property Price ÷ Gross Annual Rent
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="grmPropertyPrice">Property Price (KSh)</Label>
+                      <Input
+                        id="grmPropertyPrice"
+                        type="number"
+                        placeholder="e.g., 12000000"
+                        value={grmPropertyPrice}
+                        onChange={(e) => setGrmPropertyPrice(e.target.value)}
+                        className="bg-background"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="grossAnnualRent">Gross Annual Rent (KSh)</Label>
+                      <Input
+                        id="grossAnnualRent"
+                        type="number"
+                        placeholder="e.g., 1200000"
+                        value={grossAnnualRent}
+                        onChange={(e) => setGrossAnnualRent(e.target.value)}
+                        className="bg-background"
+                      />
+                    </div>
+                  </div>
+
+                  {calculatedGRM !== null && (
+                    <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
+                      <p className="text-sm text-muted-foreground mb-1">Gross Rent Multiplier:</p>
+                      <p className="text-2xl font-bold text-primary">
+                        {calculatedGRM.toFixed(2)}x
+                      </p>
+                      <p className={`text-sm mt-1 ${getGRMCategory(calculatedGRM).color}`}>
+                        {getGRMCategory(calculatedGRM).label}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="text-xs text-muted-foreground space-y-1 border-t border-border pt-3">
+                    <p className="font-medium">GRM ranges:</p>
+                    <p>4-8: Strong • 8-12: Average • 12+: Below average</p>
                   </div>
                 </CardContent>
               </Card>
