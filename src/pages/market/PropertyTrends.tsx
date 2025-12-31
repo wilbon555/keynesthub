@@ -3,7 +3,7 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent, Banknote } from "lucide-react";
 
 const PropertyTrends = () => {
   // NOI Calculator State
@@ -13,6 +13,10 @@ const PropertyTrends = () => {
   // Cap Rate Calculator State
   const [noiForCapRate, setNoiForCapRate] = useState<string>("");
   const [propertyValue, setPropertyValue] = useState<string>("");
+
+  // Cash-on-Cash Return Calculator State
+  const [annualCashFlow, setAnnualCashFlow] = useState<string>("");
+  const [totalCashInvested, setTotalCashInvested] = useState<string>("");
 
   // Calculate NOI
   const calculatedNOI = useMemo(() => {
@@ -29,6 +33,23 @@ const PropertyTrends = () => {
     if (noi === 0 || value === 0) return null;
     return (noi / value) * 100;
   }, [noiForCapRate, propertyValue]);
+
+  // Calculate Cash-on-Cash Return
+  const calculatedCashOnCash = useMemo(() => {
+    const cashFlow = parseFloat(annualCashFlow) || 0;
+    const cashInvested = parseFloat(totalCashInvested) || 0;
+    if (cashInvested === 0) return null;
+    return (cashFlow / cashInvested) * 100;
+  }, [annualCashFlow, totalCashInvested]);
+
+  // Get Cash-on-Cash Return category
+  const getCashOnCashCategory = (rate: number) => {
+    if (rate < 0) return { label: "Negative Return - Loss", color: "text-red-600" };
+    if (rate < 4) return { label: "Below Average Return", color: "text-orange-600" };
+    if (rate < 8) return { label: "Average Return", color: "text-yellow-600" };
+    if (rate < 12) return { label: "Good Return", color: "text-green-600" };
+    return { label: "Excellent Return", color: "text-emerald-600" };
+  };
 
   // Get Cap Rate category
   const getCapRateCategory = (rate: number) => {
@@ -238,7 +259,7 @@ const PropertyTrends = () => {
           {/* Interactive Calculators */}
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-foreground mb-6">Investment Calculators</h2>
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {/* NOI Calculator */}
               <Card className="border-border">
                 <CardHeader>
@@ -363,6 +384,70 @@ const PropertyTrends = () => {
                   <div className="text-xs text-muted-foreground space-y-1 border-t border-border pt-3">
                     <p className="font-medium">Cap Rate ranges:</p>
                     <p>4-6%: Prime • 6-8%: Moderate • 8-10%+: Higher risk</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Cash-on-Cash Return Calculator */}
+              <Card className="border-border">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Banknote className="w-5 h-5 text-primary" />
+                    Cash-on-Cash Return
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Measure actual cash return on your investment
+                  </p>
+                  
+                  <div className="bg-muted/50 p-3 rounded-lg">
+                    <p className="font-mono text-xs text-foreground">
+                      CoC = (Annual Cash Flow ÷ Cash Invested) × 100
+                    </p>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="annualCashFlow">Annual Pre-Tax Cash Flow (KSh)</Label>
+                      <Input
+                        id="annualCashFlow"
+                        type="number"
+                        placeholder="e.g., 480000"
+                        value={annualCashFlow}
+                        onChange={(e) => setAnnualCashFlow(e.target.value)}
+                        className="bg-background"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="totalCashInvested">Total Cash Invested (KSh)</Label>
+                      <Input
+                        id="totalCashInvested"
+                        type="number"
+                        placeholder="e.g., 4000000"
+                        value={totalCashInvested}
+                        onChange={(e) => setTotalCashInvested(e.target.value)}
+                        className="bg-background"
+                      />
+                    </div>
+                  </div>
+
+                  {calculatedCashOnCash !== null && (
+                    <div className="bg-primary/10 p-4 rounded-lg border border-primary/20">
+                      <p className="text-sm text-muted-foreground mb-1">Cash-on-Cash Return:</p>
+                      <p className={`text-2xl font-bold ${calculatedCashOnCash >= 0 ? 'text-primary' : 'text-red-600'}`}>
+                        {calculatedCashOnCash.toFixed(2)}%
+                      </p>
+                      <p className={`text-sm mt-1 ${getCashOnCashCategory(calculatedCashOnCash).color}`}>
+                        {getCashOnCashCategory(calculatedCashOnCash).label}
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="text-xs text-muted-foreground space-y-1 border-t border-border pt-3">
+                    <p className="font-medium">Cash invested includes:</p>
+                    <p>Down payment, closing costs, renovation costs</p>
                   </div>
                 </CardContent>
               </Card>
