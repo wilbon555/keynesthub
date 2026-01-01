@@ -1,15 +1,16 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent, Banknote, Building, Save, Trash2, GitCompare, X } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent, Banknote, Building, Save, Trash2, GitCompare, X, FileDown } from "lucide-react";
+import { toast } from "sonner";
 
 interface SavedCalculation {
   id: string;
   name: string;
-  timestamp: Date;
+  timestamp: string; // Changed to string for JSON serialization
   noi: number | null;
   capRate: number | null;
   cashOnCash: number | null;
@@ -25,6 +26,8 @@ interface SavedCalculation {
     grossAnnualRent: string;
   };
 }
+
+const STORAGE_KEY = "keynesthub_saved_calculations";
 
 const PropertyTrends = () => {
   // NOI Calculator State
@@ -43,10 +46,26 @@ const PropertyTrends = () => {
   const [grmPropertyPrice, setGrmPropertyPrice] = useState<string>("");
   const [grossAnnualRent, setGrossAnnualRent] = useState<string>("");
 
-  // Saved Calculations for Comparison
-  const [savedCalculations, setSavedCalculations] = useState<SavedCalculation[]>([]);
+  // Saved Calculations for Comparison - Load from localStorage
+  const [savedCalculations, setSavedCalculations] = useState<SavedCalculation[]>(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const [propertyName, setPropertyName] = useState<string>("");
   const [showComparison, setShowComparison] = useState(false);
+
+  // Persist to localStorage whenever savedCalculations changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedCalculations));
+    } catch (error) {
+      console.error("Failed to save calculations to localStorage:", error);
+    }
+  }, [savedCalculations]);
 
   // Calculate NOI
   const calculatedNOI = useMemo(() => {
@@ -122,7 +141,7 @@ const PropertyTrends = () => {
     const newCalculation: SavedCalculation = {
       id: Date.now().toString(),
       name,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       noi: calculatedNOI,
       capRate: calculatedCapRate,
       cashOnCash: calculatedCashOnCash,
@@ -140,11 +159,153 @@ const PropertyTrends = () => {
     };
     setSavedCalculations((prev) => [...prev, newCalculation]);
     setPropertyName("");
+    toast.success(`"${name}" saved successfully`);
   };
+
+  // Export comparison to PDF
+  const exportToPDF = useCallback(() => {
+    if (savedCalculations.length === 0) {
+      toast.error("No calculations to export");
+      return;
+    }
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      toast.error("Please allow popups to export PDF");
+      return;
+    }
+
+    const getCategoryLabel = (type: string, value: number | null) => {
+      if (value === null) return "—";
+      switch (type) {
+        case "capRate":
+          return getCapRateCategory(value).label;
+        case "cashOnCash":
+          return getCashOnCashCategory(value).label;
+        case "grm":
+          return getGRMCategory(value).label;
+        default:
+          return "";
+      }
+    };
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Property Comparison Report - KeynestHub</title>
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #1a1a1a; }
+          .header { text-align: center; margin-bottom: 40px; border-bottom: 2px solid #0f766e; padding-bottom: 20px; }
+          .header h1 { color: #0f766e; font-size: 28px; margin-bottom: 8px; }
+          .header p { color: #666; font-size: 14px; }
+          .date { color: #888; font-size: 12px; margin-top: 8px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 12px 16px; text-align: center; }
+          th { background: #0f766e; color: white; font-weight: 600; }
+          th:first-child, td:first-child { text-align: left; }
+          tr:nth-child(even) { background: #f9f9f9; }
+          .metric-label { font-weight: 500; color: #444; }
+          .value { font-weight: 600; font-size: 15px; }
+          .category { font-size: 11px; color: #666; margin-top: 4px; }
+          .positive { color: #16a34a; }
+          .negative { color: #dc2626; }
+          .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #ddd; padding-top: 20px; }
+          @media print { body { padding: 20px; } }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Property Investment Comparison</h1>
+          <p>KeynestHub Investment Analysis Report</p>
+          <p class="date">Generated on ${new Date().toLocaleDateString('en-KE', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}</p>
+        </div>
+        
+        <table>
+          <thead>
+            <tr>
+              <th>Investment Metric</th>
+              ${savedCalculations.map(calc => `<th>${calc.name}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="metric-label">Net Operating Income (NOI)</td>
+              ${savedCalculations.map(calc => `
+                <td>
+                  <div class="value ${calc.noi !== null ? (calc.noi >= 0 ? 'positive' : 'negative') : ''}">
+                    ${calc.noi !== null ? formatCurrency(calc.noi) : '—'}
+                  </div>
+                </td>
+              `).join('')}
+            </tr>
+            <tr>
+              <td class="metric-label">Capitalization Rate</td>
+              ${savedCalculations.map(calc => `
+                <td>
+                  <div class="value">${calc.capRate !== null ? calc.capRate.toFixed(2) + '%' : '—'}</div>
+                  <div class="category">${getCategoryLabel('capRate', calc.capRate)}</div>
+                </td>
+              `).join('')}
+            </tr>
+            <tr>
+              <td class="metric-label">Cash-on-Cash Return</td>
+              ${savedCalculations.map(calc => `
+                <td>
+                  <div class="value ${calc.cashOnCash !== null ? (calc.cashOnCash >= 0 ? '' : 'negative') : ''}">
+                    ${calc.cashOnCash !== null ? calc.cashOnCash.toFixed(2) + '%' : '—'}
+                  </div>
+                  <div class="category">${getCategoryLabel('cashOnCash', calc.cashOnCash)}</div>
+                </td>
+              `).join('')}
+            </tr>
+            <tr>
+              <td class="metric-label">Gross Rent Multiplier</td>
+              ${savedCalculations.map(calc => `
+                <td>
+                  <div class="value">${calc.grm !== null ? calc.grm.toFixed(2) + 'x' : '—'}</div>
+                  <div class="category">${getCategoryLabel('grm', calc.grm)}</div>
+                </td>
+              `).join('')}
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="footer">
+          <p>This report was generated by KeynestHub Investment Analysis Tools</p>
+          <p>Visit keynesthub.com for more property investment resources</p>
+        </div>
+        
+        <script>
+          window.onload = function() {
+            window.print();
+            setTimeout(function() { window.close(); }, 1000);
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    printWindow.document.write(html);
+    printWindow.document.close();
+    toast.success("Opening PDF export...");
+  }, [savedCalculations, formatCurrency, getCapRateCategory, getCashOnCashCategory, getGRMCategory]);
 
   // Delete a saved calculation
   const deleteCalculation = (id: string) => {
-    setSavedCalculations((prev) => prev.filter((calc) => calc.id !== id));
+    const calc = savedCalculations.find(c => c.id === id);
+    setSavedCalculations((prev) => prev.filter((c) => c.id !== id));
+    if (calc) {
+      toast.success(`"${calc.name}" deleted`);
+    }
   };
 
   // Clear all inputs
@@ -393,6 +554,16 @@ const PropertyTrends = () => {
                 >
                   <GitCompare className="w-4 h-4" />
                   Compare ({savedCalculations.length})
+                </Button>
+                <Button
+                  onClick={exportToPDF}
+                  variant="outline"
+                  size="sm"
+                  className="gap-1"
+                  disabled={savedCalculations.length === 0}
+                >
+                  <FileDown className="w-4 h-4" />
+                  PDF
                 </Button>
                 <Button
                   onClick={clearInputs}
