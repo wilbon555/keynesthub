@@ -3,7 +3,28 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent, Banknote, Building } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent, Banknote, Building, Save, Trash2, GitCompare, X } from "lucide-react";
+
+interface SavedCalculation {
+  id: string;
+  name: string;
+  timestamp: Date;
+  noi: number | null;
+  capRate: number | null;
+  cashOnCash: number | null;
+  grm: number | null;
+  inputs: {
+    grossRentalIncome: string;
+    operatingExpenses: string;
+    noiForCapRate: string;
+    propertyValue: string;
+    annualCashFlow: string;
+    totalCashInvested: string;
+    grmPropertyPrice: string;
+    grossAnnualRent: string;
+  };
+}
 
 const PropertyTrends = () => {
   // NOI Calculator State
@@ -21,6 +42,11 @@ const PropertyTrends = () => {
   // GRM Calculator State
   const [grmPropertyPrice, setGrmPropertyPrice] = useState<string>("");
   const [grossAnnualRent, setGrossAnnualRent] = useState<string>("");
+
+  // Saved Calculations for Comparison
+  const [savedCalculations, setSavedCalculations] = useState<SavedCalculation[]>([]);
+  const [propertyName, setPropertyName] = useState<string>("");
+  const [showComparison, setShowComparison] = useState(false);
 
   // Calculate NOI
   const calculatedNOI = useMemo(() => {
@@ -89,6 +115,66 @@ const PropertyTrends = () => {
       maximumFractionDigits: 0 
     }).format(value);
   };
+
+  // Save current calculation
+  const saveCalculation = () => {
+    const name = propertyName.trim() || `Property ${savedCalculations.length + 1}`;
+    const newCalculation: SavedCalculation = {
+      id: Date.now().toString(),
+      name,
+      timestamp: new Date(),
+      noi: calculatedNOI,
+      capRate: calculatedCapRate,
+      cashOnCash: calculatedCashOnCash,
+      grm: calculatedGRM,
+      inputs: {
+        grossRentalIncome,
+        operatingExpenses,
+        noiForCapRate,
+        propertyValue,
+        annualCashFlow,
+        totalCashInvested,
+        grmPropertyPrice,
+        grossAnnualRent,
+      },
+    };
+    setSavedCalculations((prev) => [...prev, newCalculation]);
+    setPropertyName("");
+  };
+
+  // Delete a saved calculation
+  const deleteCalculation = (id: string) => {
+    setSavedCalculations((prev) => prev.filter((calc) => calc.id !== id));
+  };
+
+  // Clear all inputs
+  const clearInputs = () => {
+    setGrossRentalIncome("");
+    setOperatingExpenses("");
+    setNoiForCapRate("");
+    setPropertyValue("");
+    setAnnualCashFlow("");
+    setTotalCashInvested("");
+    setGrmPropertyPrice("");
+    setGrossAnnualRent("");
+    setPropertyName("");
+  };
+
+  // Load a saved calculation into inputs
+  const loadCalculation = (calc: SavedCalculation) => {
+    setGrossRentalIncome(calc.inputs.grossRentalIncome);
+    setOperatingExpenses(calc.inputs.operatingExpenses);
+    setNoiForCapRate(calc.inputs.noiForCapRate);
+    setPropertyValue(calc.inputs.propertyValue);
+    setAnnualCashFlow(calc.inputs.annualCashFlow);
+    setTotalCashInvested(calc.inputs.totalCashInvested);
+    setGrmPropertyPrice(calc.inputs.grmPropertyPrice);
+    setGrossAnnualRent(calc.inputs.grossAnnualRent);
+  };
+
+  // Check if any calculation has values
+  const hasCalculations = calculatedNOI !== null || calculatedCapRate !== null || calculatedCashOnCash !== null || calculatedGRM !== null;
+
   const trends = [
     {
       location: "Nairobi CBD",
@@ -279,7 +365,170 @@ const PropertyTrends = () => {
 
           {/* Interactive Calculators */}
           <div className="mt-12">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Investment Calculators</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <h2 className="text-2xl font-bold text-foreground">Investment Calculators</h2>
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  placeholder="Property name (optional)"
+                  value={propertyName}
+                  onChange={(e) => setPropertyName(e.target.value)}
+                  className="w-48 bg-background"
+                />
+                <Button
+                  onClick={saveCalculation}
+                  disabled={!hasCalculations}
+                  variant="outline"
+                  size="sm"
+                  className="gap-1"
+                >
+                  <Save className="w-4 h-4" />
+                  Save
+                </Button>
+                <Button
+                  onClick={() => setShowComparison(!showComparison)}
+                  variant={showComparison ? "default" : "outline"}
+                  size="sm"
+                  className="gap-1"
+                  disabled={savedCalculations.length === 0}
+                >
+                  <GitCompare className="w-4 h-4" />
+                  Compare ({savedCalculations.length})
+                </Button>
+                <Button
+                  onClick={clearInputs}
+                  variant="ghost"
+                  size="sm"
+                  className="gap-1"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Clear
+                </Button>
+              </div>
+            </div>
+
+            {/* Comparison Panel */}
+            {showComparison && savedCalculations.length > 0 && (
+              <Card className="border-border mb-6">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2">
+                      <GitCompare className="w-5 h-5 text-primary" />
+                      Property Comparison
+                    </CardTitle>
+                    <Button variant="ghost" size="sm" onClick={() => setShowComparison(false)}>
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-border">
+                          <th className="text-left py-3 px-2 text-muted-foreground font-medium">Metric</th>
+                          {savedCalculations.map((calc) => (
+                            <th key={calc.id} className="text-center py-3 px-2 min-w-[140px]">
+                              <div className="flex flex-col items-center gap-1">
+                                <span className="font-semibold text-foreground">{calc.name}</span>
+                                <div className="flex gap-1">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 px-2 text-xs"
+                                    onClick={() => loadCalculation(calc)}
+                                  >
+                                    Load
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 px-2 text-xs text-destructive hover:text-destructive"
+                                    onClick={() => deleteCalculation(calc.id)}
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-border/50">
+                          <td className="py-3 px-2 text-muted-foreground">Net Operating Income</td>
+                          {savedCalculations.map((calc) => (
+                            <td key={calc.id} className="text-center py-3 px-2">
+                              <span className={calc.noi !== null ? (calc.noi >= 0 ? "text-green-600 font-medium" : "text-red-600 font-medium") : "text-muted-foreground"}>
+                                {calc.noi !== null ? formatCurrency(calc.noi) : "—"}
+                              </span>
+                            </td>
+                          ))}
+                        </tr>
+                        <tr className="border-b border-border/50">
+                          <td className="py-3 px-2 text-muted-foreground">Cap Rate</td>
+                          {savedCalculations.map((calc) => (
+                            <td key={calc.id} className="text-center py-3 px-2">
+                              {calc.capRate !== null ? (
+                                <div className="flex flex-col items-center">
+                                  <span className="font-medium text-foreground">{calc.capRate.toFixed(2)}%</span>
+                                  <span className={`text-xs ${getCapRateCategory(calc.capRate).color}`}>
+                                    {getCapRateCategory(calc.capRate).label.split(",")[0]}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">—</span>
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                        <tr className="border-b border-border/50">
+                          <td className="py-3 px-2 text-muted-foreground">Cash-on-Cash Return</td>
+                          {savedCalculations.map((calc) => (
+                            <td key={calc.id} className="text-center py-3 px-2">
+                              {calc.cashOnCash !== null ? (
+                                <div className="flex flex-col items-center">
+                                  <span className={`font-medium ${calc.cashOnCash >= 0 ? "text-foreground" : "text-red-600"}`}>
+                                    {calc.cashOnCash.toFixed(2)}%
+                                  </span>
+                                  <span className={`text-xs ${getCashOnCashCategory(calc.cashOnCash).color}`}>
+                                    {getCashOnCashCategory(calc.cashOnCash).label}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">—</span>
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                        <tr>
+                          <td className="py-3 px-2 text-muted-foreground">Gross Rent Multiplier</td>
+                          {savedCalculations.map((calc) => (
+                            <td key={calc.id} className="text-center py-3 px-2">
+                              {calc.grm !== null ? (
+                                <div className="flex flex-col items-center">
+                                  <span className="font-medium text-foreground">{calc.grm.toFixed(2)}x</span>
+                                  <span className={`text-xs ${getGRMCategory(calc.grm).color}`}>
+                                    {getGRMCategory(calc.grm).label.split(" - ")[0]}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">—</span>
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  {savedCalculations.length === 0 && (
+                    <p className="text-center text-muted-foreground py-6">
+                      No saved calculations yet. Fill in the calculators and click "Save" to compare properties.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {/* NOI Calculator */}
               <Card className="border-border">
