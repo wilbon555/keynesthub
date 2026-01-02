@@ -36,6 +36,12 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       bedrooms: z.coerce.number().min(0, "Bedrooms must be 0 or more").optional(),
       bathrooms: z.coerce.number().min(0, "Bathrooms must be 0 or more").optional(),
       area: z.string().min(1, "Area/Square footage is required"),
+      // Apartment-specific fields
+      units: z.coerce.number().min(1, "Units must be at least 1").optional(),
+      floors: z.coerce.number().min(1, "Floors must be at least 1").optional(),
+      buildingAge: z.coerce.number().min(0, "Building age must be 0 or more").optional(),
+      developer: z.string().optional(),
+      maintenanceQuality: z.string().optional(),
       priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       phone: z
@@ -62,6 +68,11 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       bedrooms: undefined,
       bathrooms: undefined,
       area: "",
+      units: undefined,
+      floors: undefined,
+      buildingAge: undefined,
+      developer: "",
+      maintenanceQuality: "",
       priceMin: 1,
       priceMax: 1,
       phone: "",
@@ -138,6 +149,12 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
         description: values.description,
         status: 'available' as const,
         listing_type: values.listingType,
+        // Apartment-specific fields
+        units: values.units,
+        floors: values.floors,
+        building_age: values.buildingAge,
+        developer: values.developer,
+        maintenance_quality: values.maintenanceQuality,
         uploadedFiles: selectedFiles // Pass files to be uploaded
       };
 
@@ -453,6 +470,113 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           )}
                         />
                       </div>
+                    )}
+
+                    {/* Apartment-specific fields */}
+                    {form.watch("propertyType") === "Apartment" && (
+                      <>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="units"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Number of Units</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min={1} 
+                                    placeholder="e.g., 12" 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="floors"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Number of Floors</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min={1} 
+                                    placeholder="e.g., 5" 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="buildingAge"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Building Age (years)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min={0} 
+                                    placeholder="e.g., 3" 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="developer"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Developer/Builder</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="e.g., ABC Developers Ltd" 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="maintenanceQuality"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Maintenance Quality</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select quality" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="excellent">Excellent</SelectItem>
+                                    <SelectItem value="good">Good</SelectItem>
+                                    <SelectItem value="fair">Fair</SelectItem>
+                                    <SelectItem value="needs_work">Needs Work</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
+                      </>
                     )}
 
                     {/* Area field for other property types */}

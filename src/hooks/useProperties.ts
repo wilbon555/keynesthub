@@ -12,8 +12,8 @@ export interface Property {
   bathrooms?: number;
   area: string;
   type: string;
-  image?: string; // Make optional
-  images?: string[]; // Make optional for backward compatibility
+  image?: string;
+  images?: string[];
   featured: boolean;
   region?: string;
   country?: string;
@@ -24,7 +24,13 @@ export interface Property {
   user_id: string;
   created_at: string;
   updated_at: string;
-  uploadedFiles?: File[]; // For file uploads
+  // Apartment-specific fields
+  units?: number;
+  floors?: number;
+  building_age?: number;
+  developer?: string;
+  maintenance_quality?: string;
+  uploadedFiles?: File[];
 }
 
 export const useProperties = () => {
