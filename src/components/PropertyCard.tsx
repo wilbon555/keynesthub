@@ -24,6 +24,7 @@ interface PropertyCardProps {
   featured?: boolean;
   phone?: string;
   user_id?: string;
+  listing_type?: 'sale' | 'rent';
 }
 
 export const PropertyCard = ({
@@ -39,7 +40,8 @@ export const PropertyCard = ({
   images: propertyImages,
   featured = false,
   phone,
-  user_id
+  user_id,
+  listing_type = 'sale'
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
@@ -80,10 +82,13 @@ export const PropertyCard = ({
     phone,
     user_id: user_id || '',
     status: 'available',
-    listing_type: 'sale',
+    listing_type: listing_type,
     created_at: '',
     updated_at: '',
   };
+
+  // Determine button text based on listing type
+  const contactButtonText = listing_type === 'rent' ? 'Inquire to Rent' : 'Contact Owner';
   
   // Use multiple images if available, fallback to single image or placeholder
   const images = propertyImages && propertyImages.length > 0 
@@ -234,22 +239,24 @@ export const PropertyCard = ({
             </div>
           </div>
 
-          {phone && !isOwner && (
+          {!isOwner && (
             <div className="space-y-2 pt-2">
-              <div className="text-sm text-muted-foreground flex items-center gap-2">
-                <MessageCircle className="h-4 w-4" />
-                <span>Contact: {maskPhoneNumber(phone)}</span>
-              </div>
+              {phone && (
+                <div className="text-sm text-muted-foreground flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4" />
+                  <span>Contact: {maskPhoneNumber(phone)}</span>
+                </div>
+              )}
               <Button
                 size="sm"
-                className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white"
+                className="w-full bg-primary hover:bg-primary/90"
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowContactDialog(true);
                 }}
               >
                 <MessageCircle className="h-4 w-4 mr-2" />
-                Contact via WhatsApp
+                {contactButtonText}
               </Button>
             </div>
           )}
@@ -295,6 +302,8 @@ export const PropertyCard = ({
         propertyId={id}
         propertyTitle={title}
         phoneNumber={phone || ''}
+        listingType={listing_type}
+        propertyType={type}
       />
       
       <EditPropertyDialog
