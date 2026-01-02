@@ -57,21 +57,26 @@ export type Database = {
           area: string
           bathrooms: number | null
           bedrooms: number | null
+          building_age: number | null
           country: string | null
           created_at: string
           description: string | null
+          developer: string | null
           featured: boolean | null
+          floors: number | null
           id: string
           image: string | null
           images: string[] | null
           listing_type: string
           location: string
+          maintenance_quality: string | null
           phone: string | null
           price: string
           region: string | null
           status: string | null
           title: string
           type: string
+          units: number | null
           updated_at: string
           user_id: string
         }
@@ -79,21 +84,26 @@ export type Database = {
           area: string
           bathrooms?: number | null
           bedrooms?: number | null
+          building_age?: number | null
           country?: string | null
           created_at?: string
           description?: string | null
+          developer?: string | null
           featured?: boolean | null
+          floors?: number | null
           id?: string
           image?: string | null
           images?: string[] | null
           listing_type?: string
           location: string
+          maintenance_quality?: string | null
           phone?: string | null
           price: string
           region?: string | null
           status?: string | null
           title: string
           type: string
+          units?: number | null
           updated_at?: string
           user_id: string
         }
@@ -101,21 +111,26 @@ export type Database = {
           area?: string
           bathrooms?: number | null
           bedrooms?: number | null
+          building_age?: number | null
           country?: string | null
           created_at?: string
           description?: string | null
+          developer?: string | null
           featured?: boolean | null
+          floors?: number | null
           id?: string
           image?: string | null
           images?: string[] | null
           listing_type?: string
           location?: string
+          maintenance_quality?: string | null
           phone?: string | null
           price?: string
           region?: string | null
           status?: string | null
           title?: string
           type?: string
+          units?: number | null
           updated_at?: string
           user_id?: string
         }
