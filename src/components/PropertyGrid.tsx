@@ -287,11 +287,12 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
                   ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3" 
                   : "grid-cols-1"
               } animate-fade-in`}>
-                {filteredProperties.map((property) => (
+              {filteredProperties.map((property) => (
                   <PropertyCard 
                     key={property.id} 
                     {...property} 
                     images={property.images}
+                    listing_type={property.listing_type}
                   />
                 ))}
               </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
+import { LogIn } from 'lucide-react';
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
@@ -21,10 +24,27 @@ interface ContactDialogProps {
   propertyId: string;
   propertyTitle: string;
   phoneNumber: string;
+  listingType?: 'sale' | 'rent';
+  propertyType?: string;
 }
 
-const ContactDialog = ({ isOpen, onClose, propertyId, propertyTitle, phoneNumber }: ContactDialogProps) => {
+const ContactDialog = ({ 
+  isOpen, 
+  onClose, 
+  propertyId, 
+  propertyTitle, 
+  phoneNumber,
+  listingType = 'sale',
+  propertyType = 'Property'
+}: ContactDialogProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  const getDefaultMessage = () => {
+    const typeText = listingType === 'rent' ? 'rent' : 'purchase';
+    return `I am interested in this ${propertyType.toLowerCase()} and would like more details about the ${typeText}.`;
+  };
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -34,6 +54,49 @@ const ContactDialog = ({ isOpen, onClose, propertyId, propertyTitle, phoneNumber
   const [showWhatsApp, setShowWhatsApp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Pre-fill email from user if logged in, and set default message
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(prev => ({
+        ...prev,
+        email: user?.email || prev.email,
+        message: prev.message || getDefaultMessage()
+      }));
+    }
+  }, [isOpen, user]);
+
+  // If user is not logged in, show login prompt
+  if (!user) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Sign in Required</DialogTitle>
+            <DialogDescription>
+              Please sign in to contact property owners and submit inquiries.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4 py-6">
+            <LogIn className="h-12 w-12 text-muted-foreground" />
+            <p className="text-center text-muted-foreground">
+              Only registered users can contact property owners. This helps protect both buyers and sellers.
+            </p>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button onClick={() => {
+                onClose();
+                navigate('/auth');
+              }}>
+                Sign In
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -55,8 +118,8 @@ const ContactDialog = ({ isOpen, onClose, propertyId, propertyTitle, phoneNumber
 
       setShowWhatsApp(true);
       toast({
-        title: "Contact request submitted",
-        description: "Click the WhatsApp button below to continue the conversation"
+        title: "Inquiry submitted successfully!",
+        description: "The property owner has been notified and will contact you soon."
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -106,15 +169,20 @@ const ContactDialog = ({ isOpen, onClose, propertyId, propertyTitle, phoneNumber
     onClose();
   };
 
+  const dialogTitle = listingType === 'rent' ? 'Inquire About Rental' : 'Contact Property Owner';
+  const dialogDescription = listingType === 'rent' 
+    ? 'Fill in your details to inquire about renting this property'
+    : 'Fill in your details to contact the property owner';
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Contact Property Owner</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>
             {!showWhatsApp 
-              ? "Fill in your details to contact the property owner via WhatsApp"
-              : "Your request has been logged. Click below to continue on WhatsApp"}
+              ? dialogDescription
+              : "Your inquiry has been submitted! The owner will be notified. You can also reach out via WhatsApp."}
           </DialogDescription>
         </DialogHeader>
 
@@ -174,7 +242,7 @@ const ContactDialog = ({ isOpen, onClose, propertyId, propertyTitle, phoneNumber
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Submitting...' : 'Continue to WhatsApp'}
+                {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
               </Button>
             </div>
           </form>
