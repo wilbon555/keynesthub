@@ -6,6 +6,7 @@ import { MapPin, Bed, Bath, Square, MessageCircle, Trash2, Edit } from "lucide-r
 import { PhotoGallery } from "./PhotoGallery";
 import ContactDialog from "./ContactDialog";
 import { EditPropertyDialog } from "./EditPropertyDialog";
+import { VerificationBadge } from "./VerificationBadge";
 import { useProperties, Property } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -25,6 +26,7 @@ interface PropertyCardProps {
   phone?: string;
   user_id?: string;
   listing_type?: 'sale' | 'rent';
+  verification_status?: string;
 }
 
 export const PropertyCard = ({
@@ -41,7 +43,8 @@ export const PropertyCard = ({
   featured = false,
   phone,
   user_id,
-  listing_type = 'sale'
+  listing_type = 'sale',
+  verification_status = 'pending'
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
@@ -207,6 +210,9 @@ export const PropertyCard = ({
       >
         <div className="space-y-3">
           <div>
+            <div className="flex items-center gap-2 mb-1">
+              <VerificationBadge status={verification_status} />
+            </div>
             <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-smooth">
               {title}
             </h3>

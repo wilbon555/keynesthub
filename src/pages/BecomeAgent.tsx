@@ -6,10 +6,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Navigation } from "@/components/Navigation";
 import { useToast } from "@/hooks/use-toast";
-import { UserCheck, MapPin, Phone, DollarSign } from "lucide-react";
+import { UserCheck, MapPin, Phone, DollarSign, Shield, Clock, CheckCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserRoles } from "@/hooks/useUserRoles";
+import { useNavigate } from "react-router-dom";
 
 const BecomeAgent = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { isAgent, pendingRoles, applyForRole, loading: rolesLoading } = useUserRoles();
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -20,6 +27,7 @@ const BecomeAgent = () => {
     priceRange: "",
     experience: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const countries = [
     { value: "US", label: "United States", currency: "$" },
@@ -33,9 +41,21 @@ const BecomeAgent = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const hasPendingAgentApplication = pendingRoles.some(r => r.role === 'agent');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      toast({
+        title: "Sign In Required",
+        description: "Please sign in to apply as an agent.",
+        variant: "destructive"
+      });
+      navigate('/auth');
+      return;
+    }
+
     // Basic validation
     if (!formData.fullName || !formData.email || !formData.phone || !formData.country) {
       toast({
@@ -46,25 +66,86 @@ const BecomeAgent = () => {
       return;
     }
 
-    toast({
-      title: "Application Submitted",
-      description: "Thank you for your interest! We'll review your application and get back to you soon."
-    });
-
-    // Reset form
-    setFormData({
-      fullName: "",
-      email: "",
-      phone: "",
-      country: "",
-      state: "",
-      hometown: "",
-      priceRange: "",
-      experience: ""
-    });
+    setIsSubmitting(true);
+    
+    try {
+      const success = await applyForRole('agent');
+      
+      if (success) {
+        toast({
+          title: "Application Submitted",
+          description: "Thank you for your interest! An admin will review your application and get back to you soon."
+        });
+      } else {
+        toast({
+          title: "Application Failed",
+          description: "You may have already applied. Please try again later.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to submit application. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const selectedCountry = countries.find(c => c.value === formData.country);
+
+  // Already an agent
+  if (isAgent) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8">
+          <div className="max-w-md mx-auto text-center">
+            <Card>
+              <CardContent className="py-12">
+                <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" />
+                <h2 className="text-2xl font-bold mb-2">You're Already an Agent!</h2>
+                <p className="text-muted-foreground mb-6">
+                  You have been approved as a KeyNestHub agent. Access your dashboard to manage inquiries and verify listings.
+                </p>
+                <Button onClick={() => navigate('/agent-dashboard')}>
+                  <Shield className="w-4 h-4 mr-2" />
+                  Go to Agent Dashboard
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Has pending application
+  if (hasPendingAgentApplication) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8">
+          <div className="max-w-md mx-auto text-center">
+            <Card>
+              <CardContent className="py-12">
+                <Clock className="w-16 h-16 mx-auto mb-4 text-yellow-500" />
+                <h2 className="text-2xl font-bold mb-2">Application Pending</h2>
+                <p className="text-muted-foreground mb-6">
+                  Your agent application is being reviewed by our admin team. We'll notify you once it's approved.
+                </p>
+                <Button variant="outline" onClick={() => navigate('/dashboard')}>
+                  Back to Dashboard
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -76,13 +157,30 @@ const BecomeAgent = () => {
             <UserCheck className="w-16 h-16 mx-auto mb-4 text-primary" />
             <h1 className="text-4xl font-bold text-foreground mb-2">Become an Agent</h1>
             <p className="text-muted-foreground text-lg">
-              Join our network of professional real estate agents and grow your business with us.
+              Join our network of verified agents and help protect buyers from fraud.
             </p>
           </div>
 
+          {/* Benefits Card */}
+          <Card className="mb-6 bg-primary/5 border-primary/20">
+            <CardContent className="py-6">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-primary" />
+                Agent Responsibilities
+              </h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>• Verify property ownership documents before listings go live</li>
+                <li>• Review and approve buyer inquiries to prevent fraud</li>
+                <li>• Schedule and coordinate property viewings</li>
+                <li>• Act as a trusted intermediary between buyers and sellers</li>
+                <li>• Ensure all transactions follow platform guidelines</li>
+              </ul>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
-              <CardTitle>Agent Registration</CardTitle>
+              <CardTitle>Agent Application</CardTitle>
               <CardDescription>
                 Fill out the form below to apply as an agent with KeyNestHub
               </CardDescription>
@@ -206,8 +304,14 @@ const BecomeAgent = () => {
                   </Select>
                 </div>
 
-                <Button type="submit" className="w-full" size="lg">
-                  Submit Application
+                {!user && (
+                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-sm text-yellow-700 dark:text-yellow-300">
+                    You need to sign in before applying. Click submit to be redirected to the login page.
+                  </div>
+                )}
+
+                <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || rolesLoading}>
+                  {isSubmitting ? 'Submitting...' : 'Submit Application'}
                 </Button>
               </form>
             </CardContent>

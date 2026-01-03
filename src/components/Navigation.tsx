@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Shield, LayoutDashboard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRoles } from "@/hooks/useUserRoles";
 import { useToast } from "@/hooks/use-toast";
 import { ContactDropdown } from "@/components/ContactDropdown";
 import keyNestHubLogo from "@/assets/keynesthub-logo.png";
@@ -13,6 +14,7 @@ export const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { isAgent, isAdmin } = useUserRoles();
   const { toast } = useToast();
 
   const handleSignOut = async () => {
@@ -140,6 +142,16 @@ export const Navigation = () => {
                           <a href="/become-agent" className="block rounded-md p-2 hover:bg-accent text-foreground">Become an Agent</a>
                         </NavigationMenuLink>
                       </li>
+                      {(isAgent || isAdmin) && (
+                        <li>
+                          <NavigationMenuLink asChild>
+                            <a href="/agent-dashboard" className="block rounded-md p-2 hover:bg-accent text-foreground font-medium text-primary">
+                              <Shield className="inline w-4 h-4 mr-2" />
+                              Agent Dashboard
+                            </a>
+                          </NavigationMenuLink>
+                        </li>
+                      )}
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -174,6 +186,12 @@ export const Navigation = () => {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-3">
             <ContactDropdown variant="ghost" size="sm" />
+            {user && (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
+                <LayoutDashboard className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+            )}
             {user ? (
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />
@@ -238,6 +256,12 @@ export const Navigation = () => {
                   <div className="mt-2 flex flex-col">
                     <a href="/agents/find-agent" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Find an Agent</a>
                     <a href="/become-agent" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Become an Agent</a>
+                    {(isAgent || isAdmin) && (
+                      <a href="/agent-dashboard" className="py-2 pl-2 text-primary font-medium hover:text-primary/80 transition-smooth">
+                        <Shield className="inline w-4 h-4 mr-2" />
+                        Agent Dashboard
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -252,6 +276,12 @@ export const Navigation = () => {
 
                 <div className="flex flex-col space-y-2 pt-4">
                   <ContactDropdown variant="ghost" size="sm" className="justify-start" />
+                  {user && (
+                    <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate("/dashboard")}>
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </Button>
+                  )}
                   {user ? (
                     <Button variant="outline" size="sm" className="justify-start" onClick={handleSignOut}>
                       <LogOut className="w-4 h-4 mr-2" />
