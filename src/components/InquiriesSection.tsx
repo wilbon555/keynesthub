@@ -2,7 +2,7 @@ import { useInquiries } from '@/hooks/useInquiries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Mail, Phone, MessageSquare, Calendar, MapPin, Home, Inbox } from 'lucide-react';
+import { Mail, Phone, MessageSquare, Calendar, MapPin, Home, Inbox, Shield, Clock, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const InquiriesSection = () => {
@@ -20,22 +20,59 @@ export const InquiriesSection = () => {
     return (
       <div className="text-center py-12">
         <Inbox className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-        <h3 className="text-lg font-semibold text-foreground mb-2">No Inquiries Yet</h3>
-        <p className="text-muted-foreground">
-          When potential buyers or renters contact you about your properties, their inquiries will appear here.
+        <h3 className="text-lg font-semibold text-foreground mb-2">No Approved Inquiries Yet</h3>
+        <p className="text-muted-foreground max-w-md mx-auto">
+          All inquiries are first reviewed by KeyNestHub agents to protect you from fraud. 
+          Once an agent verifies a buyer and schedules a viewing, you'll see their details here.
         </p>
       </div>
     );
   }
 
+  const getStatusBadge = (status?: string) => {
+    switch (status) {
+      case 'approved':
+        return (
+          <Badge className="bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/30">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Agent Approved
+          </Badge>
+        );
+      case 'pending':
+        return (
+          <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-700">
+            <Clock className="h-3 w-3 mr-1" />
+            Pending Review
+          </Badge>
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-semibold">Property Inquiries</h2>
+          <h2 className="text-xl font-semibold">Approved Inquiries</h2>
           <p className="text-muted-foreground text-sm">
-            {inquiries.length} inquiry{inquiries.length !== 1 ? 'ies' : ''} received
+            {inquiries.length} verified inquiry{inquiries.length !== 1 ? 'ies' : ''} from agent-approved buyers
           </p>
+        </div>
+      </div>
+
+      <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6">
+        <div className="flex items-start gap-3">
+          <Shield className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="text-sm font-medium text-foreground">
+              Agent-Verified Inquiries
+            </p>
+            <p className="text-sm text-muted-foreground mt-1">
+              All inquiries shown here have been verified by KeyNestHub agents. 
+              Our agents have confirmed the buyer's identity and interest before connecting them with you.
+            </p>
+          </div>
         </div>
       </div>
 

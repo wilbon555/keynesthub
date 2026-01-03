@@ -293,6 +293,7 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
                     {...property} 
                     images={property.images}
                     listing_type={property.listing_type}
+                    verification_status={property.verification_status || 'verified'}
                   />
                 ))}
               </div>

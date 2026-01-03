@@ -31,6 +31,11 @@ export interface Property {
   developer?: string;
   maintenance_quality?: string;
   uploadedFiles?: File[];
+  // Verification fields
+  verification_status?: string;
+  verified_at?: string;
+  verified_by?: string;
+  verification_notes?: string;
 }
 
 export const useProperties = () => {
