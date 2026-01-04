@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import AgentDashboard from "./pages/AgentDashboard";
+import AdminPanel from "./pages/AdminPanel";
 import InvestmentTips from "./pages/InvestmentTips";
 import MortgageCalculator from "./pages/MortgageCalculator";
 import BecomeAgent from "./pages/BecomeAgent";
@@ -50,6 +51,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/agent-dashboard" element={<ProtectedRoute><AgentDashboard /></ProtectedRoute>} />
+          <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
           <Route path="/install" element={<Install />} />
           
           {/* Buy Routes */}
