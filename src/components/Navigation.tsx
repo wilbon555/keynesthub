@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Menu, X, User, LogOut, Shield, LayoutDashboard } from "lucide-react";
+import { Menu, X, User, LogOut, Shield, LayoutDashboard, Settings } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
@@ -192,6 +192,12 @@ export const Navigation = () => {
                 Dashboard
               </Button>
             )}
+            {isAdmin && (
+              <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="text-primary">
+                <Settings className="w-4 h-4 mr-2" />
+                Admin
+              </Button>
+            )}
             {user ? (
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />
@@ -280,6 +286,12 @@ export const Navigation = () => {
                     <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate("/dashboard")}>
                       <LayoutDashboard className="w-4 h-4 mr-2" />
                       Dashboard
+                    </Button>
+                  )}
+                  {isAdmin && (
+                    <Button variant="ghost" size="sm" className="justify-start text-primary" onClick={() => navigate("/admin")}>
+                      <Settings className="w-4 h-4 mr-2" />
+                      Admin Panel
                     </Button>
                   )}
                   {user ? (
