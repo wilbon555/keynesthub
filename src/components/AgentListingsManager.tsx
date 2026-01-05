@@ -18,7 +18,14 @@ import {
   Check, 
   X, 
   Building,
-  Eye
+  Eye,
+  Phone,
+  Bed,
+  Bath,
+  Calendar,
+  Ruler,
+  Home,
+  Info
 } from "lucide-react";
 import { AgentListing, useAgentListings } from "@/hooks/useAgentListings";
 import { VerificationBadge } from "./VerificationBadge";
@@ -37,7 +44,13 @@ export const AgentListingsManager = () => {
   const [selectedListing, setSelectedListing] = useState<AgentListing | null>(null);
   const [showVerifyDialog, setShowVerifyDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [notes, setNotes] = useState('');
+
+  const handleViewDetails = (listing: AgentListing) => {
+    setSelectedListing(listing);
+    setShowDetailsDialog(true);
+  };
 
   const handleVerify = (listing: AgentListing) => {
     setSelectedListing(listing);
@@ -92,62 +105,123 @@ export const AgentListingsManager = () => {
   const renderListingCard = (listing: AgentListing, showActions: boolean = false) => (
     <Card key={listing.id}>
       <CardContent className="p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Image */}
-          <div className="w-full md:w-32 h-24 bg-muted rounded-lg overflow-hidden flex-shrink-0">
-            <img 
-              src={listing.images?.[0] || listing.image || '/placeholder.svg'} 
-              alt={listing.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Image */}
+            <div className="w-full md:w-40 h-28 bg-muted rounded-lg overflow-hidden flex-shrink-0">
+              <img 
+                src={listing.images?.[0] || listing.image || '/placeholder.svg'} 
+                alt={listing.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
-          {/* Details */}
-          <div className="flex-1 space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <VerificationBadge status={listing.verification_status} />
-                <Badge variant="outline">{listing.type}</Badge>
-                <Badge variant="outline">{listing.listing_type}</Badge>
+            {/* Main Details */}
+            <div className="flex-1 space-y-2">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <VerificationBadge status={listing.verification_status} />
+                  <Badge variant="outline">{listing.type}</Badge>
+                  <Badge variant="outline">{listing.listing_type}</Badge>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  <Clock className="inline w-3 h-3 mr-1" />
+                  {format(new Date(listing.created_at), 'MMM d, yyyy')}
+                </span>
               </div>
-              <span className="text-sm text-muted-foreground">
-                <Clock className="inline w-3 h-3 mr-1" />
-                {format(new Date(listing.created_at), 'MMM d, yyyy')}
-              </span>
+
+              <h4 className="font-semibold text-lg">{listing.title}</h4>
+              
+              <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+                <span className="flex items-center gap-1">
+                  <MapPin className="w-3 h-3" />
+                  {listing.location}
+                  {listing.region && `, ${listing.region}`}
+                  {listing.country && `, ${listing.country}`}
+                </span>
+                <span className="font-medium text-primary text-base">{listing.price}</span>
+                <span className="flex items-center gap-1">
+                  <Ruler className="w-3 h-3" />
+                  {listing.area}
+                </span>
+              </div>
+
+              {/* Property Specs */}
+              <div className="flex items-center gap-4 text-sm flex-wrap">
+                {listing.bedrooms && (
+                  <span className="flex items-center gap-1">
+                    <Bed className="w-4 h-4 text-muted-foreground" />
+                    {listing.bedrooms} Beds
+                  </span>
+                )}
+                {listing.bathrooms && (
+                  <span className="flex items-center gap-1">
+                    <Bath className="w-4 h-4 text-muted-foreground" />
+                    {listing.bathrooms} Baths
+                  </span>
+                )}
+                {listing.floors && (
+                  <span className="flex items-center gap-1">
+                    <Building className="w-4 h-4 text-muted-foreground" />
+                    {listing.floors} Floors
+                  </span>
+                )}
+                {listing.building_age && (
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    {listing.building_age} yrs old
+                  </span>
+                )}
+              </div>
             </div>
 
-            <h4 className="font-semibold">{listing.title}</h4>
-            
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <MapPin className="w-3 h-3" />
-                {listing.location}
-              </span>
-              <span className="font-medium text-primary">{listing.price}</span>
-              <span>{listing.area}</span>
+            {/* Actions */}
+            <div className="flex gap-2 md:flex-col justify-end">
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => handleViewDetails(listing)}
+              >
+                <Eye className="w-4 h-4 mr-1" />
+                Details
+              </Button>
+              {showActions && (
+                <>
+                  <Button 
+                    size="sm" 
+                    className="bg-green-600 hover:bg-green-700"
+                    onClick={() => handleVerify(listing)}
+                  >
+                    <Check className="w-4 h-4 mr-1" />
+                    Verify
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="destructive"
+                    onClick={() => handleReject(listing)}
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Reject
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Actions */}
-          {showActions && (
-            <div className="flex gap-2 md:flex-col">
-              <Button 
-                size="sm" 
-                className="bg-green-600 hover:bg-green-700"
-                onClick={() => handleVerify(listing)}
-              >
-                <Check className="w-4 h-4 mr-1" />
-                Verify
-              </Button>
-              <Button 
-                size="sm" 
-                variant="destructive"
-                onClick={() => handleReject(listing)}
-              >
-                <X className="w-4 h-4 mr-1" />
-                Reject
-              </Button>
+          {/* Phone Number - Highlighted for verification */}
+          {listing.phone && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-primary/10 rounded-md border border-primary/20">
+              <Phone className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">Owner Contact:</span>
+              <a href={`tel:${listing.phone}`} className="text-primary font-semibold hover:underline">
+                {listing.phone}
+              </a>
             </div>
+          )}
+
+          {/* Description Preview */}
+          {listing.description && (
+            <p className="text-sm text-muted-foreground line-clamp-2">{listing.description}</p>
           )}
         </div>
       </CardContent>
@@ -269,6 +343,183 @@ export const AgentListingsManager = () => {
             <Button variant="destructive" onClick={confirmReject}>
               <X className="w-4 h-4 mr-1" />
               Confirm Rejection
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Details Dialog */}
+      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
+        <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Home className="w-5 h-5" />
+              Property Details
+            </DialogTitle>
+            <DialogDescription>
+              Full details for verification review
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedListing && (
+            <div className="space-y-4">
+              {/* Images */}
+              {(selectedListing.images?.length || selectedListing.image) && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {(selectedListing.images || [selectedListing.image]).filter(Boolean).map((img, idx) => (
+                    <img 
+                      key={idx}
+                      src={img || '/placeholder.svg'} 
+                      alt={`Property ${idx + 1}`}
+                      className="w-full h-24 object-cover rounded-lg"
+                    />
+                  ))}
+                </div>
+              )}
+
+              {/* Status */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <VerificationBadge status={selectedListing.verification_status} />
+                <Badge variant="outline">{selectedListing.type}</Badge>
+                <Badge variant="outline">{selectedListing.listing_type}</Badge>
+              </div>
+
+              {/* Title & Price */}
+              <div>
+                <h3 className="text-xl font-semibold">{selectedListing.title}</h3>
+                <p className="text-2xl font-bold text-primary">{selectedListing.price}</p>
+              </div>
+
+              {/* Owner Contact - Highlighted */}
+              <div className="p-4 bg-primary/10 rounded-lg border border-primary/20">
+                <h4 className="font-semibold flex items-center gap-2 mb-2">
+                  <Phone className="w-4 h-4" />
+                  Owner Contact Information
+                </h4>
+                {selectedListing.phone ? (
+                  <a href={`tel:${selectedListing.phone}`} className="text-lg font-bold text-primary hover:underline">
+                    {selectedListing.phone}
+                  </a>
+                ) : (
+                  <p className="text-muted-foreground italic">No phone number provided</p>
+                )}
+              </div>
+
+              {/* Location Details */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-muted-foreground">Location</Label>
+                  <p className="font-medium">{selectedListing.location}</p>
+                </div>
+                {selectedListing.region && (
+                  <div>
+                    <Label className="text-muted-foreground">Region</Label>
+                    <p className="font-medium">{selectedListing.region}</p>
+                  </div>
+                )}
+                {selectedListing.country && (
+                  <div>
+                    <Label className="text-muted-foreground">Country</Label>
+                    <p className="font-medium">{selectedListing.country}</p>
+                  </div>
+                )}
+                <div>
+                  <Label className="text-muted-foreground">Area</Label>
+                  <p className="font-medium">{selectedListing.area}</p>
+                </div>
+              </div>
+
+              {/* Property Specs */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {selectedListing.bedrooms && (
+                  <div className="flex items-center gap-2">
+                    <Bed className="w-4 h-4 text-muted-foreground" />
+                    <div>
+                      <Label className="text-muted-foreground text-xs">Bedrooms</Label>
+                      <p className="font-medium">{selectedListing.bedrooms}</p>
+                    </div>
+                  </div>
+                )}
+                {selectedListing.bathrooms && (
+                  <div className="flex items-center gap-2">
+                    <Bath className="w-4 h-4 text-muted-foreground" />
+                    <div>
+                      <Label className="text-muted-foreground text-xs">Bathrooms</Label>
+                      <p className="font-medium">{selectedListing.bathrooms}</p>
+                    </div>
+                  </div>
+                )}
+                {selectedListing.floors && (
+                  <div className="flex items-center gap-2">
+                    <Building className="w-4 h-4 text-muted-foreground" />
+                    <div>
+                      <Label className="text-muted-foreground text-xs">Floors</Label>
+                      <p className="font-medium">{selectedListing.floors}</p>
+                    </div>
+                  </div>
+                )}
+                {selectedListing.units && (
+                  <div className="flex items-center gap-2">
+                    <Home className="w-4 h-4 text-muted-foreground" />
+                    <div>
+                      <Label className="text-muted-foreground text-xs">Units</Label>
+                      <p className="font-medium">{selectedListing.units}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Additional Info */}
+              <div className="grid grid-cols-2 gap-4">
+                {selectedListing.building_age && (
+                  <div>
+                    <Label className="text-muted-foreground">Building Age</Label>
+                    <p className="font-medium">{selectedListing.building_age} years</p>
+                  </div>
+                )}
+                {selectedListing.developer && (
+                  <div>
+                    <Label className="text-muted-foreground">Developer</Label>
+                    <p className="font-medium">{selectedListing.developer}</p>
+                  </div>
+                )}
+                {selectedListing.maintenance_quality && (
+                  <div>
+                    <Label className="text-muted-foreground">Maintenance Quality</Label>
+                    <p className="font-medium capitalize">{selectedListing.maintenance_quality}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              {selectedListing.description && (
+                <div>
+                  <Label className="text-muted-foreground">Description</Label>
+                  <p className="mt-1 text-sm whitespace-pre-wrap">{selectedListing.description}</p>
+                </div>
+              )}
+
+              {/* Verification Info */}
+              {selectedListing.verification_notes && (
+                <div className="p-3 bg-muted rounded-lg">
+                  <Label className="text-muted-foreground">Verification Notes</Label>
+                  <p className="mt-1 text-sm">{selectedListing.verification_notes}</p>
+                </div>
+              )}
+
+              {/* Timestamps */}
+              <div className="text-xs text-muted-foreground pt-2 border-t">
+                <p>Listed: {format(new Date(selectedListing.created_at), 'PPpp')}</p>
+                {selectedListing.verified_at && (
+                  <p>Verified: {format(new Date(selectedListing.verified_at), 'PPpp')}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
+              Close
             </Button>
           </DialogFooter>
         </DialogContent>
