@@ -19,6 +19,17 @@ export interface AgentListing {
   listing_type: string;
   image: string | null;
   images: string[] | null;
+  phone: string | null;
+  description: string | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  region: string | null;
+  country: string | null;
+  developer: string | null;
+  maintenance_quality: string | null;
+  building_age: number | null;
+  floors: number | null;
+  units: number | null;
 }
 
 export const useAgentListings = () => {
