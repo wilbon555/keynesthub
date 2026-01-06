@@ -3,23 +3,61 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { UserRole } from './useUserRoles';
 
+export interface AgentApplication {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  country: string;
+  state: string | null;
+  hometown: string | null;
+  price_range: string | null;
+  experience: string | null;
+  created_at: string;
+}
+
+export interface UserRoleWithApplication extends UserRole {
+  application?: AgentApplication | null;
+}
+
 export const useAdminRoles = () => {
-  const [pendingApplications, setPendingApplications] = useState<UserRole[]>([]);
-  const [approvedRoles, setApprovedRoles] = useState<UserRole[]>([]);
+  const [pendingApplications, setPendingApplications] = useState<UserRoleWithApplication[]>([]);
+  const [approvedRoles, setApprovedRoles] = useState<UserRoleWithApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
   const fetchAllRoles = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch all roles
+      const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('*')
         .order('applied_at', { ascending: false });
 
-      if (error) throw error;
+      if (rolesError) throw rolesError;
 
-      const pending = (data || []).filter(r => !r.approved) as UserRole[];
-      const approved = (data || []).filter(r => r.approved) as UserRole[];
+      // Fetch all agent applications
+      const { data: applicationsData, error: appsError } = await supabase
+        .from('agent_applications')
+        .select('*');
+
+      if (appsError) throw appsError;
+
+      // Map applications by user_id for quick lookup
+      const applicationsMap = new Map<string, AgentApplication>();
+      (applicationsData || []).forEach((app: AgentApplication) => {
+        applicationsMap.set(app.user_id, app);
+      });
+
+      // Combine roles with their applications
+      const rolesWithApps: UserRoleWithApplication[] = (rolesData || []).map(role => ({
+        ...role,
+        application: applicationsMap.get(role.user_id) || null
+      })) as UserRoleWithApplication[];
+
+      const pending = rolesWithApps.filter(r => !r.approved);
+      const approved = rolesWithApps.filter(r => r.approved);
 
       setPendingApplications(pending);
       setApprovedRoles(approved);

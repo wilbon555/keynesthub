@@ -69,6 +69,25 @@ const BecomeAgent = () => {
     setIsSubmitting(true);
     
     try {
+      // First save the application details
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { error: appError } = await supabase
+        .from('agent_applications')
+        .insert({
+          user_id: user.id,
+          full_name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          country: formData.country,
+          state: formData.state || null,
+          hometown: formData.hometown || null,
+          price_range: formData.priceRange || null,
+          experience: formData.experience || null
+        });
+
+      if (appError) throw appError;
+
+      // Then apply for the role
       const success = await applyForRole('agent');
       
       if (success) {
@@ -84,6 +103,7 @@ const BecomeAgent = () => {
         });
       }
     } catch (error) {
+      console.error('Application error:', error);
       toast({
         title: "Error",
         description: "Failed to submit application. Please try again.",
