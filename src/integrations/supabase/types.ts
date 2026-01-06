@@ -44,6 +44,48 @@ export type Database = {
         }
         Relationships: []
       }
+      agent_applications: {
+        Row: {
+          country: string
+          created_at: string
+          email: string
+          experience: string | null
+          full_name: string
+          hometown: string | null
+          id: string
+          phone: string
+          price_range: string | null
+          state: string | null
+          user_id: string
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          email: string
+          experience?: string | null
+          full_name: string
+          hometown?: string | null
+          id?: string
+          phone: string
+          price_range?: string | null
+          state?: string | null
+          user_id: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          email?: string
+          experience?: string | null
+          full_name?: string
+          hometown?: string | null
+          id?: string
+          phone?: string
+          price_range?: string | null
+          state?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       contact_requests: {
         Row: {
           agent_notes: string | null

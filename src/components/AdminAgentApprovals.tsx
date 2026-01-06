@@ -1,16 +1,26 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useAdminRoles } from "@/hooks/useAdminRoles";
-import { CheckCircle, XCircle, Clock, Users, Loader2 } from "lucide-react";
+import { useAdminRoles, UserRoleWithApplication } from "@/hooks/useAdminRoles";
+import { CheckCircle, XCircle, Clock, Users, Loader2, Phone, Mail, MapPin, Briefcase, DollarSign, Eye } from "lucide-react";
 import { format } from "date-fns";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export const AdminAgentApprovals = () => {
   const { pendingApplications, approvedRoles, loading, approveRole, rejectRole } = useAdminRoles();
+  const [selectedApplication, setSelectedApplication] = useState<UserRoleWithApplication | null>(null);
 
   const pendingAgentApplications = pendingApplications.filter(app => app.role === 'agent');
   const approvedAgents = approvedRoles.filter(role => role.role === 'agent');
+
+  const countries: Record<string, string> = {
+    'US': 'United States',
+    'KE': 'Kenya',
+    'UK': 'United Kingdom',
+    'CA': 'Canada',
+    'AU': 'Australia'
+  };
 
   if (loading) {
     return (
@@ -19,6 +29,106 @@ export const AdminAgentApprovals = () => {
       </div>
     );
   }
+
+  const ApplicationCard = ({ application, showActions = true }: { application: UserRoleWithApplication; showActions?: boolean }) => (
+    <Card className="mb-4">
+      <CardContent className="p-4">
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+          <div className="flex-1 space-y-3">
+            {/* Header with name and status */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">
+                  {application.application?.full_name || 'Unknown Applicant'}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Applied {format(new Date(application.applied_at), 'MMM dd, yyyy HH:mm')}
+                </p>
+              </div>
+              <Badge variant={application.approved ? "default" : "secondary"} className={application.approved ? "bg-green-600" : ""}>
+                {application.approved ? 'Approved' : 'Pending'}
+              </Badge>
+            </div>
+
+            {/* Application details */}
+            {application.application ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  <span>{application.application.email}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  <span>{application.application.phone}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <MapPin className="w-4 h-4 text-muted-foreground" />
+                  <span>
+                    {[
+                      application.application.hometown,
+                      application.application.state,
+                      countries[application.application.country] || application.application.country
+                    ].filter(Boolean).join(', ')}
+                  </span>
+                </div>
+                {application.application.experience && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Briefcase className="w-4 h-4 text-muted-foreground" />
+                    <span>{application.application.experience} years experience</span>
+                  </div>
+                )}
+                {application.application.price_range && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <DollarSign className="w-4 h-4 text-muted-foreground" />
+                    <span>{application.application.price_range}</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground italic">
+                No application details available (legacy application)
+              </p>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSelectedApplication(application)}
+            >
+              <Eye className="h-4 w-4 mr-1" />
+              Details
+            </Button>
+            {showActions && !application.approved && (
+              <>
+                <Button
+                  size="sm"
+                  onClick={() => approveRole(application.id)}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCircle className="h-4 w-4 mr-1" />
+                  Approve
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => rejectRole(application.id)}
+                >
+                  <XCircle className="h-4 w-4 mr-1" />
+                  Reject
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="space-y-6">
@@ -32,7 +142,7 @@ export const AdminAgentApprovals = () => {
                 Pending Agent Applications
               </CardTitle>
               <CardDescription>
-                Review and approve users who want to become agents
+                Review application details and approve users who want to become agents
               </CardDescription>
             </div>
             <Badge variant="secondary">{pendingAgentApplications.length} pending</Badge>
@@ -45,53 +155,11 @@ export const AdminAgentApprovals = () => {
               <p>No pending agent applications</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User ID</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Applied At</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pendingAgentApplications.map((application) => (
-                  <TableRow key={application.id}>
-                    <TableCell className="font-mono text-sm">
-                      {application.user_id.substring(0, 8)}...
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="capitalize">
-                        {application.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {format(new Date(application.applied_at), 'MMM dd, yyyy HH:mm')}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => approveRole(application.id)}
-                          className="bg-green-600 hover:bg-green-700"
-                        >
-                          <CheckCircle className="h-4 w-4 mr-1" />
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => rejectRole(application.id)}
-                        >
-                          <XCircle className="h-4 w-4 mr-1" />
-                          Reject
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div>
+              {pendingAgentApplications.map((application) => (
+                <ApplicationCard key={application.id} application={application} showActions={true} />
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
@@ -119,42 +187,126 @@ export const AdminAgentApprovals = () => {
               <p>No approved agents yet</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>User ID</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Approved At</TableHead>
-                  <TableHead>Approved By</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {approvedAgents.map((role) => (
-                  <TableRow key={role.id}>
-                    <TableCell className="font-mono text-sm">
-                      {role.user_id.substring(0, 8)}...
-                    </TableCell>
-                    <TableCell>
-                      <Badge className="bg-green-600 capitalize">
-                        {role.role}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {role.approved_at 
-                        ? format(new Date(role.approved_at), 'MMM dd, yyyy HH:mm')
-                        : '-'
-                      }
-                    </TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {role.approved_by ? `${role.approved_by.substring(0, 8)}...` : '-'}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <div>
+              {approvedAgents.map((role) => (
+                <ApplicationCard key={role.id} application={role} showActions={false} />
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
+
+      {/* Details Dialog */}
+      <Dialog open={!!selectedApplication} onOpenChange={() => setSelectedApplication(null)}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Agent Application Details</DialogTitle>
+            <DialogDescription>
+              Full details of the agent application
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedApplication && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 pb-4 border-b">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">
+                    {selectedApplication.application?.full_name || 'Unknown Applicant'}
+                  </h3>
+                  <Badge variant={selectedApplication.approved ? "default" : "secondary"} className={selectedApplication.approved ? "bg-green-600" : ""}>
+                    {selectedApplication.approved ? 'Approved' : 'Pending Review'}
+                  </Badge>
+                </div>
+              </div>
+
+              {selectedApplication.application ? (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-muted-foreground">Email</label>
+                      <p className="font-medium">{selectedApplication.application.email}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground">Phone</label>
+                      <p className="font-medium">{selectedApplication.application.phone}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-muted-foreground">Country</label>
+                      <p className="font-medium">{countries[selectedApplication.application.country] || selectedApplication.application.country}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground">State/County</label>
+                      <p className="font-medium">{selectedApplication.application.state || '-'}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm text-muted-foreground">Hometown</label>
+                      <p className="font-medium">{selectedApplication.application.hometown || '-'}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-muted-foreground">Experience</label>
+                      <p className="font-medium">{selectedApplication.application.experience ? `${selectedApplication.application.experience} years` : '-'}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-muted-foreground">Price Range</label>
+                    <p className="font-medium">{selectedApplication.application.price_range || '-'}</p>
+                  </div>
+
+                  <div>
+                    <label className="text-sm text-muted-foreground">Applied On</label>
+                    <p className="font-medium">{format(new Date(selectedApplication.applied_at), 'MMMM dd, yyyy \'at\' HH:mm')}</p>
+                  </div>
+
+                  {selectedApplication.approved && selectedApplication.approved_at && (
+                    <div>
+                      <label className="text-sm text-muted-foreground">Approved On</label>
+                      <p className="font-medium">{format(new Date(selectedApplication.approved_at), 'MMMM dd, yyyy \'at\' HH:mm')}</p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-muted-foreground italic">No detailed application data available.</p>
+              )}
+
+              {!selectedApplication.approved && (
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button
+                    className="flex-1 bg-green-600 hover:bg-green-700"
+                    onClick={() => {
+                      approveRole(selectedApplication.id);
+                      setSelectedApplication(null);
+                    }}
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Approve Agent
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => {
+                      rejectRole(selectedApplication.id);
+                      setSelectedApplication(null);
+                    }}
+                  >
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Reject
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
