@@ -72,10 +72,26 @@ export const useAdminRoles = () => {
     fetchAllRoles();
   }, []);
 
+  const sendNotificationEmail = async (email: string, fullName: string, status: "approved" | "rejected") => {
+    try {
+      const { error } = await supabase.functions.invoke('notify-agent-application', {
+        body: { email, fullName, status }
+      });
+      if (error) {
+        console.error('Failed to send notification email:', error);
+      }
+    } catch (error) {
+      console.error('Error sending notification email:', error);
+    }
+  };
+
   const approveRole = async (roleId: string): Promise<boolean> => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
+
+      // Get the application details before approving
+      const application = pendingApplications.find(app => app.id === roleId);
 
       const { error } = await supabase
         .from('user_roles')
@@ -87,6 +103,15 @@ export const useAdminRoles = () => {
         .eq('id', roleId);
 
       if (error) throw error;
+
+      // Send notification email
+      if (application?.application) {
+        sendNotificationEmail(
+          application.application.email,
+          application.application.full_name,
+          "approved"
+        );
+      }
 
       toast({
         title: "Application Approved",
@@ -108,12 +133,24 @@ export const useAdminRoles = () => {
 
   const rejectRole = async (roleId: string): Promise<boolean> => {
     try {
+      // Get the application details before rejecting
+      const application = pendingApplications.find(app => app.id === roleId);
+
       const { error } = await supabase
         .from('user_roles')
         .delete()
         .eq('id', roleId);
 
       if (error) throw error;
+
+      // Send notification email
+      if (application?.application) {
+        sendNotificationEmail(
+          application.application.email,
+          application.application.full_name,
+          "rejected"
+        );
+      }
 
       toast({
         title: "Application Rejected",
