@@ -34,6 +34,7 @@ import ShortTerm from "./pages/rent/ShortTerm";
 
 // Agent pages
 import FindAgent from "./pages/agents/FindAgent";
+import AgentsDirectory from "./pages/agents/AgentsDirectory";
 
 // Market pages
 import PropertyTrends from "./pages/market/PropertyTrends";
@@ -73,6 +74,7 @@ const App = () => (
           
           {/* Agent Routes */}
           <Route path="/agents/find-agent" element={<FindAgent />} />
+          <Route path="/agents/directory" element={<AgentsDirectory />} />
           <Route path="/become-agent" element={<BecomeAgent />} />
           
           {/* Market Routes */}
