@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Menu, X, User, LogOut, Shield, LayoutDashboard, Settings } from "lucide-react";
+import { Menu, X, User, LogOut, Shield, LayoutDashboard, Settings, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
@@ -37,8 +37,11 @@ export const Navigation = () => {
     <nav className="bg-card/95 backdrop-blur-sm border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center space-x-3">
+          {/* Logo - clickable to go home */}
+          <div 
+            className="flex items-center space-x-3 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate("/")}
+          >
             <div className="w-8 h-8 flex items-center justify-center">
               <img src={keyNestHubLogo} alt="KeyNestHub logo icon" className="w-full h-full object-contain" loading="lazy" />
             </div>
@@ -185,6 +188,10 @@ export const Navigation = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-3">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
+              <Home className="w-4 h-4 mr-2" />
+              Home
+            </Button>
             <ContactDropdown variant="ghost" size="sm" />
             {user && (
               <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
@@ -228,6 +235,12 @@ export const Navigation = () => {
           <div className="md:hidden border-t border-border animate-fade-in">
             <ScrollArea className="h-[calc(100vh-4rem)] py-4">
               <div className="flex flex-col space-y-4 px-4">
+                {/* Home link for mobile */}
+                <a href="/" className="flex items-center py-2 text-primary font-semibold hover:text-primary/80 transition-smooth">
+                  <Home className="w-4 h-4 mr-2" />
+                  Home
+                </a>
+
                 <div>
                   <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Buy</div>
                   <div className="mt-2 flex flex-col">
