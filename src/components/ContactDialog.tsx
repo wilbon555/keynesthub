@@ -118,6 +118,18 @@ const ContactDialog = ({
 
       if (error) throw error;
 
+      // Notify agents via email (fire and forget - don't block on this)
+      supabase.functions.invoke('notify-new-inquiry', {
+        body: {
+          propertyTitle,
+          propertyId,
+          requesterName: validated.name,
+          requesterEmail: validated.email,
+          requesterPhone: validated.phone || null,
+          message: validated.message || null
+        }
+      }).catch(err => console.error('Failed to notify agents:', err));
+
       setIsSubmitted(true);
       toast({
         title: "Inquiry submitted successfully!",

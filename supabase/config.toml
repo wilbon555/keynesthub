@@ -2,3 +2,6 @@ project_id = "tyhcmtdppcxslyzfuqvk"
 
 [functions.get-google-maps-key]
 verify_jwt = false
+
+[functions.notify-new-inquiry]
+verify_jwt = false
