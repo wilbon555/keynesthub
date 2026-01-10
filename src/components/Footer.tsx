@@ -12,6 +12,16 @@ const Footer = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const sendWelcomeEmail = async (subscriberEmail: string) => {
+    try {
+      await supabase.functions.invoke("send-newsletter-welcome", {
+        body: { email: subscriberEmail },
+      });
+    } catch (error) {
+      console.error("Failed to send welcome email:", error);
+    }
+  };
+
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) return;
@@ -30,6 +40,7 @@ const Footer = () => {
         }
       } else {
         toast.success("Thank you for subscribing to our newsletter!");
+        sendWelcomeEmail(email.trim());
       }
       setEmail("");
     } catch (error) {
@@ -57,7 +68,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-black text-white">
+    <footer className="bg-slate-900 text-white">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Section */}
