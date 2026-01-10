@@ -2,19 +2,41 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import keyNestHubLogo from "@/assets/keynesthub-logo.png";
 
 const Footer = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim()) {
-      toast.success("Thank you for subscribing to our newsletter!");
+    if (!email.trim()) return;
+
+    setIsLoading(true);
+    try {
+      const { error } = await supabase
+        .from("newsletter_subscribers")
+        .insert({ email: email.trim() });
+
+      if (error) {
+        if (error.code === "23505") {
+          toast.info("You're already subscribed to our newsletter!");
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success("Thank you for subscribing to our newsletter!");
+      }
       setEmail("");
+    } catch (error) {
+      console.error("Newsletter subscription error:", error);
+      toast.error("Failed to subscribe. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -101,10 +123,13 @@ const Footer = () => {
                 <Mail className="w-4 h-4" />
                 keynesthub@gmail.com
               </a>
-              <div className="flex items-center gap-2 text-gray-400 text-sm">
+              <a 
+                href="tel:+254701555240" 
+                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
+              >
                 <Phone className="w-4 h-4" />
-                +254 700 000 000
-              </div>
+                +254 701 555 240
+              </a>
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <MapPin className="w-4 h-4" />
                 Nairobi, Kenya
@@ -122,9 +147,10 @@ const Footer = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 text-sm"
                   required
+                  disabled={isLoading}
                 />
-                <Button type="submit" size="icon" className="shrink-0">
-                  <Send className="w-4 h-4" />
+                <Button type="submit" size="icon" className="shrink-0" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </Button>
               </form>
             </div>
