@@ -304,19 +304,6 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
                   Load More Properties
                 </Button>
               </div>
-
-              {/* Copyright Footer */}
-              <div className="text-center mt-8 py-6 border-t border-border">
-                <p className="text-muted-foreground text-sm">
-                  © {new Date().getFullYear()} KeyNestHub. All rights reserved.
-                </p>
-                <a 
-                  href="mailto:keynesthub@gmail.com" 
-                  className="text-primary hover:text-primary/80 text-sm transition-colors"
-                >
-                  keynesthub@gmail.com
-                </a>
-              </div>
             </>
           )}
         </div>
