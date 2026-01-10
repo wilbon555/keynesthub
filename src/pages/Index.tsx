@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { PropertyGrid } from "@/components/PropertyGrid";
+import { Footer } from "@/components/Footer";
 
 const Index = () => {
   return (
@@ -8,6 +9,7 @@ const Index = () => {
       <Navigation />
       <HeroSection />
       <PropertyGrid defaultStatus="available" defaultListingType="sale" />
+      <Footer />
     </div>
   );
 };
