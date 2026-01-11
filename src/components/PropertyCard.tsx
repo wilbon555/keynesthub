@@ -7,6 +7,7 @@ import { PhotoGallery } from "./PhotoGallery";
 import ContactDialog from "./ContactDialog";
 import { EditPropertyDialog } from "./EditPropertyDialog";
 import { VerificationBadge } from "./VerificationBadge";
+import { FavoriteButton } from "./FavoriteButton";
 import { useProperties, Property } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -192,9 +193,12 @@ export const PropertyCard = ({
             Featured
           </Badge>
         )}
-        <Badge variant="secondary" className="absolute top-3 right-3">
-          {type}
-        </Badge>
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          <FavoriteButton propertyId={id} />
+          <Badge variant="secondary">
+            {type}
+          </Badge>
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-smooth flex items-center justify-center pointer-events-none">
           <div className="text-white text-center">
             <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/30">

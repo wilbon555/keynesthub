@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Navigation } from "@/components/Navigation";
 import { PropertyCard } from "@/components/PropertyCard";
 import { InquiriesSection } from "@/components/InquiriesSection";
+import { WishlistSection } from "@/components/WishlistSection";
 import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
+import { useFavorites } from "@/hooks/useFavorites";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, MessageSquare, Plus, Building } from "lucide-react";
+import { Home, MessageSquare, Plus, Building, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useInquiries } from "@/hooks/useInquiries";
 
@@ -15,6 +17,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { properties, loading: propertiesLoading } = useProperties();
   const { inquiries, loading: inquiriesLoading } = useInquiries();
+  const { favorites } = useFavorites();
   const navigate = useNavigate();
 
   // Filter to only show user's own properties
@@ -37,7 +40,7 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-3 mb-8">
+        <div className="grid gap-4 md:grid-cols-4 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">My Properties</CardTitle>
@@ -64,6 +67,18 @@ const Dashboard = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Saved Properties</CardTitle>
+              <Heart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{favorites.length}</div>
+              <p className="text-xs text-muted-foreground">
+                In your wishlist
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Quick Action</CardTitle>
               <Plus className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -80,9 +95,9 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        {/* Tabs for Properties and Inquiries */}
+        {/* Tabs for Properties, Inquiries and Wishlist */}
         <Tabs defaultValue="inquiries" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-lg grid-cols-3">
             <TabsTrigger value="inquiries" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Inquiries
@@ -95,6 +110,15 @@ const Dashboard = () => {
             <TabsTrigger value="properties" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
               My Properties
+            </TabsTrigger>
+            <TabsTrigger value="wishlist" className="flex items-center gap-2">
+              <Heart className="h-4 w-4" />
+              Wishlist
+              {favorites.length > 0 && (
+                <span className="ml-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  {favorites.length}
+                </span>
+              )}
             </TabsTrigger>
           </TabsList>
 
@@ -130,6 +154,10 @@ const Dashboard = () => {
                 ))}
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="wishlist">
+            <WishlistSection />
           </TabsContent>
         </Tabs>
       </main>
