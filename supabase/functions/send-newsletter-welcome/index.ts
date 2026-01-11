@@ -42,7 +42,7 @@ const handler = async (req: Request): Promise<Response> => {
     }
 
     const emailResponse = await resend.emails.send({
-      from: "KeyNestHub <onboarding@resend.dev>",
+      from: "KeyNestHub <hello@keynesthub.com>",
       to: [email],
       subject: "Welcome to KeyNestHub Newsletter! 🏠",
       html: `
