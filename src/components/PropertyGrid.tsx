@@ -3,8 +3,9 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { useProperties, Property } from "@/hooks/useProperties";
 import PropertyMap from "./PropertyMap";
+import { AdvancedSearchFilters, SearchFilters, defaultFilters } from "./AdvancedSearchFilters";
 
-import { SlidersHorizontal, Grid, List, MapPin } from "lucide-react";
+import { Grid, List, MapPin } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import property1 from "@/assets/property-1.jpg";
@@ -136,16 +137,29 @@ interface PropertyGridProps {
 export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }: PropertyGridProps = {}) => {
   const [viewMode, setViewMode] = useState<"grid" | "list" | "map">("grid");
   const [selectedType, setSelectedType] = useState<string>(defaultType || "all");
+  const [filters, setFilters] = useState<SearchFilters>({
+    ...defaultFilters,
+    listingType: defaultListingType || 'all'
+  });
   const [searchParams] = useSearchParams();
   const { properties, loading } = useProperties();
 
   useEffect(() => {
     const typeParam = (searchParams.get("type") || defaultType || "all").toLowerCase();
     setSelectedType(typeParam);
+    
+    // Sync URL params with filters
+    const query = searchParams.get("q") || "";
+    const priceParam = searchParams.get("price") || "";
+    
+    if (query || priceParam || typeParam !== "all") {
+      setFilters(prev => ({
+        ...prev,
+        location: query,
+        propertyType: typeParam,
+      }));
+    }
   }, [searchParams, defaultType]);
-
-  const query = (searchParams.get("q") || "").toLowerCase();
-  const priceParam = searchParams.get("price") || "";
 
   const propertyTypes = ["all", "residential", "house", "apartment", "land", "commercial"];
 
@@ -154,21 +168,16 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
     return isNaN(num) ? 0 : num;
   };
 
-  const inPriceRange = (price: number) => {
-    switch (priceParam) {
-      case "0-100k":
-        return price <= 100000;
-      case "100k-300k":
-        return price >= 100000 && price <= 300000;
-      case "300k-500k":
-        return price >= 300000 && price <= 500000;
-      case "500k-1m":
-        return price >= 500000 && price <= 1000000;
-      case "1m+":
-        return price > 1000000;
-      default:
-        return true;
+  const handleFiltersChange = (newFilters: SearchFilters) => {
+    setFilters(newFilters);
+    if (newFilters.propertyType !== 'all') {
+      setSelectedType(newFilters.propertyType);
     }
+  };
+
+  const handleClearFilters = () => {
+    setFilters({ ...defaultFilters, listingType: defaultListingType || 'all' });
+    setSelectedType('all');
   };
 
   // Combine database properties with sample properties, with database ones first
@@ -178,22 +187,43 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
     .filter((property) => 
       defaultStatus ? property.status === defaultStatus : true
     )
-    .filter((property) =>
-      defaultListingType ? property.listing_type === defaultListingType : true
-    )
     .filter((property) => {
-      if (selectedType === "all") return true;
-      if (selectedType === "residential") {
+      // Listing type filter
+      if (filters.listingType === 'all') return true;
+      return property.listing_type === filters.listingType;
+    })
+    .filter((property) => {
+      // Property type filter
+      if (selectedType === "all" && filters.propertyType === "all") return true;
+      const typeToCheck = selectedType !== "all" ? selectedType : filters.propertyType;
+      if (typeToCheck === "residential") {
         return property.type.toLowerCase() === "house" || property.type.toLowerCase() === "apartment";
       }
-      return property.type.toLowerCase() === selectedType;
+      return property.type.toLowerCase() === typeToCheck;
     })
     .filter((property) => {
-      if (!query) return true;
+      // Location filter
+      if (!filters.location) return true;
       const text = `${property.title} ${property.location}`.toLowerCase();
-      return text.includes(query);
+      return text.includes(filters.location.toLowerCase());
     })
-    .filter((property) => inPriceRange(priceToNumber(property.price)));
+    .filter((property) => {
+      // Price range filter
+      const price = priceToNumber(property.price);
+      return price >= filters.minPrice && price <= filters.maxPrice;
+    })
+    .filter((property) => {
+      // Bedroom filter
+      if (filters.minBedrooms === 0 && filters.maxBedrooms === 10) return true;
+      const bedrooms = property.bedrooms || 0;
+      return bedrooms >= filters.minBedrooms && bedrooms <= filters.maxBedrooms;
+    })
+    .filter((property) => {
+      // Bathroom filter
+      if (filters.minBathrooms === 0 && filters.maxBathrooms === 10) return true;
+      const bathrooms = property.bathrooms || 0;
+      return bathrooms >= filters.minBathrooms && bathrooms <= filters.maxBathrooms;
+    });
   return (
     <section id="featured" className="py-16 bg-background">
       <div className="container mx-auto px-4">
@@ -227,10 +257,11 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm">
-              <SlidersHorizontal className="w-4 h-4 mr-2" />
-              Filters
-            </Button>
+            <AdvancedSearchFilters
+              filters={filters}
+              onFiltersChange={handleFiltersChange}
+              onClearFilters={handleClearFilters}
+            />
             <div className="flex border rounded-lg overflow-hidden">
               <Button
                 variant={viewMode === "grid" ? "default" : "ghost"}
