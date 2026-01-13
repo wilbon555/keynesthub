@@ -3,13 +3,15 @@ import { Navigation } from "@/components/Navigation";
 import { PropertyCard } from "@/components/PropertyCard";
 import { InquiriesSection } from "@/components/InquiriesSection";
 import { WishlistSection } from "@/components/WishlistSection";
+import { RecentlyViewedSection } from "@/components/RecentlyViewedSection";
 import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, MessageSquare, Plus, Building, Heart } from "lucide-react";
+import { Home, MessageSquare, Plus, Building, Heart, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useInquiries } from "@/hooks/useInquiries";
 
@@ -18,6 +20,7 @@ const Dashboard = () => {
   const { properties, loading: propertiesLoading } = useProperties();
   const { inquiries, loading: inquiriesLoading } = useInquiries();
   const { favorites } = useFavorites();
+  const { recentPropertyIds } = useRecentlyViewed();
   const navigate = useNavigate();
 
   // Filter to only show user's own properties
@@ -79,44 +82,49 @@ const Dashboard = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Quick Action</CardTitle>
-              <Plus className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Recently Viewed</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <Button 
-                className="w-full mt-2" 
-                size="sm"
-                onClick={() => navigate('/sell/list-property')}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                List New Property
-              </Button>
+              <div className="text-2xl font-bold">{recentPropertyIds.length}</div>
+              <p className="text-xs text-muted-foreground">
+                Properties viewed
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Tabs for Properties, Inquiries and Wishlist */}
+        {/* Tabs for Properties, Inquiries, Wishlist and Recently Viewed */}
         <Tabs defaultValue="inquiries" className="space-y-6">
-          <TabsList className="grid w-full max-w-lg grid-cols-3">
+          <TabsList className="grid w-full max-w-2xl grid-cols-4">
             <TabsTrigger value="inquiries" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
-              Inquiries
+              <span className="hidden sm:inline">Inquiries</span>
               {inquiries.length > 0 && (
-                <span className="ml-1 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+                <span className="bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
                   {inquiries.length}
                 </span>
               )}
             </TabsTrigger>
             <TabsTrigger value="properties" className="flex items-center gap-2">
               <Home className="h-4 w-4" />
-              My Properties
+              <span className="hidden sm:inline">My Properties</span>
             </TabsTrigger>
             <TabsTrigger value="wishlist" className="flex items-center gap-2">
               <Heart className="h-4 w-4" />
-              Wishlist
+              <span className="hidden sm:inline">Wishlist</span>
               {favorites.length > 0 && (
-                <span className="ml-1 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
                   {favorites.length}
+                </span>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="recent" className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              <span className="hidden sm:inline">Recent</span>
+              {recentPropertyIds.length > 0 && (
+                <span className="bg-muted-foreground text-background text-xs px-2 py-0.5 rounded-full">
+                  {recentPropertyIds.length}
                 </span>
               )}
             </TabsTrigger>
@@ -158,6 +166,10 @@ const Dashboard = () => {
 
           <TabsContent value="wishlist">
             <WishlistSection />
+          </TabsContent>
+
+          <TabsContent value="recent">
+            <RecentlyViewedSection />
           </TabsContent>
         </Tabs>
       </main>
