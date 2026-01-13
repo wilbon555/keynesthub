@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { VerificationBadge } from "./VerificationBadge";
 import { FavoriteButton } from "./FavoriteButton";
 import { useProperties, Property } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
+import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { toast } from "sonner";
 
 interface PropertyCardProps {
@@ -52,6 +53,14 @@ export const PropertyCard = ({
   const [showEditDialog, setShowEditDialog] = useState(false);
   const { deleteProperty, updateProperty } = useProperties();
   const { user } = useAuth();
+  const { addToRecentlyViewed } = useRecentlyViewed();
+  
+  // Track property view when gallery is opened
+  useEffect(() => {
+    if (isGalleryOpen) {
+      addToRecentlyViewed(id);
+    }
+  }, [isGalleryOpen, id, addToRecentlyViewed]);
   
   // Check if current user is the owner of this property
   const isOwner = user && user_id && user.id === user_id;
