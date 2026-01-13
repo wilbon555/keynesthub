@@ -282,6 +282,38 @@ export type Database = {
         }
         Relationships: []
       }
+      property_views: {
+        Row: {
+          id: string
+          property_id: string
+          session_id: string | null
+          viewed_at: string
+          viewer_id: string | null
+        }
+        Insert: {
+          id?: string
+          property_id: string
+          session_id?: string | null
+          viewed_at?: string
+          viewer_id?: string | null
+        }
+        Update: {
+          id?: string
+          property_id?: string
+          session_id?: string | null
+          viewed_at?: string
+          viewer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_views_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           applied_at: string
@@ -377,6 +409,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_property_view_stats: {
+        Args: { owner_user_id: string }
+        Returns: {
+          property_id: string
+          total_views: number
+          views_this_month: number
+          views_this_week: number
+          views_today: number
+        }[]
+      }
       get_user_roles: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"][]
