@@ -11,6 +11,7 @@ import { FavoriteButton } from "./FavoriteButton";
 import { useProperties, Property } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { usePropertyViews } from "@/hooks/usePropertyViews";
 import { toast } from "sonner";
 
 interface PropertyCardProps {
@@ -54,13 +55,15 @@ export const PropertyCard = ({
   const { deleteProperty, updateProperty } = useProperties();
   const { user } = useAuth();
   const { addToRecentlyViewed } = useRecentlyViewed();
+  const { recordView } = usePropertyViews();
   
   // Track property view when gallery is opened
   useEffect(() => {
     if (isGalleryOpen) {
       addToRecentlyViewed(id);
+      recordView(id); // Record view to database for analytics
     }
-  }, [isGalleryOpen, id, addToRecentlyViewed]);
+  }, [isGalleryOpen, id, addToRecentlyViewed, recordView]);
   
   // Check if current user is the owner of this property
   const isOwner = user && user_id && user.id === user_id;

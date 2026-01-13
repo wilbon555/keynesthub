@@ -4,14 +4,16 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { InquiriesSection } from "@/components/InquiriesSection";
 import { WishlistSection } from "@/components/WishlistSection";
 import { RecentlyViewedSection } from "@/components/RecentlyViewedSection";
+import { PropertyAnalyticsCard } from "@/components/PropertyAnalyticsCard";
 import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { usePropertyViews } from "@/hooks/usePropertyViews";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, MessageSquare, Plus, Building, Heart, Clock } from "lucide-react";
+import { Home, MessageSquare, Plus, Building, Heart, Clock, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useInquiries } from "@/hooks/useInquiries";
 
@@ -21,6 +23,7 @@ const Dashboard = () => {
   const { inquiries, loading: inquiriesLoading } = useInquiries();
   const { favorites } = useFavorites();
   const { recentPropertyIds } = useRecentlyViewed();
+  const { totalStats, getPropertyStats } = usePropertyViews();
   const navigate = useNavigate();
 
   // Filter to only show user's own properties
@@ -82,17 +85,29 @@ const Dashboard = () => {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Recently Viewed</CardTitle>
-              <Clock className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Total Views</CardTitle>
+              <Eye className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{recentPropertyIds.length}</div>
+              <div className="text-2xl font-bold">{totalStats.total_views}</div>
               <p className="text-xs text-muted-foreground">
-                Properties viewed
+                On your properties
               </p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Analytics Card for Owners */}
+        {myProperties.length > 0 && (
+          <div className="mb-8">
+            <PropertyAnalyticsCard
+              totalViews={totalStats.total_views}
+              viewsToday={totalStats.views_today}
+              viewsThisWeek={totalStats.views_this_week}
+              viewsThisMonth={totalStats.views_this_month}
+            />
+          </div>
+        )}
 
         {/* Tabs for Properties, Inquiries, Wishlist and Recently Viewed */}
         <Tabs defaultValue="inquiries" className="space-y-6">
@@ -152,14 +167,26 @@ const Dashboard = () => {
                 </Button>
               </div>
             ) : (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {myProperties.map((property) => (
-                  <PropertyCard 
-                    key={property.id} 
-                    {...property}
-                    listing_type={property.listing_type}
-                  />
-                ))}
+              <div className="space-y-6">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {myProperties.map((property) => {
+                    const stats = getPropertyStats(property.id);
+                    return (
+                      <div key={property.id} className="relative">
+                        <PropertyCard 
+                          {...property}
+                          listing_type={property.listing_type}
+                        />
+                        {stats && stats.total_views > 0 && (
+                          <div className="absolute top-3 left-3 z-10 bg-background/90 backdrop-blur-sm rounded-md px-2 py-1 flex items-center gap-1 text-xs font-medium shadow-sm">
+                            <Eye className="h-3 w-3 text-primary" />
+                            {stats.total_views} views
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </TabsContent>
