@@ -8,6 +8,7 @@ import ContactDialog from "./ContactDialog";
 import { EditPropertyDialog } from "./EditPropertyDialog";
 import { VerificationBadge } from "./VerificationBadge";
 import { FavoriteButton } from "./FavoriteButton";
+import ShareButtons from "./ShareButtons";
 import { useProperties, Property } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -206,6 +207,7 @@ export const PropertyCard = ({
           </Badge>
         )}
         <div className="absolute top-3 right-3 flex items-center gap-2">
+          <ShareButtons propertyId={id} title={title} price={price} />
           <FavoriteButton propertyId={id} />
           <Badge variant="secondary">
             {type}
