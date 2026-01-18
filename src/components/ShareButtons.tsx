@@ -23,25 +23,29 @@ const ShareButtons = ({ propertyId, title, price }: ShareButtonsProps) => {
     return `Check out this property: ${title} - ${price}`;
   };
 
-  const shareOnWhatsApp = () => {
+  const shareOnWhatsApp = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const url = `https://wa.me/?text=${encodeURIComponent(`${getShareText()} ${getShareUrl()}`)}`;
     window.open(url, "_blank", "noopener,noreferrer");
     toast.success("Opening WhatsApp...");
   };
 
-  const shareOnFacebook = () => {
+  const shareOnFacebook = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}&quote=${encodeURIComponent(getShareText())}`;
     window.open(url, "_blank", "noopener,noreferrer");
     toast.success("Opening Facebook...");
   };
 
-  const shareOnTwitter = () => {
+  const shareOnTwitter = (e: React.MouseEvent) => {
+    e.stopPropagation();
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}&url=${encodeURIComponent(getShareUrl())}`;
     window.open(url, "_blank", "noopener,noreferrer");
     toast.success("Opening Twitter...");
   };
 
-  const copyLink = async () => {
+  const copyLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     try {
       await navigator.clipboard.writeText(getShareUrl());
       toast.success("Link copied to clipboard!");
@@ -50,9 +54,14 @@ const ShareButtons = ({ propertyId, title, price }: ShareButtonsProps) => {
     }
   };
 
+  const handleTriggerClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+  };
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger asChild onClick={handleTriggerClick}>
         <Button
           variant="ghost"
           size="icon"
