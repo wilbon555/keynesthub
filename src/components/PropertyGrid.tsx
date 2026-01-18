@@ -17,7 +17,7 @@ import property6 from "@/assets/property-6.jpg";
 
 const sampleProperties: Property[] = [
   {
-    id: "1",
+    id: "00000000-0000-0000-0000-000000000001",
     title: "Modern Family Home with Garden",
     price: "$450,000",
     location: "Suburbia Heights, CA",
@@ -36,7 +36,7 @@ const sampleProperties: Property[] = [
     updated_at: new Date().toISOString()
   },
   {
-    id: "2",
+    id: "00000000-0000-0000-0000-000000000002",
     title: "Luxury Downtown Apartment",
     price: "$320,000",
     location: "Downtown Metro, NY",
@@ -55,7 +55,7 @@ const sampleProperties: Property[] = [
     updated_at: new Date().toISOString()
   },
   {
-    id: "3",
+    id: "00000000-0000-0000-0000-000000000003",
     title: "Beautiful Development Land",
     price: "$180,000",
     location: "Green Valley, TX",
@@ -72,7 +72,7 @@ const sampleProperties: Property[] = [
     updated_at: new Date().toISOString()
   },
   {
-    id: "4",
+    id: "00000000-0000-0000-0000-000000000004",
     title: "Elegant Two-Story Residence",
     price: "$625,000",
     location: "Maple Street, WA",
@@ -91,7 +91,7 @@ const sampleProperties: Property[] = [
     updated_at: new Date().toISOString()
   },
   {
-    id: "5",
+    id: "00000000-0000-0000-0000-000000000005",
     title: "Commercial Office Building",
     price: "$1,200,000",
     location: "Business District, FL",
@@ -108,7 +108,7 @@ const sampleProperties: Property[] = [
     updated_at: new Date().toISOString()
   },
   {
-    id: "6",
+    id: "00000000-0000-0000-0000-000000000006",
     title: "Charming Suburban Home",
     price: "$385,000",
     location: "Oak Lane, OR",
