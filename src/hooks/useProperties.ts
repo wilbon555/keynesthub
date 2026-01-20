@@ -51,6 +51,7 @@ export const useProperties = () => {
         .from('properties')
         .select('*')
         .eq('status', 'available')
+        .eq('verification_status', 'verified')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
