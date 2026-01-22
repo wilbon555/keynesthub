@@ -1,10 +1,11 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { GoogleMap, useJsApiLoader, OverlayView, InfoWindow, Autocomplete } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, OverlayView, InfoWindow, Autocomplete, Polygon } from '@react-google-maps/api';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, Home, Search, X, Locate, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { PolygonDrawingControls } from './PolygonDrawingControls';
 import {
   Select,
   SelectContent,
@@ -32,6 +33,30 @@ const calculateDistance = (
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 };
+
+// Check if a point is inside a polygon using ray casting algorithm
+const isPointInPolygon = (
+  point: google.maps.LatLngLiteral,
+  polygon: google.maps.LatLngLiteral[]
+): boolean => {
+  let inside = false;
+  const x = point.lng;
+  const y = point.lat;
+
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].lng;
+    const yi = polygon[i].lat;
+    const xj = polygon[j].lng;
+    const yj = polygon[j].lat;
+
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) {
+      inside = !inside;
+    }
+  }
+
+  return inside;
+};
+
 interface Property {
   id: string;
   title: string;
@@ -62,7 +87,7 @@ const defaultCenter = {
   lng: 0
 };
 
-const libraries: ("places")[] = ["places"];
+const libraries: ("places" | "drawing")[] = ["places", "drawing"];
 
 // Custom marker component
 const CustomMarker: React.FC<{
@@ -70,7 +95,8 @@ const CustomMarker: React.FC<{
   onClick: () => void;
   isSelected: boolean;
   isNearby?: boolean;
-}> = ({ position, onClick, isSelected, isNearby }) => {
+  isInPolygon?: boolean;
+}> = ({ position, onClick, isSelected, isNearby, isInPolygon }) => {
   return (
     <OverlayView
       position={position}
@@ -88,6 +114,8 @@ const CustomMarker: React.FC<{
           hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2
           ${isSelected 
             ? 'bg-primary scale-110 ring-2 ring-primary/50' 
+            : isInPolygon
+            ? 'bg-purple-500 hover:bg-purple-600 ring-2 ring-purple-300'
             : isNearby
             ? 'bg-green-500 hover:bg-green-600 ring-2 ring-green-300'
             : 'bg-primary hover:bg-primary/90'
@@ -121,7 +149,6 @@ const MapSearchBox: React.FC<{
           lng: place.geometry.location.lng()
         };
         
-        // Determine zoom level based on place type
         let zoom = 12;
         if (place.types?.includes('country')) {
           zoom = 5;
@@ -323,6 +350,20 @@ const NearbyPropertiesControl: React.FC<{
   );
 };
 
+// Polygon options
+const polygonOptions = {
+  fillColor: '#8B5CF6',
+  fillOpacity: 0.2,
+  strokeColor: '#8B5CF6',
+  strokeOpacity: 0.8,
+  strokeWeight: 2,
+  clickable: false,
+  draggable: false,
+  editable: false,
+  geodesic: false,
+  zIndex: 1,
+};
+
 // Inner component that only renders after API key is available
 const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = ({ apiKey, properties }) => {
   const [markers, setMarkers] = useState<MarkerData[]>([]);
@@ -330,8 +371,12 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [userLocation, setUserLocation] = useState<google.maps.LatLngLiteral | null>(null);
   const [showNearby, setShowNearby] = useState(false);
-  const [radius, setRadius] = useState(25); // Default 25km
+  const [radius, setRadius] = useState(25);
   const [geocoding, setGeocoding] = useState(true);
+  
+  // Polygon drawing state
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [polygonPoints, setPolygonPoints] = useState<google.maps.LatLngLiteral[]>([]);
 
   // Calculate nearby properties
   const nearbyMarkerIds = React.useMemo(() => {
@@ -352,11 +397,29 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
     return nearby;
   }, [userLocation, showNearby, radius, markers]);
 
-  // Filter markers to show only nearby when filter is active
+  // Calculate properties in polygon
+  const propertiesInPolygon = React.useMemo(() => {
+    if (polygonPoints.length < 3) return new Set<string>();
+    
+    const inPolygon = new Set<string>();
+    markers.forEach((marker) => {
+      if (isPointInPolygon(marker.position, polygonPoints)) {
+        inPolygon.add(marker.property.id);
+      }
+    });
+    return inPolygon;
+  }, [markers, polygonPoints]);
+
+  // Filter markers based on polygon or nearby
   const visibleMarkers = React.useMemo(() => {
-    if (!showNearby || !userLocation) return markers;
-    return markers.filter((marker) => nearbyMarkerIds.has(marker.property.id));
-  }, [markers, showNearby, userLocation, nearbyMarkerIds]);
+    if (polygonPoints.length >= 3) {
+      return markers.filter((marker) => propertiesInPolygon.has(marker.property.id));
+    }
+    if (showNearby && userLocation) {
+      return markers.filter((marker) => nearbyMarkerIds.has(marker.property.id));
+    }
+    return markers;
+  }, [markers, polygonPoints, propertiesInPolygon, showNearby, userLocation, nearbyMarkerIds]);
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: 'google-map-script',
@@ -433,7 +496,7 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
 
   const handleLocate = useCallback((location: google.maps.LatLngLiteral) => {
     setUserLocation(location);
-    setShowNearby(true); // Auto-enable nearby filter when locating
+    setShowNearby(true);
     if (map) {
       map.panTo(location);
       map.setZoom(14);
@@ -447,6 +510,31 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
   const handleRadiusChange = useCallback((newRadius: number) => {
     setRadius(newRadius);
   }, []);
+
+  // Polygon drawing handlers
+  const handleStartDrawing = useCallback(() => {
+    setIsDrawing(true);
+    setPolygonPoints([]);
+    setShowNearby(false);
+  }, []);
+
+  const handleStopDrawing = useCallback(() => {
+    setIsDrawing(false);
+  }, []);
+
+  const handleClearPolygon = useCallback(() => {
+    setPolygonPoints([]);
+    setIsDrawing(false);
+  }, []);
+
+  const handleMapClick = useCallback((e: google.maps.MapMouseEvent) => {
+    if (!isDrawing || !e.latLng) return;
+    
+    setPolygonPoints(prev => [
+      ...prev,
+      { lat: e.latLng!.lat(), lng: e.latLng!.lng() }
+    ]);
+  }, [isDrawing]);
 
   if (loadError) {
     return (
@@ -467,17 +555,47 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
         <>
           <MapSearchBox onPlaceSelected={handlePlaceSelected} />
           <LocateMeButton onLocate={handleLocate} />
+          <PolygonDrawingControls
+            isDrawing={isDrawing}
+            onStartDrawing={handleStartDrawing}
+            onStopDrawing={handleStopDrawing}
+            onClearPolygon={handleClearPolygon}
+            polygonPoints={polygonPoints}
+            propertiesInPolygon={propertiesInPolygon.size}
+          />
           <GoogleMap
             mapContainerStyle={containerStyle}
             center={defaultCenter}
             zoom={2}
             onLoad={onLoad}
             onUnmount={onUnmount}
+            onClick={handleMapClick}
             options={{
               streetViewControl: false,
               mapTypeControl: false,
+              draggableCursor: isDrawing ? 'crosshair' : undefined,
             }}
           >
+            {/* Polygon overlay */}
+            {polygonPoints.length >= 3 && (
+              <Polygon
+                paths={polygonPoints}
+                options={polygonOptions}
+              />
+            )}
+
+            {/* Drawing preview line */}
+            {isDrawing && polygonPoints.length > 0 && (
+              <Polygon
+                paths={polygonPoints}
+                options={{
+                  ...polygonOptions,
+                  fillOpacity: 0.1,
+                  strokeOpacity: 0.5,
+                }}
+              />
+            )}
+
             {visibleMarkers.map((marker) => (
               <CustomMarker
                 key={marker.property.id}
@@ -485,6 +603,7 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
                 onClick={() => setSelectedMarker(marker)}
                 isSelected={selectedMarker?.property.id === marker.property.id}
                 isNearby={nearbyMarkerIds.has(marker.property.id)}
+                isInPolygon={propertiesInPolygon.has(marker.property.id)}
               />
             ))}
 
@@ -525,6 +644,13 @@ const GoogleMapWrapper: React.FC<{ apiKey: string; properties: Property[] }> = (
               </InfoWindow>
             )}
           </GoogleMap>
+
+          {/* Drawing mode indicator */}
+          {isDrawing && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm shadow-lg">
+              Click on the map to draw your search area
+            </div>
+          )}
         </>
       )}
     </div>

@@ -186,6 +186,68 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          new_listings: boolean | null
+          price_changes: boolean | null
+          saved_search_matches: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          new_listings?: boolean | null
+          price_changes?: boolean | null
+          saved_search_matches?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          new_listings?: boolean | null
+          price_changes?: boolean | null
+          saved_search_matches?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      price_history: {
+        Row: {
+          changed_at: string
+          id: string
+          new_price: string
+          old_price: string
+          property_id: string
+        }
+        Insert: {
+          changed_at?: string
+          id?: string
+          new_price: string
+          old_price: string
+          property_id: string
+        }
+        Update: {
+          changed_at?: string
+          id?: string
+          new_price?: string
+          old_price?: string
+          property_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "price_history_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       properties: {
         Row: {
           area: string
@@ -217,6 +279,8 @@ export type Database = {
           verification_status: string
           verified_at: string | null
           verified_by: string | null
+          virtual_tour_type: string | null
+          virtual_tour_url: string | null
         }
         Insert: {
           area: string
@@ -248,6 +312,8 @@ export type Database = {
           verification_status?: string
           verified_at?: string | null
           verified_by?: string | null
+          virtual_tour_type?: string | null
+          virtual_tour_url?: string | null
         }
         Update: {
           area?: string
@@ -279,6 +345,8 @@ export type Database = {
           verification_status?: string
           verified_at?: string | null
           verified_by?: string | null
+          virtual_tour_type?: string | null
+          virtual_tour_url?: string | null
         }
         Relationships: []
       }
@@ -313,6 +381,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      saved_searches: {
+        Row: {
+          center_point: Json | null
+          created_at: string
+          filters: Json | null
+          id: string
+          name: string
+          notifications_enabled: boolean | null
+          polygon_coordinates: Json | null
+          radius_km: number | null
+          search_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          center_point?: Json | null
+          created_at?: string
+          filters?: Json | null
+          id?: string
+          name: string
+          notifications_enabled?: boolean | null
+          polygon_coordinates?: Json | null
+          radius_km?: number | null
+          search_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          center_point?: Json | null
+          created_at?: string
+          filters?: Json | null
+          id?: string
+          name?: string
+          notifications_enabled?: boolean | null
+          polygon_coordinates?: Json | null
+          radius_km?: number | null
+          search_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
