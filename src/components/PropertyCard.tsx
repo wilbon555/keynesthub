@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Bed, Bath, Square, MessageCircle, Trash2, Edit } from "lucide-react";
+import { MapPin, Bed, Bath, Square, MessageCircle, Trash2, Edit, Video } from "lucide-react";
 import { PhotoGallery } from "./PhotoGallery";
 import ContactDialog from "./ContactDialog";
 import { EditPropertyDialog } from "./EditPropertyDialog";
 import { VerificationBadge } from "./VerificationBadge";
 import { FavoriteButton } from "./FavoriteButton";
 import ShareButtons from "./ShareButtons";
+import { VirtualTourViewer } from "./VirtualTourViewer";
 import { useProperties, Property } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -31,6 +32,8 @@ interface PropertyCardProps {
   user_id?: string;
   listing_type?: 'sale' | 'rent';
   verification_status?: string;
+  virtual_tour_url?: string;
+  virtual_tour_type?: 'none' | '360_image' | 'video' | 'matterport' | 'external';
 }
 
 export const PropertyCard = ({
@@ -48,11 +51,14 @@ export const PropertyCard = ({
   phone,
   user_id,
   listing_type = 'sale',
-  verification_status = 'pending'
+  verification_status = 'pending',
+  virtual_tour_url,
+  virtual_tour_type = 'none'
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showVirtualTour, setShowVirtualTour] = useState(false);
   const { deleteProperty, updateProperty } = useProperties();
   const { user } = useAuth();
   const { addToRecentlyViewed } = useRecentlyViewed();
@@ -201,11 +207,25 @@ export const PropertyCard = ({
             </div>
           )}
         </div>
-        {featured && (
-          <Badge className="absolute top-3 left-3 bg-gradient-primary border-0 text-primary-foreground">
-            Featured
-          </Badge>
-        )}
+        <div className="absolute top-3 left-3 flex items-center gap-2">
+          {featured && (
+            <Badge className="bg-gradient-primary border-0 text-primary-foreground">
+              Featured
+            </Badge>
+          )}
+          {virtual_tour_url && virtual_tour_type !== 'none' && (
+            <Badge 
+              className="bg-purple-500 hover:bg-purple-600 border-0 text-white cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowVirtualTour(true);
+              }}
+            >
+              <Video className="w-3 h-3 mr-1" />
+              360° Tour
+            </Badge>
+          )}
+        </div>
         <div className="absolute top-3 right-3 flex items-center gap-2">
           <ShareButtons propertyId={id} title={title} price={price} />
           <FavoriteButton propertyId={id} />
@@ -336,6 +356,16 @@ export const PropertyCard = ({
         property={currentProperty}
         onSave={handleEditProperty}
       />
+      
+      {virtual_tour_url && virtual_tour_type !== 'none' && (
+        <VirtualTourViewer
+          isOpen={showVirtualTour}
+          onClose={() => setShowVirtualTour(false)}
+          tourUrl={virtual_tour_url}
+          tourType={virtual_tour_type}
+          title={title}
+        />
+      )}
     </Card>
   );
 };
