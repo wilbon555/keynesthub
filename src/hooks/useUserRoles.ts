@@ -28,6 +28,7 @@ export const useUserRoles = () => {
       return;
     }
 
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -53,7 +54,8 @@ export const useUserRoles = () => {
 
   useEffect(() => {
     fetchRoles();
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const hasRole = (role: AppRole): boolean => {
     return roles.includes(role);
