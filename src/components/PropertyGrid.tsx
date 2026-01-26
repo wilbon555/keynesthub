@@ -180,8 +180,8 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
     setSelectedType('all');
   };
 
-  // Combine database properties with sample properties, with database ones first
-  const allProperties = [...properties, ...sampleProperties];
+  // Show database properties if available, otherwise fall back to sample properties for demo
+  const allProperties = properties.length > 0 ? properties : sampleProperties;
   
   const filteredProperties = allProperties
     .filter((property) => 
