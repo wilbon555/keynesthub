@@ -10,6 +10,7 @@ import { VerificationBadge } from "./VerificationBadge";
 import { FavoriteButton } from "./FavoriteButton";
 import ShareButtons from "./ShareButtons";
 import { VirtualTourViewer } from "./VirtualTourViewer";
+import { QuickAIBadges } from "./ai/QuickAIBadges";
 import { useProperties, Property } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -248,8 +249,21 @@ export const PropertyCard = ({
       >
         <div className="space-y-3">
           <div>
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
               <VerificationBadge status={verification_status} />
+              <QuickAIBadges 
+                property={{
+                  id,
+                  title,
+                  price,
+                  location,
+                  type,
+                  bedrooms,
+                  bathrooms,
+                  area,
+                  listing_type
+                }}
+              />
             </div>
             <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-smooth">
               {title}
@@ -338,6 +352,18 @@ export const PropertyCard = ({
         isOpen={isGalleryOpen}
         onClose={() => setIsGalleryOpen(false)}
         title={title}
+        property={{
+          id,
+          title,
+          price,
+          location,
+          type,
+          bedrooms,
+          bathrooms,
+          area,
+          listing_type
+        }}
+        isOwner={isOwner}
       />
       
       <ContactDialog

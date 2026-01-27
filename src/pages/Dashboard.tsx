@@ -5,6 +5,7 @@ import { InquiriesSection } from "@/components/InquiriesSection";
 import { WishlistSection } from "@/components/WishlistSection";
 import { RecentlyViewedSection } from "@/components/RecentlyViewedSection";
 import { PropertyAnalyticsCard } from "@/components/PropertyAnalyticsCard";
+import { SellerAIInsights } from "@/components/ai/SellerAIInsights";
 import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -13,7 +14,7 @@ import { usePropertyViews } from "@/hooks/usePropertyViews";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Home, MessageSquare, Plus, Building, Heart, Clock, Eye } from "lucide-react";
+import { Home, MessageSquare, Plus, Building, Heart, Clock, Eye, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useInquiries } from "@/hooks/useInquiries";
 
@@ -168,6 +169,35 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="space-y-6">
+                {/* AI Seller Insights Section */}
+                {myProperties.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-primary" />
+                      AI Seller Insights
+                    </h3>
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {myProperties.slice(0, 3).map((property) => (
+                        <SellerAIInsights
+                          key={property.id}
+                          property={{
+                            id: property.id,
+                            title: property.title,
+                            price: property.price,
+                            location: property.location,
+                            type: property.type,
+                            bedrooms: property.bedrooms ?? undefined,
+                            bathrooms: property.bathrooms ?? undefined,
+                            area: property.area,
+                            listing_type: property.listing_type,
+                            description: property.description ?? undefined
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {myProperties.map((property) => {
                     const stats = getPropertyStats(property.id);
