@@ -420,15 +420,38 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           name="bedrooms"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Bedrooms</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  min={0} 
-                                  placeholder="e.g., 3" 
-                                  {...field} 
-                                />
-                              </FormControl>
+                              <FormLabel>
+                                {form.watch("listingType") === "rent" ? "Bedroom Type" : "Bedrooms"}
+                              </FormLabel>
+                              {form.watch("listingType") === "rent" ? (
+                                <Select 
+                                  onValueChange={(value) => field.onChange(parseInt(value))} 
+                                  value={field.value?.toString()}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select bedroom type" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="0">Bedsitter</SelectItem>
+                                    <SelectItem value="1">1 Bedroom</SelectItem>
+                                    <SelectItem value="2">2 Bedroom</SelectItem>
+                                    <SelectItem value="3">3 Bedroom</SelectItem>
+                                    <SelectItem value="4">4 Bedroom</SelectItem>
+                                    <SelectItem value="5">5+ Bedroom</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              ) : (
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min={0} 
+                                    placeholder="e.g., 3" 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                              )}
                               <FormMessage />
                             </FormItem>
                           )}
