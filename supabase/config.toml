@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.notify-new-inquiry]
 verify_jwt = false
+
+[functions.property-ai-insights]
+verify_jwt = false

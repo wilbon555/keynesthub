@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { AIInsightsPanel } from "./ai/AIInsightsPanel";
+import { PropertyForAI } from "@/hooks/usePropertyAI";
 
 interface PhotoGalleryProps {
   images: string[];
@@ -9,6 +11,8 @@ interface PhotoGalleryProps {
   onClose: () => void;
   initialIndex?: number;
   title?: string;
+  property?: PropertyForAI;
+  isOwner?: boolean;
 }
 
 export const PhotoGallery = ({ 
@@ -16,10 +20,13 @@ export const PhotoGallery = ({
   isOpen, 
   onClose, 
   initialIndex = 0,
-  title 
+  title,
+  property,
+  isOwner = false
 }: PhotoGalleryProps) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [zoom, setZoom] = useState(1);
+  const [showAIInsights, setShowAIInsights] = useState(false);
 
   const nextImage = () => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -47,7 +54,7 @@ export const PhotoGallery = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-black/95">
+      <DialogContent className={`max-w-6xl w-full p-0 bg-black/95 ${showAIInsights ? 'h-[95vh]' : 'h-[90vh]'}`}>
         <div className="relative w-full h-full flex items-center justify-center">
           {/* Close button */}
           <Button
@@ -125,6 +132,20 @@ export const PhotoGallery = ({
             </div>
           )}
 
+          {/* AI Insights Toggle Button */}
+          {property && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute top-4 right-16 z-10 text-white hover:bg-white/20 gap-2"
+              onClick={() => setShowAIInsights(!showAIInsights)}
+            >
+              <Sparkles className="w-4 h-4" />
+              AI Insights
+              {showAIInsights ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </Button>
+          )}
+
           {/* Main image */}
           <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
             <img
@@ -162,6 +183,17 @@ export const PhotoGallery = ({
                   />
                 </button>
               ))}
+            </div>
+          )}
+
+          {/* AI Insights Panel - slides in from right */}
+          {property && showAIInsights && (
+            <div className="absolute top-0 right-0 w-full md:w-[400px] h-full z-20 overflow-y-auto bg-background border-l">
+              <AIInsightsPanel 
+                property={property}
+                isOwner={isOwner}
+                className="rounded-none border-0 h-full"
+              />
             </div>
           )}
         </div>
