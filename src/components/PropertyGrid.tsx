@@ -164,7 +164,13 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
   const propertyTypes = ["all", "residential", "house", "apartment", "land", "commercial"];
 
   const priceToNumber = (price: string) => {
-    const num = Number(price.replace(/[^0-9]/g, ""));
+    // Extract only the first number from the price string (handles ranges like "Ksh56,000,000 - Ksh60,000,000")
+    // Remove currency symbols and get the first number
+    const cleanPrice = price.replace(/[^\d,.-]/g, '');
+    // Split by common range separators and take the first price
+    const firstPrice = cleanPrice.split(/[-–—]/)[0].trim();
+    // Remove commas and parse
+    const num = Number(firstPrice.replace(/,/g, ''));
     return isNaN(num) ? 0 : num;
   };
 
