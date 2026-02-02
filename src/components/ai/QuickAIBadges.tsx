@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { usePropertyAI, PriceAnalysis, PropertyForAI } from '@/hooks/usePropertyAI';
 import { PriceFairnessBadge } from './PriceFairnessBadge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface QuickAIBadgesProps {
   property: PropertyForAI;
@@ -15,9 +17,12 @@ const priceAnalysisCache = new Map<string, PriceAnalysis>();
 export function QuickAIBadges({ property, showOnHover = false, className }: QuickAIBadgesProps) {
   const [priceAnalysis, setPriceAnalysis] = useState<PriceAnalysis | null>(null);
   const [hasAttempted, setHasAttempted] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const { isLoading, getPriceAnalysis } = usePropertyAI();
 
-  useEffect(() => {
+  const fetchAnalysis = async () => {
+    if (hasAttempted) return;
+    
     // Check cache first
     const cached = priceAnalysisCache.get(property.id);
     if (cached) {
@@ -26,37 +31,62 @@ export function QuickAIBadges({ property, showOnHover = false, className }: Quic
       return;
     }
 
-    // Auto-fetch price analysis
-    const fetchAnalysis = async () => {
-      const result = await getPriceAnalysis(property);
-      if (result) {
-        setPriceAnalysis(result);
-        priceAnalysisCache.set(property.id, result);
-      }
-      setHasAttempted(true);
-    };
+    setHasAttempted(true);
+    const result = await getPriceAnalysis(property);
+    if (result) {
+      setPriceAnalysis(result);
+      priceAnalysisCache.set(property.id, result);
+    }
+  };
 
-    // Small delay to prevent overwhelming the API on page load
-    const timeoutId = setTimeout(fetchAnalysis, Math.random() * 2000 + 500);
-    
-    return () => clearTimeout(timeoutId);
-  }, [property.id]);
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    if (showOnHover && !hasAttempted) {
+      fetchAnalysis();
+    }
+  };
 
-  if (isLoading && !hasAttempted) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!hasAttempted) {
+      fetchAnalysis();
+    }
+  };
+
+  // If we have analysis, show the badge
+  if (priceAnalysis) {
+    return (
+      <div className={className}>
+        <PriceFairnessBadge 
+          rating={priceAnalysis.fairnessRating}
+          score={priceAnalysis.fairnessScore}
+          size="sm"
+        />
+      </div>
+    );
+  }
+
+  // If loading, show skeleton
+  if (isLoading && hasAttempted) {
     return <Skeleton className="h-5 w-20" />;
   }
 
-  if (!priceAnalysis) {
-    return null;
-  }
-
+  // Show a button to trigger analysis on demand
   return (
-    <div className={className}>
-      <PriceFairnessBadge 
-        rating={priceAnalysis.fairnessRating}
-        score={priceAnalysis.fairnessScore}
+    <div 
+      className={className}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <Button
+        variant="ghost"
         size="sm"
-      />
+        className="h-5 px-2 py-0 text-xs gap-1 text-muted-foreground hover:text-primary"
+        onClick={handleClick}
+      >
+        <Sparkles className="w-3 h-3" />
+        {isHovered || showOnHover ? 'Get AI Price' : 'AI'}
+      </Button>
     </div>
   );
 }
