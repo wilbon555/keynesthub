@@ -200,6 +200,7 @@ export const PhotoGallery = ({
                 property={property}
                 isOwner={isOwner}
                 className="rounded-none border-0 h-full"
+                onClose={() => setShowAIInsights(false)}
               />
             </div>
           )}
