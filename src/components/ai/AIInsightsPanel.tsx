@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { 
   Sparkles, 
-  TrendingUp, 
+  TrendingUp,
+  X,
   TrendingDown, 
   DollarSign, 
   BarChart3, 
@@ -29,9 +30,10 @@ interface AIInsightsPanelProps {
   property: PropertyForAI;
   isOwner?: boolean;
   className?: string;
+  onClose?: () => void;
 }
 
-export function AIInsightsPanel({ property, isOwner = false, className }: AIInsightsPanelProps) {
+export function AIInsightsPanel({ property, isOwner = false, className, onClose }: AIInsightsPanelProps) {
   const [analysis, setAnalysis] = useState<ComprehensiveAnalysis | null>(null);
   const [hasLoaded, setHasLoaded] = useState(false);
   const { isLoading, getComprehensiveAnalysis } = usePropertyAI();
@@ -115,9 +117,16 @@ export function AIInsightsPanel({ property, isOwner = false, className }: AIInsi
             <Sparkles className="w-5 h-5 text-primary" />
             AI Insights
           </CardTitle>
-          <Button variant="ghost" size="sm" onClick={loadAnalysis} disabled={isLoading}>
-            <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" onClick={loadAnalysis} disabled={isLoading}>
+              <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
+            </Button>
+            {onClose && (
+              <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8">
+                <X className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
         </div>
         {summary && (
           <p className="text-sm text-muted-foreground mt-2">{summary}</p>
