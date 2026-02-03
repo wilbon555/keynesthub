@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.property-ai-insights]
 verify_jwt = false
+
+[functions.smart-property-search]
+verify_jwt = false

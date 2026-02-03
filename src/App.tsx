@@ -13,6 +13,7 @@ import InvestmentTips from "./pages/InvestmentTips";
 import MortgageCalculator from "./pages/MortgageCalculator";
 import BecomeAgent from "./pages/BecomeAgent";
 import Install from "./pages/Install";
+import Discover from "./pages/Discover";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // Buy pages
@@ -49,6 +50,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/discover" element={<Discover />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/agent-dashboard" element={<ProtectedRoute><AgentDashboard /></ProtectedRoute>} />
