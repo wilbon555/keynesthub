@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Menu, X, User, LogOut, Shield, LayoutDashboard, Settings, Home } from "lucide-react";
+import { Menu, X, User, LogOut, Shield, LayoutDashboard, Settings, Home, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
@@ -192,6 +192,15 @@ export const Navigation = () => {
               <Home className="w-4 h-4 mr-2" />
               Home
             </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate("/discover")}
+              className="text-primary"
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              AI Discover
+            </Button>
             <ContactDropdown variant="ghost" size="sm" />
             {user && (
               <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
@@ -239,6 +248,10 @@ export const Navigation = () => {
                 <a href="/" className="flex items-center py-2 text-primary font-semibold hover:text-primary/80 transition-smooth">
                   <Home className="w-4 h-4 mr-2" />
                   Home
+                </a>
+                <a href="/discover" className="flex items-center py-2 text-primary font-semibold hover:text-primary/80 transition-smooth">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  AI Discover
                 </a>
 
                 <div>
