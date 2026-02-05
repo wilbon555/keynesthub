@@ -18,9 +18,14 @@ export const useUserRoles = () => {
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [pendingRoles, setPendingRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
 
   const fetchRoles = async () => {
+    // Wait for auth to complete before fetching roles
+    if (authLoading) {
+      return;
+    }
+
     if (!user) {
       setRoles([]);
       setPendingRoles([]);
@@ -53,17 +58,21 @@ export const useUserRoles = () => {
   };
 
   useEffect(() => {
-    fetchRoles();
+    // Only fetch when auth is done loading
+    if (!authLoading) {
+      fetchRoles();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, authLoading]);
 
   const hasRole = (role: AppRole): boolean => {
     return roles.includes(role);
   };
 
-  const isAgent = hasRole('agent');
-  const isAdmin = hasRole('admin');
-  const isOwner = hasRole('owner');
+  // Derived state should only be computed when not loading
+  const isAgent = !loading && !authLoading && hasRole('agent');
+  const isAdmin = !loading && !authLoading && hasRole('admin');
+  const isOwner = !loading && !authLoading && hasRole('owner');
 
   const applyForRole = async (role: AppRole): Promise<boolean> => {
     if (!user) return false;
@@ -90,7 +99,7 @@ export const useUserRoles = () => {
   return {
     roles,
     pendingRoles,
-    loading,
+    loading: loading || authLoading, // Combined loading state
     hasRole,
     isAgent,
     isAdmin,

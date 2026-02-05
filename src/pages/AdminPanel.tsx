@@ -13,17 +13,22 @@ const AdminPanel = () => {
   const { user, loading: authLoading } = useAuth();
   const { isAdmin, loading: rolesLoading } = useUserRoles();
 
+  // Combined loading state - wait for both auth and roles to finish
+  const isLoading = authLoading || rolesLoading;
+
   useEffect(() => {
-    if (!authLoading && !rolesLoading) {
+    // Only redirect after all loading is complete
+    if (!isLoading) {
       if (!user) {
-        navigate('/auth');
+        navigate('/auth?redirect=/admin');
       } else if (!isAdmin) {
         navigate('/');
       }
     }
-  }, [user, isAdmin, authLoading, rolesLoading, navigate]);
+  }, [user, isAdmin, isLoading, navigate]);
 
-  if (authLoading || rolesLoading) {
+  // Show loading state while auth or roles are loading
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -31,6 +36,7 @@ const AdminPanel = () => {
     );
   }
 
+  // After loading, if user is not admin, don't render (redirect will happen)
   if (!user || !isAdmin) {
     return null;
   }
