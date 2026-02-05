@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent, Banknote, Building, Save, Trash2, GitCompare, X, FileDown } from "lucide-react";
 import { toast } from "sonner";
+import { MarketAIInsights } from "@/components/ai/MarketAIInsights";
 
 interface SavedCalculation {
   id: string;
@@ -402,9 +403,10 @@ const PropertyTrends = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-foreground mb-4">Property Market Trends</h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-muted-foreground mb-6">
               Stay informed with the latest property market data, price movements, and investment opportunities
             </p>
+            <MarketAIInsights context="property_trends" className="max-w-2xl mx-auto" />
           </div>
 
           {/* Market Overview */}

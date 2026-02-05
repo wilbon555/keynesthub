@@ -1,6 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Home, MapPin, Calculator, Shield } from "lucide-react";
+import { MarketAIInsights } from "@/components/ai/MarketAIInsights";
 
 const InvestmentTips = () => {
   return (
@@ -11,9 +12,10 @@ const InvestmentTips = () => {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-foreground mb-4">Property Investment Tips</h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg text-muted-foreground mb-6">
               Master the art of real estate investing with these proven strategies and insights
             </p>
+            <MarketAIInsights context="investment_tips" className="max-w-2xl mx-auto" />
           </div>
 
           <div className="grid gap-8 md:grid-cols-2">
