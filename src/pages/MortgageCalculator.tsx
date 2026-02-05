@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/Navigation";
 import { Calculator, DollarSign, TrendingUp, Home } from "lucide-react";
+import { MarketAIInsights } from "@/components/ai/MarketAIInsights";
 
 interface CalculationResult {
   monthlyPayment: number;
@@ -79,10 +80,15 @@ const MortgageCalculator = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-4">Mortgage Calculator</h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
               Calculate mortgage payments and analyze investment potential for real estate properties. 
               Perfect for investors, homebuyers, and real estate professionals.
             </p>
+            <MarketAIInsights 
+              context="mortgage_calculator" 
+              contextData={{ loanAmount, downPayment, interestRate, loanTerm }}
+              className="max-w-2xl mx-auto" 
+            />
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">

@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.smart-property-search]
 verify_jwt = false
+
+[functions.market-ai-insights]
+verify_jwt = false
