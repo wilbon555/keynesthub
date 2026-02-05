@@ -20,7 +20,8 @@ serve(async (req) => {
 
     const systemPrompt = `You are a real estate market analyst specializing in the Kenyan property market. 
 Provide accurate, up-to-date insights based on current market conditions.
-Format your response with clear sections using bullet points.
+Format your response in plain text only. Do NOT use any markdown formatting such as #, *, **, or bullet symbols like - or •.
+Use numbered lists (1. 2. 3.) for lists and simple line breaks for sections.
 Be specific with locations, price ranges (in KES), and percentages where applicable.
 Current date: ${new Date().toLocaleDateString('en-KE', { 
   weekday: 'long', 
