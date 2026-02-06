@@ -25,10 +25,12 @@ import {
   Calendar,
   Ruler,
   Home,
-  Info
+  Info,
+  ZoomIn
 } from "lucide-react";
 import { AgentListing, useAgentListings } from "@/hooks/useAgentListings";
 import { VerificationBadge } from "./VerificationBadge";
+import { PhotoGallery } from "./PhotoGallery";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -46,6 +48,8 @@ export const AgentListingsManager = () => {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [notes, setNotes] = useState('');
+  const [showGallery, setShowGallery] = useState(false);
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
 
   const handleViewDetails = (listing: AgentListing) => {
     setSelectedListing(listing);
@@ -363,17 +367,35 @@ export const AgentListingsManager = () => {
 
           {selectedListing && (
             <div className="space-y-4">
-              {/* Images */}
+              {/* Images - Clickable for full view */}
               {(selectedListing.images?.length || selectedListing.image) && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {(selectedListing.images || [selectedListing.image]).filter(Boolean).map((img, idx) => (
-                    <img 
-                      key={idx}
-                      src={img || '/placeholder.svg'} 
-                      alt={`Property ${idx + 1}`}
-                      className="w-full h-24 object-cover rounded-lg"
-                    />
-                  ))}
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <ZoomIn className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Click any image to view in full size</span>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {(selectedListing.images || [selectedListing.image]).filter(Boolean).map((img, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          setGalleryInitialIndex(idx);
+                          setShowGallery(true);
+                        }}
+                        className="relative group w-full h-24 rounded-lg overflow-hidden focus:outline-none focus:ring-2 focus:ring-primary"
+                      >
+                        <img 
+                          src={img || '/placeholder.svg'} 
+                          alt={`Property ${idx + 1}`}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                          <ZoomIn className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
 
@@ -524,6 +546,17 @@ export const AgentListingsManager = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Photo Gallery for full image view */}
+      {selectedListing && (
+        <PhotoGallery
+          images={(selectedListing.images || [selectedListing.image]).filter(Boolean) as string[]}
+          isOpen={showGallery}
+          onClose={() => setShowGallery(false)}
+          initialIndex={galleryInitialIndex}
+          title={selectedListing.title}
+        />
+      )}
     </div>
   );
 };
