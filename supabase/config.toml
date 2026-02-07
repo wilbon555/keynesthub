@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.market-ai-insights]
 verify_jwt = false
+
+[functions.property-chatbot]
+verify_jwt = false
