@@ -1,9 +1,83 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
+
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+
+async function searchProperties(query: string) {
+  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+  
+  // Extract keywords for search
+  const keywords = query.toLowerCase();
+  
+  let queryBuilder = supabase
+    .from('properties')
+    .select('id, title, location, price, type, bedrooms, bathrooms, area, listing_type, image')
+    .eq('verification_status', 'approved')
+    .limit(5);
+  
+  // Filter by listing type if mentioned
+  if (keywords.includes('rent') || keywords.includes('lease')) {
+    queryBuilder = queryBuilder.eq('listing_type', 'rent');
+  } else if (keywords.includes('buy') || keywords.includes('sale') || keywords.includes('purchase')) {
+    queryBuilder = queryBuilder.eq('listing_type', 'sale');
+  }
+  
+  // Filter by property type
+  if (keywords.includes('apartment') || keywords.includes('flat')) {
+    queryBuilder = queryBuilder.eq('type', 'Apartment');
+  } else if (keywords.includes('house') || keywords.includes('home')) {
+    queryBuilder = queryBuilder.eq('type', 'House');
+  } else if (keywords.includes('room') || keywords.includes('bedsitter') || keywords.includes('single')) {
+    queryBuilder = queryBuilder.or('type.ilike.%room%,type.ilike.%bedsitter%,bedrooms.eq.1');
+  } else if (keywords.includes('land') || keywords.includes('plot')) {
+    queryBuilder = queryBuilder.eq('type', 'Land');
+  } else if (keywords.includes('office') || keywords.includes('commercial')) {
+    queryBuilder = queryBuilder.eq('type', 'Commercial');
+  }
+  
+  // Search by location
+  const locationPatterns = [
+    'jooust', 'joust', 'kisumu', 'nairobi', 'mombasa', 'nakuru', 'eldoret',
+    'westlands', 'karen', 'kilimani', 'lavington', 'kileleshwa', 'parklands',
+    'ngong', 'thika', 'nyeri', 'machakos', 'kajiado', 'ruiru', 'juja'
+  ];
+  
+  for (const loc of locationPatterns) {
+    if (keywords.includes(loc)) {
+      queryBuilder = queryBuilder.ilike('location', `%${loc}%`);
+      break;
+    }
+  }
+  
+  const { data, error } = await queryBuilder;
+  
+  if (error) {
+    console.error('Property search error:', error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+function formatPropertiesForAI(properties: any[]) {
+  if (!properties.length) return '';
+  
+  const formatted = properties.map((p, i) => 
+    `${i + 1}. **${p.title}** - ${p.location}\n` +
+    `   - Price: ${p.price}\n` +
+    `   - Type: ${p.type} (${p.listing_type})\n` +
+    `   - ${p.bedrooms ? `${p.bedrooms} bed, ` : ''}${p.bathrooms ? `${p.bathrooms} bath, ` : ''}${p.area}\n` +
+    `   - 🔗 [View Property](/discover?property=${p.id})`
+  ).join('\n\n');
+  
+  return `\n\nHere are some matching properties I found:\n\n${formatted}\n\nYou can click on any property to view more details, or use our filters to narrow down by budget, room type, and distance.`;
+}
 
 const systemPrompt = `You are a helpful real estate assistant for KeyNestHub, a Kenyan property platform. Your role is to:
 
@@ -14,16 +88,18 @@ const systemPrompt = `You are a helpful real estate assistant for KeyNestHub, a 
 5. Qualify leads by understanding their requirements
 
 Key facts about Kenyan real estate:
-- Popular areas: Nairobi (Westlands, Karen, Kilimani, Lavington), Mombasa, Kisumu
-- Property types: Apartments, townhouses, bungalows, maisonettes, land
+- Popular areas: Nairobi (Westlands, Karen, Kilimani, Lavington), Mombasa, Kisumu, Nakuru
+- Property types: Apartments, townhouses, bungalows, maisonettes, land, bedsitters, single rooms
 - Currency: KES (Kenyan Shillings)
-- Common price ranges: Entry-level (1-5M KES), Mid-range (5-15M KES), Premium (15-50M KES), Luxury (50M+ KES)
+- Common rent ranges: Single rooms (3K-10K KES), Bedsitters (5K-15K KES), 1BR (15K-40K KES), 2BR (25K-80K KES)
+- Common sale prices: Entry-level (1-5M KES), Mid-range (5-15M KES), Premium (15-50M KES), Luxury (50M+ KES)
 
-Be conversational, helpful, and guide users toward taking action (viewing properties, contacting agents, signing up).
-
-If a user asks about specific listings, suggest they use the search feature or browse our property listings.
-
-Keep responses concise and helpful. Use plain language, avoid excessive markdown formatting.`;
+IMPORTANT INSTRUCTIONS:
+- When property listings are provided in the context, ALWAYS include them in your response with clickable links
+- Guide users to use the platform's filters for: budget range, number of rooms, property type, and location
+- Mention specific filters available: price slider, bedroom count, property type dropdown, location search
+- Be conversational and helpful, guiding users toward taking action (viewing properties, contacting agents)
+- Keep responses concise but informative`;
 
 serve(async (req) => {
   console.log('Property chatbot function invoked');
@@ -42,6 +118,29 @@ serve(async (req) => {
       throw new Error('LOVABLE_API_KEY is not configured');
     }
 
+    // Get the latest user message to search properties
+    const latestUserMessage = messages?.filter((m: any) => m.role === 'user').pop()?.content || '';
+    
+    // Search for relevant properties based on user query
+    let propertyContext = '';
+    if (latestUserMessage) {
+      console.log('Searching properties for:', latestUserMessage);
+      const properties = await searchProperties(latestUserMessage);
+      console.log('Found properties:', properties.length);
+      propertyContext = formatPropertiesForAI(properties);
+    }
+
+    // Enhance the last user message with property context
+    const enhancedMessages = messages.map((m: any, index: number) => {
+      if (index === messages.length - 1 && m.role === 'user' && propertyContext) {
+        return {
+          ...m,
+          content: m.content + `\n\n[SYSTEM CONTEXT - Available listings matching the query:${propertyContext}]`
+        };
+      }
+      return m;
+    });
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -52,7 +151,7 @@ serve(async (req) => {
         model: 'google/gemini-3-flash-preview',
         messages: [
           { role: 'system', content: systemPrompt },
-          ...messages,
+          ...enhancedMessages,
         ],
         stream: true,
       }),
