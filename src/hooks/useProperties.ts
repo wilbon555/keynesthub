@@ -36,6 +36,9 @@ export interface Property {
   verified_at?: string;
   verified_by?: string;
   verification_notes?: string;
+  // Vacancy tracking (for rentals)
+  total_units?: number;
+  vacant_units?: number;
 }
 
 export const useProperties = () => {

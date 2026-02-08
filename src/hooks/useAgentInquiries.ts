@@ -23,6 +23,9 @@ export interface AgentInquiry {
     price: string;
     user_id: string;
     verification_status: string;
+    listing_type: 'sale' | 'rent';
+    total_units?: number;
+    vacant_units?: number;
   };
 }
 
@@ -45,7 +48,7 @@ export const useAgentInquiries = () => {
         .from('contact_requests')
         .select(`
           *,
-          property:properties(id, title, type, location, price, user_id, verification_status)
+          property:properties(id, title, type, location, price, user_id, verification_status, listing_type, total_units, vacant_units)
         `)
         .order('created_at', { ascending: false });
 

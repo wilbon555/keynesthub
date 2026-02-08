@@ -35,6 +35,8 @@ interface PropertyCardProps {
   verification_status?: string;
   virtual_tour_url?: string;
   virtual_tour_type?: 'none' | '360_image' | 'video' | 'matterport' | 'external';
+  total_units?: number;
+  vacant_units?: number;
 }
 
 export const PropertyCard = ({
@@ -54,7 +56,9 @@ export const PropertyCard = ({
   listing_type = 'sale',
   verification_status = 'pending',
   virtual_tour_url,
-  virtual_tour_type = 'none'
+  virtual_tour_type = 'none',
+  total_units,
+  vacant_units
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
@@ -208,15 +212,30 @@ export const PropertyCard = ({
             </div>
           )}
         </div>
-        <div className="absolute top-3 left-3 flex items-center gap-2">
+        <div className="absolute top-3 left-3 flex items-center gap-2 flex-wrap">
           {featured && (
             <Badge className="bg-gradient-primary border-0 text-primary-foreground">
               Featured
             </Badge>
           )}
+          {listing_type === 'rent' && vacant_units !== undefined && total_units !== undefined && (
+            <Badge 
+              className={`border-0 ${
+                vacant_units === 0 
+                  ? 'bg-destructive text-destructive-foreground' 
+                  : vacant_units <= 3 
+                    ? 'bg-orange-500 text-white' 
+                    : 'bg-green-600 text-white'
+              }`}
+            >
+              {vacant_units === 0 
+                ? 'Fully Rented' 
+                : `${vacant_units}/${total_units} Available`}
+            </Badge>
+          )}
           {virtual_tour_url && virtual_tour_type !== 'none' && (
             <Badge 
-              className="bg-purple-500 hover:bg-purple-600 border-0 text-white cursor-pointer"
+              className="bg-accent text-accent-foreground border-0 cursor-pointer"
               onClick={(e) => {
                 e.stopPropagation();
                 setShowVirtualTour(true);
