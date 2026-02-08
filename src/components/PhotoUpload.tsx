@@ -42,6 +42,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       buildingAge: z.coerce.number().min(0, "Building age must be 0 or more").optional(),
       developer: z.string().optional(),
       maintenanceQuality: z.string().optional(),
+      // Vacancy tracking for rentals
+      totalUnits: z.coerce.number().min(1, "Total units must be at least 1").optional(),
+      vacantUnits: z.coerce.number().min(0, "Vacant units cannot be negative").optional(),
       priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       phone: z
@@ -53,6 +56,15 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
     .refine((data) => data.priceMax >= data.priceMin, {
       message: "Max price must be greater than or equal to Min price",
       path: ["priceMax"],
+    })
+    .refine((data) => {
+      if (data.listingType === 'rent' && data.totalUnits && data.vacantUnits) {
+        return data.vacantUnits <= data.totalUnits;
+      }
+      return true;
+    }, {
+      message: "Vacant units cannot exceed total units",
+      path: ["vacantUnits"],
     });
 
   type DetailsForm = z.infer<typeof detailsSchema>;
@@ -73,6 +85,8 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       buildingAge: undefined,
       developer: "",
       maintenanceQuality: "",
+      totalUnits: undefined,
+      vacantUnits: undefined,
       priceMin: 1,
       priceMax: 1,
       phone: "",
@@ -155,6 +169,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
         building_age: values.buildingAge,
         developer: values.developer,
         maintenance_quality: values.maintenanceQuality,
+        // Vacancy tracking for rentals
+        total_units: values.listingType === 'rent' ? (values.totalUnits || 1) : undefined,
+        vacant_units: values.listingType === 'rent' ? (values.vacantUnits ?? values.totalUnits ?? 1) : undefined,
         uploadedFiles: selectedFiles // Pass files to be uploaded
       };
 
@@ -411,6 +428,54 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                         )}
                       />
                     </div>
+
+                    {/* Vacancy tracking fields for rentals */}
+                    {form.watch("listingType") === "rent" && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border border-border">
+                        <div className="col-span-2">
+                          <p className="text-sm font-medium text-foreground mb-2">📊 Vacancy Tracking</p>
+                          <p className="text-xs text-muted-foreground">Track available units to show real-time availability to potential tenants.</p>
+                        </div>
+                        <FormField
+                          control={form.control}
+                          name="totalUnits"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Total Units/Rooms</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min={1} 
+                                  placeholder="e.g., 30" 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="vacantUnits"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Currently Vacant</FormLabel>
+                              <FormControl>
+                                <Input 
+                                  type="number" 
+                                  min={0}
+                                  max={form.watch("totalUnits") || 999}
+                                  placeholder="e.g., 15" 
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
 
                     {/* Bedrooms, Bathrooms, Area fields for applicable property types */}
                     {["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType")) && (

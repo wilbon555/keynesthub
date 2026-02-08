@@ -271,10 +271,12 @@ export type Database = {
           region: string | null
           status: string | null
           title: string
+          total_units: number | null
           type: string
           units: number | null
           updated_at: string
           user_id: string
+          vacant_units: number | null
           verification_notes: string | null
           verification_status: string
           verified_at: string | null
@@ -304,10 +306,12 @@ export type Database = {
           region?: string | null
           status?: string | null
           title: string
+          total_units?: number | null
           type: string
           units?: number | null
           updated_at?: string
           user_id: string
+          vacant_units?: number | null
           verification_notes?: string | null
           verification_status?: string
           verified_at?: string | null
@@ -337,10 +341,12 @@ export type Database = {
           region?: string | null
           status?: string | null
           title?: string
+          total_units?: number | null
           type?: string
           units?: number | null
           updated_at?: string
           user_id?: string
+          vacant_units?: number | null
           verification_notes?: string | null
           verification_status?: string
           verified_at?: string | null
@@ -549,6 +555,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      decrement_vacant_units: { Args: { property_id: string }; Returns: number }
       get_property_view_stats: {
         Args: { owner_user_id: string }
         Returns: {
@@ -570,6 +577,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_vacant_units: { Args: { property_id: string }; Returns: number }
     }
     Enums: {
       app_role: "buyer" | "owner" | "agent" | "admin"

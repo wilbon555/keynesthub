@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Property } from "@/hooks/useProperties";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Home } from "lucide-react";
+import { toast } from "sonner";
 
 interface EditPropertyDialogProps {
   isOpen: boolean;
@@ -29,6 +30,8 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
     phone: property.phone || "",
     description: property.description || "",
     listing_type: property.listing_type,
+    total_units: property.total_units?.toString() || "1",
+    vacant_units: property.vacant_units?.toString() || "1",
   });
   
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -39,14 +42,24 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
     setIsSubmitting(true);
 
     try {
+      const totalUnits = parseInt(formData.total_units) || 1;
+      const vacantUnits = parseInt(formData.vacant_units) || 0;
+      
+      // Validate vacant units doesn't exceed total
+      if (vacantUnits > totalUnits) {
+        throw new Error("Vacant units cannot exceed total units");
+      }
+
       await onSave({
         ...formData,
         bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : undefined,
         bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : undefined,
+        total_units: formData.listing_type === 'rent' ? totalUnits : undefined,
+        vacant_units: formData.listing_type === 'rent' ? vacantUnits : undefined,
         uploadedFiles: uploadedFiles.length > 0 ? uploadedFiles : undefined,
       });
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating property:", error);
     } finally {
       setIsSubmitting(false);
@@ -98,6 +111,49 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
               </Select>
             </div>
           </div>
+
+          {/* Vacancy tracking for rentals */}
+          {formData.listing_type === 'rent' && (
+            <div className="p-4 bg-muted/50 rounded-lg border border-border space-y-3">
+              <div className="flex items-center gap-2">
+                <Home className="h-4 w-4 text-primary" />
+                <p className="text-sm font-medium text-foreground">Vacancy Tracking</p>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Track available units in real-time. When a booking is approved, vacant units will automatically decrease.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="total_units">Total Units/Rooms</Label>
+                  <Input
+                    id="total_units"
+                    type="number"
+                    min={1}
+                    value={formData.total_units}
+                    onChange={(e) => setFormData({ ...formData, total_units: e.target.value })}
+                    placeholder="e.g., 30"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="vacant_units">Currently Vacant</Label>
+                  <Input
+                    id="vacant_units"
+                    type="number"
+                    min={0}
+                    max={parseInt(formData.total_units) || 999}
+                    value={formData.vacant_units}
+                    onChange={(e) => setFormData({ ...formData, vacant_units: e.target.value })}
+                    placeholder="e.g., 15"
+                  />
+                </div>
+              </div>
+              {parseInt(formData.vacant_units) === 0 && (
+                <p className="text-xs text-destructive font-medium">
+                  ⚠️ No vacant units - property will show as fully rented
+                </p>
+              )}
+            </div>
+          )}
 
           <div>
             <Label htmlFor="location">Location *</Label>

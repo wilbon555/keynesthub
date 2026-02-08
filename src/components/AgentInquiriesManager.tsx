@@ -23,10 +23,12 @@ import {
   X, 
   CalendarDays,
   MessageSquare,
-  User
+  User,
+  Home
 } from "lucide-react";
 import { AgentInquiry, useAgentInquiries } from "@/hooks/useAgentInquiries";
 import { useViewings } from "@/hooks/useViewings";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -69,7 +71,26 @@ export const AgentInquiriesManager = () => {
 
     if (success) {
       await updateInquiryStatus(selectedInquiry.id, 'approved', notes);
-      toast.success('Viewing scheduled successfully');
+      
+      // Decrement vacant units for rental properties
+      if (selectedInquiry.property.listing_type === 'rent') {
+        const { data, error } = await supabase.rpc('decrement_vacant_units', {
+          property_id: selectedInquiry.property_id
+        });
+        
+        if (error) {
+          console.error('Failed to decrement vacant units:', error);
+        } else {
+          const remainingUnits = data as number;
+          if (remainingUnits === 0) {
+            toast.info('This property is now fully rented!');
+          } else {
+            toast.success(`Viewing scheduled. ${remainingUnits} units remaining.`);
+          }
+        }
+      } else {
+        toast.success('Viewing scheduled successfully');
+      }
     } else {
       toast.error('Failed to schedule viewing');
     }
@@ -152,7 +173,25 @@ export const AgentInquiriesManager = () => {
                       
                       {inquiry.property && (
                         <div className="bg-muted/50 rounded-lg p-3">
-                          <p className="font-medium">{inquiry.property.title}</p>
+                          <div className="flex items-center justify-between">
+                            <p className="font-medium">{inquiry.property.title}</p>
+                            {inquiry.property.listing_type === 'rent' && 
+                             inquiry.property.vacant_units !== undefined && 
+                             inquiry.property.total_units !== undefined && (
+                              <Badge 
+                                className={`${
+                                  inquiry.property.vacant_units === 0 
+                                    ? 'bg-destructive text-destructive-foreground' 
+                                    : inquiry.property.vacant_units <= 3 
+                                      ? 'bg-orange-500 text-white' 
+                                      : 'bg-green-600 text-white'
+                                } border-0`}
+                              >
+                                <Home className="w-3 h-3 mr-1" />
+                                {inquiry.property.vacant_units}/{inquiry.property.total_units} vacant
+                              </Badge>
+                            )}
+                          </div>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                             <MapPin className="w-3 h-3" />
                             {inquiry.property.location}
