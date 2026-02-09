@@ -30,8 +30,10 @@ export const HeroSection = () => {
       <div className="absolute inset-0">
         <img 
           src={heroImage} 
-          alt="Beautiful Property" 
+          alt="Premium real estate properties in Kenya - KeyNestHub" 
           className="w-full h-full object-cover opacity-20"
+          loading="eager"
+          fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/20" />
       </div>

@@ -178,6 +178,11 @@ export const Navigation = () => {
                           <a href="/investment-tips" className="block rounded-md p-2 hover:bg-accent text-foreground">Investment Tips</a>
                         </NavigationMenuLink>
                       </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/neighborhoods" className="block rounded-md p-2 hover:bg-accent text-foreground">Neighborhood Guides</a>
+                        </NavigationMenuLink>
+                      </li>
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -303,6 +308,7 @@ export const Navigation = () => {
                     <a href="/market/property-trends" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Property Trends</a>
                     <a href="/mortgage-calculator" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Mortgage Calculator</a>
                     <a href="/investment-tips" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
+                    <a href="/neighborhoods" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Neighborhood Guides</a>
                   </div>
                 </div>
 

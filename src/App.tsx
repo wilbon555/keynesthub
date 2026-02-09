@@ -41,7 +41,7 @@ import AgentsDirectory from "./pages/agents/AgentsDirectory";
 
 // Market pages
 import PropertyTrends from "./pages/market/PropertyTrends";
-
+import NeighborhoodGuide from "./pages/neighborhoods/NeighborhoodGuide";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -87,6 +87,10 @@ const App = () => (
           <Route path="/market/property-trends" element={<PropertyTrends />} />
           <Route path="/investment-tips" element={<InvestmentTips />} />
           <Route path="/mortgage-calculator" element={<MortgageCalculator />} />
+          
+          {/* Neighborhood Guides */}
+          <Route path="/neighborhoods" element={<NeighborhoodGuide />} />
+          <Route path="/neighborhoods/:slug" element={<NeighborhoodGuide />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
