@@ -63,6 +63,7 @@ const Footer = () => {
     { label: "Investment Tips", path: "/investment-tips" },
     { label: "Mortgage Calculator", path: "/mortgage-calculator" },
     { label: "Property Trends", path: "/market/property-trends" },
+    { label: "Neighborhood Guides", path: "/neighborhoods" },
     { label: "Become an Agent", path: "/become-agent" },
     { label: "Pricing Plans", path: "/sell/pricing-plans" },
   ];

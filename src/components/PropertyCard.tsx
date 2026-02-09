@@ -140,6 +140,8 @@ export const PropertyCard = ({
             <img 
               src={images[0]} 
               alt={title}
+              loading="lazy"
+              decoding="async"
               className="w-full h-48 object-cover transition-smooth group-hover:scale-105"
               onClick={() => setIsGalleryOpen(true)}
             />
@@ -150,6 +152,8 @@ export const PropertyCard = ({
                   key={idx}
                   src={img}
                   alt={`${title} - Photo ${idx + 1}`}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
                   onClick={() => setIsGalleryOpen(true)}
                 />
@@ -160,6 +164,8 @@ export const PropertyCard = ({
               <img
                 src={images[0]}
                 alt={`${title} - Photo 1`}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
                 onClick={() => setIsGalleryOpen(true)}
               />
@@ -169,6 +175,8 @@ export const PropertyCard = ({
                     key={idx}
                     src={img}
                     alt={`${title} - Photo ${idx + 2}`}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
                     onClick={() => setIsGalleryOpen(true)}
                   />
@@ -180,6 +188,8 @@ export const PropertyCard = ({
               <img
                 src={images[0]}
                 alt={`${title} - Photo 1`}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
                 onClick={() => setIsGalleryOpen(true)}
               />
@@ -189,6 +199,8 @@ export const PropertyCard = ({
                     key={idx}
                     src={img}
                     alt={`${title} - Photo ${idx + 2}`}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
                     onClick={() => setIsGalleryOpen(true)}
                   />
@@ -201,6 +213,8 @@ export const PropertyCard = ({
                     <img
                       src={images[3]}
                       alt={`${title} - Photo 4`}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover transition-smooth group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-white font-semibold text-lg">
