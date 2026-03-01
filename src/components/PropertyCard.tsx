@@ -2,13 +2,22 @@ import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Bed, Bath, Square, MessageCircle, Trash2, Edit, Video } from "lucide-react";
+import { MapPin, Bed, Bath, Square, MessageCircle, Trash2, Edit, Video, MoreVertical, Heart, Share2, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+} from "@/components/ui/dropdown-menu";
 import { PhotoGallery } from "./PhotoGallery";
 import ContactDialog from "./ContactDialog";
 import { EditPropertyDialog } from "./EditPropertyDialog";
 import { VerificationBadge } from "./VerificationBadge";
-import { FavoriteButton } from "./FavoriteButton";
-import ShareButtons from "./ShareButtons";
+import { useFavorites } from "@/hooks/useFavorites";
 import { VirtualTourViewer } from "./VirtualTourViewer";
 import { QuickAIBadges } from "./ai/QuickAIBadges";
 import { useProperties, Property } from "@/hooks/useProperties";
@@ -64,8 +73,10 @@ export const PropertyCard = ({
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showVirtualTour, setShowVirtualTour] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { deleteProperty, updateProperty } = useProperties();
   const { user } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
   const { addToRecentlyViewed } = useRecentlyViewed();
   const { recordView } = usePropertyViews();
   
@@ -123,109 +134,98 @@ export const PropertyCard = ({
     ? propertyImages 
     : (image ? [image] : ['/placeholder.svg']);
   
-  // Mask phone number for display
-  const maskPhoneNumber = (phone: string) => {
-    if (!phone || phone.length < 6) return phone;
-    const cleaned = phone.replace(/\D/g, '');
-    if (cleaned.length < 6) return phone;
-    return `${cleaned.slice(0, 3)}-***-**${cleaned.slice(-2)}`;
+  const isFav = isFavorite(id);
+
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    await toggleFavorite(id);
   };
-  
+
+  const getShareUrl = () => `${window.location.origin}/property/${id}`;
+  const getShareText = () => `Check out this property: ${title} - ${price}`;
+
+  const shareOnWhatsApp = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(`https://wa.me/?text=${encodeURIComponent(`${getShareText()} ${getShareUrl()}`)}`, "_blank", "noopener,noreferrer");
+  };
+  const shareOnFacebook = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}`, "_blank", "noopener,noreferrer");
+  };
+  const shareOnTwitter = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}&url=${encodeURIComponent(getShareUrl())}`, "_blank", "noopener,noreferrer");
+  };
+  const copyLink = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try { await navigator.clipboard.writeText(getShareUrl()); toast.success("Link copied!"); } catch { toast.error("Failed to copy"); }
+  };
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
+  };
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
   return (
     <Card className="group cursor-pointer transition-smooth hover:shadow-elegant hover:-translate-y-1 overflow-hidden bg-gradient-card">
       <div className="relative overflow-hidden">
-        {/* Image Grid */}
-        <div className="relative">
-          {images.length === 1 ? (
-            <img 
-              src={images[0]} 
-              alt={title}
-              loading="lazy"
-              decoding="async"
-              className="w-full h-48 object-cover transition-smooth group-hover:scale-105"
-              onClick={() => setIsGalleryOpen(true)}
-            />
-          ) : images.length === 2 ? (
-            <div className="grid grid-cols-2 gap-1 h-48">
-              {images.slice(0, 2).map((img, idx) => (
-                <img
+        {/* Swipeable Image */}
+        <div className="relative h-48">
+          <img
+            src={images[currentImageIndex]}
+            alt={`${title} - Photo ${currentImageIndex + 1}`}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover transition-all duration-300"
+            onClick={() => setIsGalleryOpen(true)}
+          />
+
+          {/* Left/Right arrows */}
+          {images.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-1 top-1/2 -translate-y-1/2 z-10 h-7 w-7 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-1 top-1/2 -translate-y-1/2 z-10 h-7 w-7 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </>
+          )}
+
+          {/* Image counter bottom-right */}
+          {images.length > 1 && (
+            <div className="absolute bottom-2 right-2 z-10 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
+              {currentImageIndex + 1}/{images.length}
+            </div>
+          )}
+
+          {/* Dot indicators */}
+          {images.length > 1 && (
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex gap-1">
+              {images.slice(0, Math.min(images.length, 5)).map((_, idx) => (
+                <span
                   key={idx}
-                  src={img}
-                  alt={`${title} - Photo ${idx + 1}`}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
-                  onClick={() => setIsGalleryOpen(true)}
+                  className={`h-1.5 w-1.5 rounded-full transition-all ${
+                    currentImageIndex === idx ? 'bg-white scale-125' : 'bg-white/50'
+                  }`}
                 />
               ))}
-            </div>
-          ) : images.length === 3 ? (
-            <div className="grid grid-cols-2 gap-1 h-48">
-              <img
-                src={images[0]}
-                alt={`${title} - Photo 1`}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
-                onClick={() => setIsGalleryOpen(true)}
-              />
-              <div className="grid grid-rows-2 gap-1">
-                {images.slice(1, 3).map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={`${title} - Photo ${idx + 2}`}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
-                    onClick={() => setIsGalleryOpen(true)}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-1 h-48">
-              <img
-                src={images[0]}
-                alt={`${title} - Photo 1`}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
-                onClick={() => setIsGalleryOpen(true)}
-              />
-              <div className="grid grid-rows-2 gap-1">
-                {images.slice(1, 3).map((img, idx) => (
-                  <img
-                    key={idx}
-                    src={img}
-                    alt={`${title} - Photo ${idx + 2}`}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-smooth group-hover:scale-105 cursor-pointer"
-                    onClick={() => setIsGalleryOpen(true)}
-                  />
-                ))}
-                {images.length > 3 && (
-                  <div 
-                    className="relative cursor-pointer"
-                    onClick={() => setIsGalleryOpen(true)}
-                  >
-                    <img
-                      src={images[3]}
-                      alt={`${title} - Photo 4`}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover transition-smooth group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-white font-semibold text-lg">
-                      +{images.length - 3} more
-                    </div>
-                  </div>
-                )}
-              </div>
+              {images.length > 5 && <span className="text-white/50 text-[8px] leading-none">…</span>}
             </div>
           )}
         </div>
+
+        {/* Top-left badges */}
         <div className="absolute top-3 left-3 flex items-center gap-2 flex-wrap">
           {featured && (
             <Badge className="bg-gradient-primary border-0 text-primary-foreground">
@@ -233,46 +233,76 @@ export const PropertyCard = ({
             </Badge>
           )}
           {listing_type === 'rent' && vacant_units !== undefined && total_units !== undefined && (
-            <Badge 
+            <Badge
               className={`border-0 ${
-                vacant_units === 0 
-                  ? 'bg-destructive text-destructive-foreground' 
-                  : vacant_units <= 3 
-                    ? 'bg-orange-500 text-white' 
+                vacant_units === 0
+                  ? 'bg-destructive text-destructive-foreground'
+                  : vacant_units <= 3
+                    ? 'bg-orange-500 text-white'
                     : 'bg-green-600 text-white'
               }`}
             >
-              {vacant_units === 0 
-                ? 'Fully Rented' 
-                : `${vacant_units}/${total_units} Available`}
+              {vacant_units === 0 ? 'Fully Rented' : `${vacant_units}/${total_units} Available`}
             </Badge>
           )}
           {virtual_tour_url && virtual_tour_type !== 'none' && (
-            <Badge 
+            <Badge
               className="bg-accent text-accent-foreground border-0 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowVirtualTour(true);
-              }}
+              onClick={(e) => { e.stopPropagation(); setShowVirtualTour(true); }}
             >
               <Video className="w-3 h-3 mr-1" />
               360° Tour
             </Badge>
           )}
         </div>
-        <div className="absolute top-3 right-3 flex items-center gap-2">
-          <ShareButtons propertyId={id} title={title} price={price} />
-          <FavoriteButton propertyId={id} />
-          <Badge variant="secondary">
-            {type}
-          </Badge>
-        </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-smooth flex items-center justify-center pointer-events-none">
-          <div className="text-white text-center">
-            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/30">
-              <span className="text-sm font-medium">📸 Click to View & Zoom</span>
-            </div>
-          </div>
+
+        {/* Top-right: type badge + 3-dot menu */}
+        <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
+          <Badge variant="secondary">{type}</Badge>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+              <button className="h-8 w-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white flex items-center justify-center">
+                <MoreVertical className="w-4 h-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48" onClick={(e) => e.stopPropagation()}>
+              <DropdownMenuItem onClick={handleToggleFavorite} className="cursor-pointer gap-2">
+                <Heart className={`h-4 w-4 ${isFav ? 'fill-red-500 text-red-500' : ''}`} />
+                {isFav ? 'Remove from Wishlist' : 'Add to Wishlist'}
+              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="gap-2">
+                  <Share2 className="h-4 w-4" />
+                  Share
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={shareOnWhatsApp} className="cursor-pointer">WhatsApp</DropdownMenuItem>
+                  <DropdownMenuItem onClick={shareOnFacebook} className="cursor-pointer">Facebook</DropdownMenuItem>
+                  <DropdownMenuItem onClick={shareOnTwitter} className="cursor-pointer">Twitter / X</DropdownMenuItem>
+                  <DropdownMenuItem onClick={copyLink} className="cursor-pointer">Copy Link</DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              {isOwner && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={(e) => { e.stopPropagation(); setShowEditDialog(true); }}
+                    className="cursor-pointer gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Edit Property
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleRemoveProperty}
+                    className="cursor-pointer gap-2 text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete Property
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
       
@@ -335,7 +365,7 @@ export const PropertyCard = ({
               {phone && (
                 <div className="text-sm text-muted-foreground flex items-center gap-2">
                   <MessageCircle className="h-4 w-4" />
-                  <span>Contact: {maskPhoneNumber(phone)}</span>
+                  <span>Contact: {phone.length >= 6 ? `${phone.replace(/\D/g, '').slice(0, 3)}-***-**${phone.replace(/\D/g, '').slice(-2)}` : phone}</span>
                 </div>
               )}
               <Button
@@ -348,32 +378,6 @@ export const PropertyCard = ({
               >
                 <MessageCircle className="h-4 w-4 mr-2" />
                 {contactButtonText}
-              </Button>
-            </div>
-          )}
-
-          {isOwner && (
-            <div className="pt-2 space-y-2">
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="w-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowEditDialog(true);
-                }}
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Property
-              </Button>
-              <Button 
-                size="sm" 
-                variant="destructive" 
-                className="w-full"
-                onClick={handleRemoveProperty}
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Remove Property
               </Button>
             </div>
           )}
