@@ -4,8 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent, Banknote, Building, Save, Trash2, GitCompare, X, FileDown } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TrendingUp, TrendingDown, DollarSign, Home, MapPin, Calendar, Calculator, Percent, Banknote, Building, Save, Trash2, GitCompare, X, FileDown, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { MarketAIInsights } from "@/components/ai/MarketAIInsights";
 
 interface SavedCalculation {
@@ -337,35 +339,60 @@ const PropertyTrends = () => {
   // Check if any calculation has values
   const hasCalculations = calculatedNOI !== null || calculatedCapRate !== null || calculatedCashOnCash !== null || calculatedGRM !== null;
 
-  const trends = [
-    {
-      location: "Nairobi CBD",
-      priceChange: "+12.5%",
-      averagePrice: "KSh 8,500,000",
-      trend: "up",
-      period: "Last 12 months"
-    },
-    {
-      location: "Westlands",
-      priceChange: "+8.2%",
-      averagePrice: "KSh 15,200,000",
-      trend: "up",
-      period: "Last 12 months"
-    },
-    {
-      location: "Karen",
-      priceChange: "-2.1%",
-      averagePrice: "KSh 22,800,000",
-      trend: "down",
-      period: "Last 12 months"
-    },
-    {
-      location: "Kilimani",
-      priceChange: "+6.7%",
-      averagePrice: "KSh 12,400,000",
-      trend: "up",
-      period: "Last 12 months"
+  // AI-powered market stats
+  interface MarketStats {
+    marketActivity: { value: string; subtitle: string; trend: string };
+    averageSaleTime: { value: string; subtitle: string; trend: string };
+    pricePerSqFt: { value: string; subtitle: string; trend: string };
+    propertiesListed: { value: string; subtitle: string };
+    regionalTrends: Array<{
+      location: string;
+      priceChange: string;
+      averagePrice: string;
+      trend: string;
+      period: string;
+    }>;
+  }
+
+  const [marketStats, setMarketStats] = useState<MarketStats | null>(null);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [lastStatsUpdate, setLastStatsUpdate] = useState<Date | null>(null);
+
+  const fetchMarketStats = useCallback(async () => {
+    setIsLoadingStats(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('market-ai-insights', {
+        body: { action: 'market_stats' }
+      });
+
+      if (error) {
+        console.error('Market stats error:', error);
+        toast.error('Failed to fetch market data. Showing defaults.');
+        return;
+      }
+
+      if (data?.stats) {
+        setMarketStats(data.stats);
+        setLastStatsUpdate(new Date());
+      }
+    } catch (err) {
+      console.error('Market stats fetch error:', err);
+      toast.error('Failed to load AI market data.');
+    } finally {
+      setIsLoadingStats(false);
     }
+  }, []);
+
+  useEffect(() => {
+    fetchMarketStats();
+  }, [fetchMarketStats]);
+
+  // Fallback data while loading or on error
+  const trends = marketStats?.regionalTrends || [
+    { location: "Nairobi CBD", priceChange: "+12.5%", averagePrice: "KSh 8,500,000", trend: "up", period: "Last 12 months" },
+    { location: "Westlands", priceChange: "+8.2%", averagePrice: "KSh 15,200,000", trend: "up", period: "Last 12 months" },
+    { location: "Karen", priceChange: "-2.1%", averagePrice: "KSh 22,800,000", trend: "down", period: "Last 12 months" },
+    { location: "Kilimani", priceChange: "+6.7%", averagePrice: "KSh 12,400,000", trend: "up", period: "Last 12 months" }
   ];
 
   const insights = [
@@ -407,61 +434,71 @@ const PropertyTrends = () => {
               Stay informed with the latest property market data, price movements, and investment opportunities
             </p>
             <MarketAIInsights context="property_trends" className="max-w-2xl mx-auto" />
+            {lastStatsUpdate && (
+              <div className="flex items-center justify-center gap-2 mt-3">
+                <p className="text-xs text-muted-foreground">
+                  AI data updated: {lastStatsUpdate.toLocaleTimeString()}
+                </p>
+                <Button variant="ghost" size="sm" onClick={fetchMarketStats} disabled={isLoadingStats} className="h-6 w-6 p-0">
+                  <RefreshCw className={`w-3 h-3 ${isLoadingStats ? 'animate-spin' : ''}`} />
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Market Overview */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-12">
-            <Card className="border-border">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Market Activity</p>
-                    <p className="text-2xl font-bold text-foreground">+18%</p>
-                    <p className="text-xs text-green-600">vs last quarter</p>
-                  </div>
-                  <TrendingUp className="w-8 h-8 text-primary" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Average Sale Time</p>
-                    <p className="text-2xl font-bold text-foreground">45 days</p>
-                    <p className="text-xs text-green-600">-8 days from last year</p>
-                  </div>
-                  <Calendar className="w-8 h-8 text-primary" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Price per Sq Ft</p>
-                    <p className="text-2xl font-bold text-foreground">KSh 8,500</p>
-                    <p className="text-xs text-green-600">+12% YoY</p>
-                  </div>
-                  <DollarSign className="w-8 h-8 text-primary" />
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-border">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Properties Listed</p>
-                    <p className="text-2xl font-bold text-foreground">2,847</p>
-                    <p className="text-xs text-blue-600">Active listings</p>
-                  </div>
-                  <Home className="w-8 h-8 text-primary" />
-                </div>
-              </CardContent>
-            </Card>
+            {[
+              {
+                label: "Market Activity",
+                value: marketStats?.marketActivity.value || "+18%",
+                subtitle: marketStats?.marketActivity.subtitle || "vs last quarter",
+                subtitleColor: marketStats?.marketActivity.trend === "down" ? "text-red-600" : "text-green-600",
+                icon: TrendingUp,
+              },
+              {
+                label: "Average Sale Time",
+                value: marketStats?.averageSaleTime.value || "45 days",
+                subtitle: marketStats?.averageSaleTime.subtitle || "-8 days from last year",
+                subtitleColor: "text-green-600",
+                icon: Calendar,
+              },
+              {
+                label: "Price per Sq Ft",
+                value: marketStats?.pricePerSqFt.value || "KSh 8,500",
+                subtitle: marketStats?.pricePerSqFt.subtitle || "+12% YoY",
+                subtitleColor: marketStats?.pricePerSqFt.trend === "down" ? "text-red-600" : "text-green-600",
+                icon: DollarSign,
+              },
+              {
+                label: "Properties Listed",
+                value: marketStats?.propertiesListed.value || "2,847",
+                subtitle: marketStats?.propertiesListed.subtitle || "Active listings",
+                subtitleColor: "text-blue-600",
+                icon: Home,
+              },
+            ].map((stat, index) => (
+              <Card key={index} className="border-border">
+                <CardContent className="pt-6">
+                  {isLoadingStats ? (
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-8 w-16" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground">{stat.label}</p>
+                        <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                        <p className={`text-xs ${stat.subtitleColor}`}>{stat.subtitle}</p>
+                      </div>
+                      <stat.icon className="w-8 h-8 text-primary" />
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
           </div>
 
           {/* Regional Trends */}
