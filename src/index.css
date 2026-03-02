@@ -129,4 +129,11 @@ All colors MUST be HSL.
   a.inline-flex {
     min-height: 44px;
   }
+
+  /* Softer, rounder mobile cards and buttons (16px radius) */
+  .rounded-md,
+  .rounded-lg,
+  .rounded-xl {
+    border-radius: 1rem !important;
+  }
 }

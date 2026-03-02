@@ -138,8 +138,8 @@ export const PropertyCard = ({
   return (
     <Card className="group cursor-pointer transition-smooth hover:shadow-elegant hover:-translate-y-1 overflow-hidden bg-gradient-card">
       <div className="relative overflow-hidden">
-        {/* Swipeable Image - shorter on mobile */}
-        <div className="relative h-36 md:h-48">
+        {/* Full-width 16:9 on mobile, fixed height on desktop */}
+        <div className="relative aspect-[16/9] md:aspect-auto md:h-48">
           <img
             src={images[currentImageIndex]}
             alt={`${title} - Photo ${currentImageIndex + 1}`}
@@ -228,6 +228,13 @@ export const PropertyCard = ({
           )}
         </div>
 
+        {/* Mobile-only: price overlay on bottom-left of image */}
+        <div className="absolute bottom-2 left-2 z-10 md:hidden">
+          <span className="bg-black/70 backdrop-blur-sm text-white font-bold text-sm px-2.5 py-1 rounded-xl">
+            {price}
+          </span>
+        </div>
+
         {/* Top-right: type badge + 3-dot menu */}
         <div className="absolute top-2 right-2 md:top-3 md:right-3 flex items-center gap-1.5 z-10">
           <Badge variant="secondary" className="text-[10px] md:text-xs">{type}</Badge>
@@ -300,7 +307,7 @@ export const PropertyCard = ({
             </div>
           </div>
           
-          <div className="text-xl md:text-2xl font-bold text-primary">
+          <div className="hidden md:block text-xl md:text-2xl font-bold text-primary">
             {price}
           </div>
           
