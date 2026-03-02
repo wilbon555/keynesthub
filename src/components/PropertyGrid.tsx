@@ -245,21 +245,24 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
 
         {/* Filters and Controls */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-          <div className="flex flex-wrap gap-3">
-            {propertyTypes.map((type) => (
-              <Badge
-                key={type}
-                variant={selectedType === type ? "default" : "outline"}
-                className={`cursor-pointer transition-smooth capitalize ${
-                  selectedType === type 
-                    ? "bg-primary text-primary-foreground" 
-                    : "hover:bg-muted"
-                }`}
-                onClick={() => setSelectedType(type)}
-              >
-                {type === "all" ? "All Properties" : type}
-              </Badge>
-            ))}
+          {/* Horizontally scrollable pills on mobile */}
+          <div className="w-full md:w-auto overflow-x-auto scrollbar-hide">
+            <div className="flex gap-2 md:gap-3 md:flex-wrap min-w-max md:min-w-0 pb-1 md:pb-0">
+              {propertyTypes.map((type) => (
+                <Badge
+                  key={type}
+                  variant={selectedType === type ? "default" : "outline"}
+                  className={`cursor-pointer transition-smooth capitalize whitespace-nowrap min-h-[36px] md:min-h-0 px-4 md:px-3 text-sm md:text-xs ${
+                    selectedType === type 
+                      ? "bg-primary text-primary-foreground" 
+                      : "hover:bg-muted"
+                  }`}
+                  onClick={() => setSelectedType(type)}
+                >
+                  {type === "all" ? "All" : type}
+                </Badge>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

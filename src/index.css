@@ -112,3 +112,21 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide scrollbar for horizontal pill scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Mobile button min-height for thumb accessibility */
+@media (max-width: 767px) {
+  button,
+  [role="button"],
+  a.inline-flex {
+    min-height: 44px;
+  }
+}

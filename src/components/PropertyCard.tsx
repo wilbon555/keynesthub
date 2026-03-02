@@ -49,25 +49,10 @@ interface PropertyCardProps {
 }
 
 export const PropertyCard = ({
-  id,
-  title,
-  price,
-  location,
-  bedrooms,
-  bathrooms,
-  area,
-  type,
-  image,
-  images: propertyImages,
-  featured = false,
-  phone,
-  user_id,
-  listing_type = 'sale',
-  verification_status = 'pending',
-  virtual_tour_url,
-  virtual_tour_type = 'none',
-  total_units,
-  vacant_units
+  id, title, price, location, bedrooms, bathrooms, area, type, image,
+  images: propertyImages, featured = false, phone, user_id,
+  listing_type = 'sale', verification_status = 'pending',
+  virtual_tour_url, virtual_tour_type = 'none', total_units, vacant_units
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
@@ -80,25 +65,20 @@ export const PropertyCard = ({
   const { addToRecentlyViewed } = useRecentlyViewed();
   const { recordView } = usePropertyViews();
   
-  // Track property view when gallery is opened
   useEffect(() => {
     if (isGalleryOpen) {
       addToRecentlyViewed(id);
-      recordView(id); // Record view to database for analytics
+      recordView(id);
     }
   }, [isGalleryOpen, id, addToRecentlyViewed, recordView]);
   
-  // Check if current user is the owner of this property
   const isOwner = user && user_id && user.id === user_id;
   
   const handleRemoveProperty = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    
     if (window.confirm('Are you sure you want to remove this property? This action cannot be undone.')) {
       const success = await deleteProperty(id);
-      if (success) {
-        toast.success('Property removed successfully');
-      }
+      if (success) toast.success('Property removed successfully');
     }
   };
 
@@ -107,29 +87,14 @@ export const PropertyCard = ({
   };
 
   const currentProperty: Property = {
-    id,
-    title,
-    price,
-    location,
-    bedrooms,
-    bathrooms,
-    area,
-    type,
-    image,
-    images: propertyImages,
-    featured: featured || false,
-    phone,
-    user_id: user_id || '',
-    status: 'available',
-    listing_type: listing_type,
-    created_at: '',
-    updated_at: '',
+    id, title, price, location, bedrooms, bathrooms, area, type, image,
+    images: propertyImages, featured: featured || false, phone,
+    user_id: user_id || '', status: 'available', listing_type,
+    created_at: '', updated_at: '',
   };
 
-  // Determine button text based on listing type
   const contactButtonText = listing_type === 'rent' ? 'Inquire to Rent' : 'Contact Owner';
   
-  // Use multiple images if available, fallback to single image or placeholder
   const images = propertyImages && propertyImages.length > 0 
     ? propertyImages 
     : (image ? [image] : ['/placeholder.svg']);
@@ -173,8 +138,8 @@ export const PropertyCard = ({
   return (
     <Card className="group cursor-pointer transition-smooth hover:shadow-elegant hover:-translate-y-1 overflow-hidden bg-gradient-card">
       <div className="relative overflow-hidden">
-        {/* Swipeable Image */}
-        <div className="relative h-48">
+        {/* Swipeable Image - shorter on mobile */}
+        <div className="relative h-36 md:h-48">
           <img
             src={images[currentImageIndex]}
             alt={`${title} - Photo ${currentImageIndex + 1}`}
@@ -202,7 +167,7 @@ export const PropertyCard = ({
             </>
           )}
 
-          {/* Image counter bottom-right */}
+          {/* Image counter */}
           {images.length > 1 && (
             <div className="absolute bottom-2 right-2 z-10 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
               {currentImageIndex + 1}/{images.length}
@@ -225,16 +190,23 @@ export const PropertyCard = ({
           )}
         </div>
 
-        {/* Top-left badges */}
-        <div className="absolute top-3 left-3 flex items-center gap-2 flex-wrap">
+        {/* Top-left badges - verification & AI overlaid on image for mobile */}
+        <div className="absolute top-2 left-2 md:top-3 md:left-3 flex items-center gap-1 md:gap-2 flex-wrap z-10">
+          {/* Mobile-only: verification & AI badges on image */}
+          <div className="flex md:hidden items-center gap-1">
+            <VerificationBadge status={verification_status} />
+            <QuickAIBadges 
+              property={{ id, title, price, location, type, bedrooms, bathrooms, area, listing_type }}
+            />
+          </div>
           {featured && (
-            <Badge className="bg-gradient-primary border-0 text-primary-foreground">
+            <Badge className="bg-gradient-primary border-0 text-primary-foreground text-[10px] md:text-xs">
               Featured
             </Badge>
           )}
           {listing_type === 'rent' && vacant_units !== undefined && total_units !== undefined && (
             <Badge
-              className={`border-0 ${
+              className={`border-0 text-[10px] md:text-xs ${
                 vacant_units === 0
                   ? 'bg-destructive text-destructive-foreground'
                   : vacant_units <= 3
@@ -247,21 +219,21 @@ export const PropertyCard = ({
           )}
           {virtual_tour_url && virtual_tour_type !== 'none' && (
             <Badge
-              className="bg-accent text-accent-foreground border-0 cursor-pointer"
+              className="bg-accent text-accent-foreground border-0 cursor-pointer text-[10px] md:text-xs"
               onClick={(e) => { e.stopPropagation(); setShowVirtualTour(true); }}
             >
               <Video className="w-3 h-3 mr-1" />
-              360° Tour
+              360°
             </Badge>
           )}
         </div>
 
         {/* Top-right: type badge + 3-dot menu */}
-        <div className="absolute top-3 right-3 flex items-center gap-1.5 z-10">
-          <Badge variant="secondary">{type}</Badge>
+        <div className="absolute top-2 right-2 md:top-3 md:right-3 flex items-center gap-1.5 z-10">
+          <Badge variant="secondary" className="text-[10px] md:text-xs">{type}</Badge>
           <DropdownMenu>
             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-              <button className="h-8 w-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white flex items-center justify-center">
+              <button className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white flex items-center justify-center">
                 <MoreVertical className="w-4 h-4" />
               </button>
             </DropdownMenuTrigger>
@@ -307,64 +279,58 @@ export const PropertyCard = ({
       </div>
       
       <CardContent 
-        className="p-4 cursor-pointer" 
+        className="p-3 md:p-4 cursor-pointer" 
         onClick={() => setIsGalleryOpen(true)}
       >
-        <div className="space-y-3">
+        <div className="space-y-2 md:space-y-3">
           <div>
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
+            {/* Desktop-only: verification & AI badges inline */}
+            <div className="hidden md:flex items-center gap-2 mb-1 flex-wrap">
               <VerificationBadge status={verification_status} />
               <QuickAIBadges 
-                property={{
-                  id,
-                  title,
-                  price,
-                  location,
-                  type,
-                  bedrooms,
-                  bathrooms,
-                  area,
-                  listing_type
-                }}
+                property={{ id, title, price, location, type, bedrooms, bathrooms, area, listing_type }}
               />
             </div>
-            <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-smooth">
+            <h3 className="font-semibold text-base md:text-lg leading-tight line-clamp-1 md:line-clamp-2 group-hover:text-primary transition-smooth">
               {title}
             </h3>
-            <div className="flex items-center text-muted-foreground text-sm mt-1">
-              <MapPin className="w-4 h-4 mr-1" />
+            <div className="flex items-center text-muted-foreground text-xs md:text-sm mt-0.5 md:mt-1">
+              <MapPin className="w-3 h-3 md:w-4 md:h-4 mr-1" />
               {location}
             </div>
           </div>
           
-          <div className="text-2xl font-bold text-primary">
+          <div className="text-xl md:text-2xl font-bold text-primary">
             {price}
           </div>
           
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+          {/* Icons only on mobile, icons + text labels on desktop */}
+          <div className="flex items-center gap-3 md:gap-4 text-xs md:text-sm text-muted-foreground">
             {bedrooms && (
-              <div className="flex items-center gap-1">
-                <Bed className="w-4 h-4" />
-                {bedrooms} beds
+              <div className="flex items-center gap-1" title={`${bedrooms} bedrooms`}>
+                <Bed className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className="md:hidden">{bedrooms}</span>
+                <span className="hidden md:inline">{bedrooms} beds</span>
               </div>
             )}
             {bathrooms && (
-              <div className="flex items-center gap-1">
-                <Bath className="w-4 h-4" />
-                {bathrooms} baths
+              <div className="flex items-center gap-1" title={`${bathrooms} bathrooms`}>
+                <Bath className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                <span className="md:hidden">{bathrooms}</span>
+                <span className="hidden md:inline">{bathrooms} baths</span>
               </div>
             )}
-            <div className="flex items-center gap-1">
-              <Square className="w-4 h-4" />
+            <div className="flex items-center gap-1" title={area}>
+              <Square className="w-3.5 h-3.5 md:w-4 md:h-4" />
               {area}
             </div>
           </div>
 
           {!isOwner && (
-            <div className="space-y-2 pt-2">
+            <div className="space-y-2 pt-1 md:pt-2">
               {phone && (
-                <div className="text-sm text-muted-foreground flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4" />
+                <div className="text-xs md:text-sm text-muted-foreground flex items-center gap-2">
+                  <MessageCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
                   <span>Contact: {phone.length >= 6 ? `${phone.replace(/\D/g, '').slice(0, 3)}-***-**${phone.replace(/\D/g, '').slice(-2)}` : phone}</span>
                 </div>
               )}
@@ -389,17 +355,7 @@ export const PropertyCard = ({
         isOpen={isGalleryOpen}
         onClose={() => setIsGalleryOpen(false)}
         title={title}
-        property={{
-          id,
-          title,
-          price,
-          location,
-          type,
-          bedrooms,
-          bathrooms,
-          area,
-          listing_type
-        }}
+        property={{ id, title, price, location, type, bedrooms, bathrooms, area, listing_type }}
         isOwner={isOwner}
       />
       
