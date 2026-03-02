@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Menu, X, User, LogOut, Shield, LayoutDashboard, Settings, Home, Sparkles } from "lucide-react";
+import { Menu, X, User, LogOut, Shield, LayoutDashboard, Settings, Home, Sparkles, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
@@ -248,7 +249,7 @@ export const Navigation = () => {
         {isMenuOpen && (
           <div className="md:hidden border-t border-border animate-fade-in">
             <ScrollArea className="h-[calc(100vh-4rem)] py-4">
-              <div className="flex flex-col space-y-4 px-4">
+              <div className="flex flex-col space-y-2 px-4">
                 {/* Home link for mobile */}
                 <a href="/" className="flex items-center py-2 text-primary font-semibold hover:text-primary/80 transition-smooth">
                   <Home className="w-4 h-4 mr-2" />
@@ -259,58 +260,74 @@ export const Navigation = () => {
                   AI Discover
                 </a>
 
-                <div>
-                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Buy</div>
-                  <div className="mt-2 flex flex-col">
-                    <a href="/buy/residential" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Residential</a>
-                    <a href="/buy/commercial" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Commercial</a>
-                    <a href="/buy/land" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Land</a>
-                    <a href="/buy/new-developments" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">New Developments</a>
-                  </div>
-                </div>
+                {/* Collapsible accordion sections */}
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Buy
+                    <ChevronDown className="w-4 h-4 transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="flex flex-col">
+                    <a href="/buy/residential" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Residential</a>
+                    <a href="/buy/commercial" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Commercial</a>
+                    <a href="/buy/land" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Land</a>
+                    <a href="/buy/new-developments" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">New Developments</a>
+                  </CollapsibleContent>
+                </Collapsible>
 
-                <div>
-                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Sell</div>
-                  <div className="mt-2 flex flex-col">
-                    <a href="/sell/list-property" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">List Your Property</a>
-                    <a href="/sell/pricing-plans" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Pricing Plans</a>
-                    <a href="/sell/agent-assistance" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Agent Assistance</a>
-                  </div>
-                </div>
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Sell
+                    <ChevronDown className="w-4 h-4 transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="flex flex-col">
+                    <a href="/sell/list-property" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">List Your Property</a>
+                    <a href="/sell/pricing-plans" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Pricing Plans</a>
+                    <a href="/sell/agent-assistance" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Agent Assistance</a>
+                  </CollapsibleContent>
+                </Collapsible>
 
-                <div>
-                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Rent</div>
-                  <div className="mt-2 flex flex-col">
-                    <a href="/rent/apartments" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Apartments</a>
-                    <a href="/rent/houses" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Houses</a>
-                    <a href="/rent/office-spaces" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Office Spaces</a>
-                    <a href="/rent/short-term" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Short Term</a>
-                  </div>
-                </div>
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Rent
+                    <ChevronDown className="w-4 h-4 transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="flex flex-col">
+                    <a href="/rent/apartments" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Apartments</a>
+                    <a href="/rent/houses" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Houses</a>
+                    <a href="/rent/office-spaces" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Office Spaces</a>
+                    <a href="/rent/short-term" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Short Term</a>
+                  </CollapsibleContent>
+                </Collapsible>
 
-                <div>
-                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Agents</div>
-                  <div className="mt-2 flex flex-col">
-                    <a href="/agents/find-agent" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Find an Agent</a>
-                    <a href="/become-agent" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Become an Agent</a>
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Agents
+                    <ChevronDown className="w-4 h-4 transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="flex flex-col">
+                    <a href="/agents/find-agent" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Find an Agent</a>
+                    <a href="/become-agent" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Become an Agent</a>
                     {(isAgent || isAdmin) && (
-                      <a href="/agent-dashboard" className="py-2 pl-2 text-primary font-medium hover:text-primary/80 transition-smooth">
+                      <a href="/agent-dashboard" className="py-2 pl-4 text-primary font-medium hover:text-primary/80 transition-smooth">
                         <Shield className="inline w-4 h-4 mr-2" />
                         Agent Dashboard
                       </a>
                     )}
-                  </div>
-                </div>
+                  </CollapsibleContent>
+                </Collapsible>
 
-                <div>
-                  <div className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Market Insights</div>
-                  <div className="mt-2 flex flex-col">
-                    <a href="/market/property-trends" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Property Trends</a>
-                    <a href="/mortgage-calculator" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Mortgage Calculator</a>
-                    <a href="/investment-tips" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
-                    <a href="/neighborhoods" className="py-2 pl-2 text-foreground hover:text-primary transition-smooth">Neighborhood Guides</a>
-                  </div>
-                </div>
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full py-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                    Market Insights
+                    <ChevronDown className="w-4 h-4 transition-transform duration-200 [[data-state=open]>&]:rotate-180" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="flex flex-col">
+                    <a href="/market/property-trends" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Property Trends</a>
+                    <a href="/mortgage-calculator" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Mortgage Calculator</a>
+                    <a href="/investment-tips" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
+                    <a href="/neighborhoods" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Neighborhood Guides</a>
+                  </CollapsibleContent>
+                </Collapsible>
 
                 <div className="flex flex-col space-y-2 pt-4">
                   <ContactDropdown variant="ghost" size="sm" className="justify-start" />

@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { SearchSection } from "./SearchSection";
 import { PhotoUpload } from "./PhotoUpload";
-import { TrendingUp, Users, Award } from "lucide-react";
+import { TrendingUp, Users, Award, Search } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
@@ -52,7 +53,23 @@ export const HeroSection = () => {
             </p>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          {/* Mobile: single search input */}
+          <div className="md:hidden w-full max-w-md mx-auto">
+            <div
+              className="relative cursor-pointer"
+              onClick={() => navigate("/discover")}
+            >
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
+              <Input
+                readOnly
+                placeholder="Search properties, locations..."
+                className="pl-12 pr-4 h-12 rounded-2xl bg-card/90 backdrop-blur-sm border-primary-foreground/20 text-foreground placeholder:text-muted-foreground cursor-pointer"
+              />
+            </div>
+          </div>
+
+          {/* Desktop: original two buttons */}
+          <div className="hidden md:flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               variant="hero" 
               size="lg" 
