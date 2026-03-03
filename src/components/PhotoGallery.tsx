@@ -1,9 +1,18 @@
-import { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut, Sparkles, ChevronDown, ChevronUp } from "lucide-react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { X, Sparkles, MoreVertical, Share2, Edit, Trash2, Heart, ChevronLeft, ChevronRight } from "lucide-react";
 import { AIInsightsPanel } from "./ai/AIInsightsPanel";
 import { PropertyForAI } from "@/hooks/usePropertyAI";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 interface PhotoGalleryProps {
   images: string[];
@@ -15,197 +24,284 @@ interface PhotoGalleryProps {
   isOwner?: boolean;
 }
 
-export const PhotoGallery = ({ 
-  images, 
-  isOpen, 
-  onClose, 
+export const PhotoGallery = ({
+  images,
+  isOpen,
+  onClose,
   initialIndex = 0,
   title,
   property,
-  isOwner = false
+  isOwner = false,
 }: PhotoGalleryProps) => {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [zoom, setZoom] = useState(1);
   const [showAIInsights, setShowAIInsights] = useState(false);
 
-  const nextImage = () => {
+  // Touch/gesture state
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [translateX, setTranslateX] = useState(0);
+  const [translateY, setTranslateY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [opacity, setOpacity] = useState(1);
+  const [pinchDistance, setPinchDistance] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentIndex(initialIndex);
+      setZoom(1);
+      setTranslateX(0);
+      setTranslateY(0);
+      setOpacity(1);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen, initialIndex]);
+
+  const nextImage = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
     setZoom(1);
-  };
+  }, [images.length]);
 
-  const prevImage = () => {
+  const prevImage = useCallback(() => {
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
     setZoom(1);
+  }, [images.length]);
+
+  // Pinch distance helper
+  const getDistance = (touches: React.TouchList) => {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
   };
 
-  const handleZoomIn = () => {
-    setZoom((prev) => Math.min(prev + 0.5, 3));
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      setPinchDistance(getDistance(e.touches));
+      return;
+    }
+    if (zoom > 1) return; // don't swipe while zoomed
+    setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+    setIsDragging(true);
   };
 
-  const handleZoomOut = () => {
-    setZoom((prev) => Math.max(prev - 0.5, 0.5));
+  const handleTouchMove = (e: React.TouchEvent) => {
+    // Pinch-to-zoom
+    if (e.touches.length === 2 && pinchDistance !== null) {
+      const newDist = getDistance(e.touches);
+      const scale = newDist / pinchDistance;
+      setZoom((prev) => Math.min(Math.max(prev * scale, 0.5), 4));
+      setPinchDistance(newDist);
+      return;
+    }
+    if (!touchStart || zoom > 1) return;
+    const dx = e.touches[0].clientX - touchStart.x;
+    const dy = e.touches[0].clientY - touchStart.y;
+
+    // Determine dominant direction
+    if (Math.abs(dy) > Math.abs(dx) && dy > 0) {
+      // Swipe down
+      setTranslateY(dy);
+      setOpacity(Math.max(1 - dy / 400, 0.2));
+    } else {
+      // Horizontal swipe
+      setTranslateX(dx);
+    }
   };
 
-  const resetZoom = () => {
-    setZoom(1);
+  const handleTouchEnd = () => {
+    setPinchDistance(null);
+    if (!touchStart) return;
+
+    // Swipe down to close
+    if (translateY > 120) {
+      onClose();
+    }
+    // Horizontal swipe
+    else if (Math.abs(translateX) > 60) {
+      if (translateX < 0) nextImage();
+      else prevImage();
+    }
+
+    setTouchStart(null);
+    setTranslateX(0);
+    setTranslateY(0);
+    setOpacity(1);
+    setIsDragging(false);
   };
 
-  if (!images.length) return null;
+  // Sharing helpers
+  const getShareUrl = () => `${window.location.origin}/property/${property?.id || ""}`;
+  const getShareText = () => `Check out: ${title || "this property"}`;
+  const shareOnWhatsApp = () => window.open(`https://wa.me/?text=${encodeURIComponent(`${getShareText()} ${getShareUrl()}`)}`, "_blank");
+  const shareOnFacebook = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getShareUrl())}`, "_blank");
+  const shareOnTwitter = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(getShareText())}&url=${encodeURIComponent(getShareUrl())}`, "_blank");
+  const copyLink = async () => {
+    try { await navigator.clipboard.writeText(getShareUrl()); toast.success("Link copied!"); } catch { toast.error("Failed to copy"); }
+  };
+
+  if (!isOpen || !images.length) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`max-w-6xl w-full p-0 bg-black/95 ${showAIInsights ? 'h-[95vh]' : 'h-[90vh]'}`}>
-        <div className="relative w-full h-full flex items-center justify-center">
-
-          {/* Navigation buttons */}
-          {images.length > 1 && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute left-4 z-10 text-white hover:bg-white/20"
-                onClick={prevImage}
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-4 z-10 text-white hover:bg-white/20"
-                onClick={nextImage}
-              >
-                <ChevronRight className="w-6 h-6" />
-              </Button>
-            </>
-          )}
-
-          {/* Zoom controls */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/20"
-              onClick={handleZoomOut}
-              disabled={zoom <= 0.5}
+    <div
+      ref={containerRef}
+      className="fixed inset-0 z-50 bg-black flex flex-col"
+      style={{ opacity }}
+    >
+      {/* Top bar */}
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-3 pt-[env(safe-area-inset-top,12px)] pb-2">
+        {/* Left: AI Insights */}
+        <div className="flex items-center gap-2">
+          {property && (
+            <button
+              onClick={() => setShowAIInsights(!showAIInsights)}
+              className="text-white/80 hover:text-white p-2"
             >
-              <ZoomOut className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:bg-white/20 min-w-16"
-              onClick={resetZoom}
-            >
-              {Math.round(zoom * 100)}%
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white hover:bg-white/20"
-              onClick={handleZoomIn}
-              disabled={zoom >= 3}  
-            >
-              <ZoomIn className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Image counter */}
-          {images.length > 1 && (
-            <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-10 text-white bg-black/50 px-3 py-1 rounded-full text-sm">
-              {currentIndex + 1} / {images.length}
-            </div>
-          )}
-
-          {/* Top bar with title and controls */}
-          <div className="absolute top-4 left-4 right-4 z-10 flex items-start justify-between gap-2">
-            {/* Title */}
-            {title && (
-              <div className="text-white bg-black/50 px-3 py-1 rounded max-w-[40%] md:max-w-md flex-shrink min-w-0">
-                <p className="text-sm font-medium truncate">{title}</p>
-              </div>
-            )}
-            
-            {/* Right side controls */}
-            <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
-              {/* AI Insights Toggle Button */}
-              {property && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-white hover:bg-white/20 gap-1 px-2 md:px-3"
-                  onClick={() => setShowAIInsights(!showAIInsights)}
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span className="hidden sm:inline">AI Insights</span>
-                  {showAIInsights ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                </Button>
-              )}
-              
-              {/* Close button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-white hover:bg-white/20"
-                onClick={onClose}
-              >
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Main image */}
-          <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
-            <img
-              src={images[currentIndex]}
-              alt={`Property photo ${currentIndex + 1}`}
-              className="max-w-full max-h-full object-contain transition-transform duration-200 cursor-move"
-              style={{ 
-                transform: `scale(${zoom})`,
-                transformOrigin: 'center center'
-              }}
-              draggable={false}
-            />
-          </div>
-
-          {/* Thumbnail strip */}
-          {images.length > 1 && (
-            <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-10 flex gap-2 bg-black/70 p-2 rounded-lg max-w-md overflow-x-auto">
-              {images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setCurrentIndex(index);
-                    setZoom(1);
-                  }}
-                  className={`flex-shrink-0 w-12 h-12 rounded overflow-hidden border-2 transition-all ${
-                    currentIndex === index 
-                      ? 'border-primary ring-2 ring-primary/30' 
-                      : 'border-white/20 hover:border-white/40'
-                  }`}
-                >
-                  <img
-                    src={image}
-                    alt={`Thumbnail ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* AI Insights Panel - slides in from right */}
-          {property && showAIInsights && (
-            <div className="absolute top-0 right-0 w-full md:w-[400px] h-full z-20 overflow-y-auto bg-background border-l">
-              <AIInsightsPanel 
-                property={property}
-                isOwner={isOwner}
-                className="rounded-none border-0 h-full"
-                onClose={() => setShowAIInsights(false)}
-              />
-            </div>
+              <Sparkles className="w-5 h-5" />
+            </button>
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+
+        {/* Center: counter */}
+        {images.length > 1 && (
+          <span className="text-white/70 text-sm font-medium">
+            {currentIndex + 1} / {images.length}
+          </span>
+        )}
+
+        {/* Right: 3-dot menu + close */}
+        <div className="flex items-center gap-1">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-white/80 hover:text-white p-2">
+                <MoreVertical className="w-5 h-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger className="gap-2">
+                  <Share2 className="h-4 w-4" /> Share
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuItem onClick={shareOnWhatsApp}>WhatsApp</DropdownMenuItem>
+                  <DropdownMenuItem onClick={shareOnFacebook}>Facebook</DropdownMenuItem>
+                  <DropdownMenuItem onClick={shareOnTwitter}>Twitter / X</DropdownMenuItem>
+                  <DropdownMenuItem onClick={copyLink}>Copy Link</DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuItem onClick={() => toast.info("Like feature")}>
+                <Heart className="h-4 w-4 mr-2" /> Like
+              </DropdownMenuItem>
+              {isOwner && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => toast.info("Edit")}>
+                    <Edit className="h-4 w-4 mr-2" /> Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={() => toast.info("Delete")}>
+                    <Trash2 className="h-4 w-4 mr-2" /> Delete
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <button onClick={onClose} className="text-white/80 hover:text-white p-2">
+            <X className="w-5 h-5" strokeWidth={1.5} />
+          </button>
+        </div>
+      </div>
+
+      {/* Main image area with touch gestures */}
+      <div
+        className="flex-1 flex items-center justify-center overflow-hidden select-none"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <img
+          src={images[currentIndex]}
+          alt={`Property photo ${currentIndex + 1}`}
+          className="max-w-full max-h-full object-contain"
+          style={{
+            transform: `translate(${translateX}px, ${translateY}px) scale(${zoom})`,
+            transition: isDragging ? "none" : "transform 0.25s ease-out",
+            touchAction: "none",
+          }}
+          draggable={false}
+        />
+      </div>
+
+      {/* Desktop nav arrows */}
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={prevImage}
+            className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white/60 hover:text-white p-2"
+          >
+            <ChevronLeft className="w-8 h-8" />
+          </button>
+          <button
+            onClick={nextImage}
+            className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white/60 hover:text-white p-2"
+          >
+            <ChevronRight className="w-8 h-8" />
+          </button>
+        </>
+      )}
+
+      {/* Bottom pagination dots (mobile) / thumbnails (desktop) */}
+      <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center">
+        {/* Mobile: dots */}
+        <div className="flex md:hidden gap-1.5">
+          {images.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => { setCurrentIndex(idx); setZoom(1); }}
+              className={`rounded-full transition-all ${
+                currentIndex === idx
+                  ? "w-6 h-2 bg-white"
+                  : "w-2 h-2 bg-white/40"
+              }`}
+            />
+          ))}
+        </div>
+        {/* Desktop: thumbnails without white borders */}
+        <div className="hidden md:flex gap-2 bg-black/60 p-2 rounded-lg max-w-lg overflow-x-auto">
+          {images.map((img, idx) => (
+            <button
+              key={idx}
+              onClick={() => { setCurrentIndex(idx); setZoom(1); }}
+              className={`flex-shrink-0 w-14 h-10 rounded-md overflow-hidden transition-all ${
+                currentIndex === idx ? "ring-2 ring-white/60 scale-105" : "opacity-50 hover:opacity-80"
+              }`}
+            >
+              <img src={img} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Swipe-down indicator */}
+      {translateY > 20 && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30 text-white/50 text-xs">
+          ↓ Release to close
+        </div>
+      )}
+
+      {/* AI Insights Panel */}
+      {property && showAIInsights && (
+        <div className="absolute top-0 right-0 w-full md:w-[400px] h-full z-40 overflow-y-auto bg-background border-l">
+          <AIInsightsPanel
+            property={property}
+            isOwner={isOwner}
+            className="rounded-none border-0 h-full"
+            onClose={() => setShowAIInsights(false)}
+          />
+        </div>
+      )}
+    </div>
   );
 };
