@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -126,51 +126,22 @@ export const PropertyCard = ({
     try { await navigator.clipboard.writeText(getShareUrl()); toast.success("Link copied!"); } catch { toast.error("Failed to copy"); }
   };
 
-  const nextImage = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setCurrentImageIndex((prev) => (prev + 1) % Math.min(images.length, 5));
-  };
-  const prevImage = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setCurrentImageIndex((prev) => (prev - 1 + Math.min(images.length, 5)) % Math.min(images.length, 5));
-  };
-
-  // Touch swipe state for card carousel
-  const cardTouchStart = useRef<number | null>(null);
-  const cardTouchDelta = useRef<number>(0);
-
-  const handleCardTouchStart = (e: React.TouchEvent) => {
-    cardTouchStart.current = e.touches[0].clientX;
-    cardTouchDelta.current = 0;
-  };
-  const handleCardTouchMove = (e: React.TouchEvent) => {
-    if (cardTouchStart.current === null) return;
-    cardTouchDelta.current = e.touches[0].clientX - cardTouchStart.current;
-  };
-  const handleCardTouchEnd = (e: React.TouchEvent) => {
+  const nextImage = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (Math.abs(cardTouchDelta.current) > 40) {
-      if (cardTouchDelta.current < 0) nextImage();
-      else prevImage();
-    }
-    cardTouchStart.current = null;
-    cardTouchDelta.current = 0;
+    setCurrentImageIndex((prev) => (prev + 1) % images.length);
   };
-
-  const displayImages = images.slice(0, 5);
+  const prevImage = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
 
   return (
     <Card className="group cursor-pointer transition-smooth hover:shadow-elegant hover:-translate-y-1 overflow-hidden bg-gradient-card">
       <div className="relative overflow-hidden">
         {/* Full-width 16:9 on mobile, fixed height on desktop */}
-        <div
-          className="relative aspect-[16/9] md:aspect-auto md:h-48"
-          onTouchStart={handleCardTouchStart}
-          onTouchMove={handleCardTouchMove}
-          onTouchEnd={handleCardTouchEnd}
-        >
+        <div className="relative aspect-[16/9] md:aspect-auto md:h-48">
           <img
-            src={displayImages[currentImageIndex]}
+            src={images[currentImageIndex]}
             alt={`${title} - Photo ${currentImageIndex + 1}`}
             loading="lazy"
             decoding="async"
@@ -178,17 +149,17 @@ export const PropertyCard = ({
             onClick={() => setIsGalleryOpen(true)}
           />
 
-          {/* Left/Right arrows (desktop hover) */}
-          {displayImages.length > 1 && (
+          {/* Left/Right arrows */}
+          {images.length > 1 && (
             <>
               <button
-                onClick={(e) => prevImage(e)}
+                onClick={prevImage}
                 className="absolute left-1 top-1/2 -translate-y-1/2 z-10 h-7 w-7 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
-                onClick={(e) => nextImage(e)}
+                onClick={nextImage}
                 className="absolute right-1 top-1/2 -translate-y-1/2 z-10 h-7 w-7 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -196,19 +167,25 @@ export const PropertyCard = ({
             </>
           )}
 
-          {/* Pagination dots */}
-          {displayImages.length > 1 && (
+          {/* Image counter */}
+          {images.length > 1 && (
+            <div className="absolute bottom-2 right-2 z-10 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
+              {currentImageIndex + 1}/{images.length}
+            </div>
+          )}
+
+          {/* Dot indicators */}
+          {images.length > 1 && (
             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex gap-1">
-              {displayImages.map((_, idx) => (
+              {images.slice(0, Math.min(images.length, 5)).map((_, idx) => (
                 <span
                   key={idx}
-                  className={`rounded-full transition-all ${
-                    currentImageIndex === idx
-                      ? 'w-4 h-1.5 bg-white'
-                      : 'w-1.5 h-1.5 bg-white/50'
+                  className={`h-1.5 w-1.5 rounded-full transition-all ${
+                    currentImageIndex === idx ? 'bg-white scale-125' : 'bg-white/50'
                   }`}
                 />
               ))}
+              {images.length > 5 && <span className="text-white/50 text-[8px] leading-none">…</span>}
             </div>
           )}
         </div>
