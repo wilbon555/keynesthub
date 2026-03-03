@@ -116,20 +116,18 @@ export function SmartSearchInput({
 
       {/* AI Suggestions from last search */}
       {suggestions && suggestions.length > 0 && (
-        <div className="mt-2 relative z-20 bg-background/95 backdrop-blur-sm border rounded-lg p-2.5 shadow-md">
-          <span className="text-xs text-muted-foreground block mb-1.5">Related:</span>
-          <div className="flex flex-wrap gap-1.5">
-            {suggestions.map((suggestion, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => onSuggestionClick?.(suggestion)}
-                className="text-xs px-2.5 py-1 bg-primary/10 text-primary hover:bg-primary/20 rounded-full transition-colors"
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
+        <div className="mt-2 flex flex-wrap gap-2">
+          <span className="text-xs text-muted-foreground">Related:</span>
+          {suggestions.map((suggestion, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => onSuggestionClick?.(suggestion)}
+              className="text-xs px-2 py-1 bg-primary/10 text-primary hover:bg-primary/20 rounded-full transition-colors"
+            >
+              {suggestion}
+            </button>
+          ))}
         </div>
       )}
     </div>
