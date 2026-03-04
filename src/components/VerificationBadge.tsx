@@ -1,20 +1,70 @@
 import { Badge } from "@/components/ui/badge";
-import { Shield, ShieldCheck, Clock } from "lucide-react";
+import { Shield, ShieldCheck, Clock, CheckCircle2, Circle, FileCheck, Landmark, ClipboardCheck } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+interface VerificationDetail {
+  titleDeedVerified?: boolean;
+  taxesPaidVerified?: boolean;
+  physicalInspectionDone?: boolean;
+}
 
 interface VerificationBadgeProps {
   status: string;
   className?: string;
+  details?: VerificationDetail;
 }
 
-export const VerificationBadge = ({ status, className = '' }: VerificationBadgeProps) => {
+const VerificationChecklist = ({ details }: { details?: VerificationDetail }) => {
+  const items = [
+    { label: 'Title Deed Verified', checked: details?.titleDeedVerified ?? false, icon: FileCheck },
+    { label: 'Taxes Paid', checked: details?.taxesPaidVerified ?? false, icon: Landmark },
+    { label: 'Physical Inspection Completed', checked: details?.physicalInspectionDone ?? false, icon: ClipboardCheck },
+  ];
+
+  return (
+    <div className="space-y-2.5 p-1">
+      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Verification Details</p>
+      {items.map((item) => (
+        <div key={item.label} className="flex items-center gap-2.5">
+          {item.checked ? (
+            <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+          ) : (
+            <Circle className="w-4 h-4 text-muted-foreground/40 flex-shrink-0" />
+          )}
+          <item.icon className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+          <span className={`text-sm ${item.checked ? 'text-foreground' : 'text-muted-foreground'}`}>
+            {item.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export const VerificationBadge = ({ status, className = '', details }: VerificationBadgeProps) => {
   if (status === 'verified') {
     return (
-      <Badge 
-        className={`bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/30 ${className}`}
-      >
-        <ShieldCheck className="w-3 h-3 mr-1" />
-        Verified Listing
-      </Badge>
+      <Popover>
+        <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+          <Badge 
+            className={`bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/30 cursor-pointer hover:bg-green-500/30 transition-colors ${className}`}
+          >
+            <ShieldCheck className="w-3 h-3 mr-1" />
+            Verified Listing
+          </Badge>
+        </PopoverTrigger>
+        <PopoverContent 
+          className="w-64" 
+          align="start" 
+          onClick={(e) => e.stopPropagation()}
+        >
+          <VerificationChecklist details={details} />
+        </PopoverContent>
+      </Popover>
     );
   }
 

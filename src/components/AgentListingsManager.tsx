@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Dialog, 
   DialogContent, 
@@ -48,6 +49,9 @@ export const AgentListingsManager = () => {
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [notes, setNotes] = useState('');
+  const [titleDeedVerified, setTitleDeedVerified] = useState(false);
+  const [taxesPaidVerified, setTaxesPaidVerified] = useState(false);
+  const [physicalInspectionDone, setPhysicalInspectionDone] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [galleryInitialIndex, setGalleryInitialIndex] = useState(0);
 
@@ -58,6 +62,9 @@ export const AgentListingsManager = () => {
 
   const handleVerify = (listing: AgentListing) => {
     setSelectedListing(listing);
+    setTitleDeedVerified(listing.title_deed_verified || false);
+    setTaxesPaidVerified(listing.taxes_paid_verified || false);
+    setPhysicalInspectionDone(listing.physical_inspection_done || false);
     setShowVerifyDialog(true);
   };
 
@@ -69,7 +76,11 @@ export const AgentListingsManager = () => {
   const confirmVerify = async () => {
     if (!selectedListing) return;
 
-    const success = await verifyListing(selectedListing.id, 'verified', notes);
+    const success = await verifyListing(selectedListing.id, 'verified', notes, {
+      title_deed_verified: titleDeedVerified,
+      taxes_paid_verified: taxesPaidVerified,
+      physical_inspection_done: physicalInspectionDone,
+    });
     
     if (success) {
       toast.success('Listing verified successfully');
@@ -80,6 +91,9 @@ export const AgentListingsManager = () => {
     setShowVerifyDialog(false);
     setSelectedListing(null);
     setNotes('');
+    setTitleDeedVerified(false);
+    setTaxesPaidVerified(false);
+    setPhysicalInspectionDone(false);
   };
 
   const confirmReject = async () => {
@@ -124,7 +138,7 @@ export const AgentListingsManager = () => {
             <div className="flex-1 space-y-2">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <VerificationBadge status={listing.verification_status} />
+                  <VerificationBadge status={listing.verification_status} details={{ titleDeedVerified: listing.title_deed_verified, taxesPaidVerified: listing.taxes_paid_verified, physicalInspectionDone: listing.physical_inspection_done }} />
                   <Badge variant="outline">{listing.type}</Badge>
                   <Badge variant="outline">{listing.listing_type}</Badge>
                 </div>
@@ -293,15 +307,47 @@ export const AgentListingsManager = () => {
             </DialogDescription>
           </DialogHeader>
 
-          <div>
-            <Label htmlFor="verify-notes">Notes (optional)</Label>
-            <Textarea
-              id="verify-notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Verification notes..."
-              className="mt-1"
-            />
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <Label className="text-sm font-semibold">Verification Checklist</Label>
+              <div className="space-y-3 p-3 bg-muted/50 rounded-lg border">
+                <div className="flex items-center space-x-3">
+                  <Checkbox 
+                    id="title-deed" 
+                    checked={titleDeedVerified} 
+                    onCheckedChange={(checked) => setTitleDeedVerified(checked === true)} 
+                  />
+                  <Label htmlFor="title-deed" className="text-sm cursor-pointer">Title Deed Verified</Label>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Checkbox 
+                    id="taxes-paid" 
+                    checked={taxesPaidVerified} 
+                    onCheckedChange={(checked) => setTaxesPaidVerified(checked === true)} 
+                  />
+                  <Label htmlFor="taxes-paid" className="text-sm cursor-pointer">Taxes Paid</Label>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Checkbox 
+                    id="physical-inspection" 
+                    checked={physicalInspectionDone} 
+                    onCheckedChange={(checked) => setPhysicalInspectionDone(checked === true)} 
+                  />
+                  <Label htmlFor="physical-inspection" className="text-sm cursor-pointer">Physical Inspection Completed</Label>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="verify-notes">Notes (optional)</Label>
+              <Textarea
+                id="verify-notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Verification notes..."
+                className="mt-1"
+              />
+            </div>
           </div>
 
           <DialogFooter>
@@ -401,7 +447,7 @@ export const AgentListingsManager = () => {
 
               {/* Status */}
               <div className="flex items-center gap-2 flex-wrap">
-                <VerificationBadge status={selectedListing.verification_status} />
+                <VerificationBadge status={selectedListing.verification_status} details={{ titleDeedVerified: selectedListing.title_deed_verified, taxesPaidVerified: selectedListing.taxes_paid_verified, physicalInspectionDone: selectedListing.physical_inspection_done }} />
                 <Badge variant="outline">{selectedListing.type}</Badge>
                 <Badge variant="outline">{selectedListing.listing_type}</Badge>
               </div>
