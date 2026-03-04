@@ -267,10 +267,13 @@ export type Database = {
           location: string
           maintenance_quality: string | null
           phone: string | null
+          physical_inspection_done: boolean
           price: string
           region: string | null
           status: string | null
+          taxes_paid_verified: boolean
           title: string
+          title_deed_verified: boolean
           total_units: number | null
           type: string
           units: number | null
@@ -302,10 +305,13 @@ export type Database = {
           location: string
           maintenance_quality?: string | null
           phone?: string | null
+          physical_inspection_done?: boolean
           price: string
           region?: string | null
           status?: string | null
+          taxes_paid_verified?: boolean
           title: string
+          title_deed_verified?: boolean
           total_units?: number | null
           type: string
           units?: number | null
@@ -337,10 +343,13 @@ export type Database = {
           location?: string
           maintenance_quality?: string | null
           phone?: string | null
+          physical_inspection_done?: boolean
           price?: string
           region?: string | null
           status?: string | null
+          taxes_paid_verified?: boolean
           title?: string
+          title_deed_verified?: boolean
           total_units?: number | null
           type?: string
           units?: number | null

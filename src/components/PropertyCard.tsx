@@ -42,6 +42,9 @@ interface PropertyCardProps {
   user_id?: string;
   listing_type?: 'sale' | 'rent';
   verification_status?: string;
+  title_deed_verified?: boolean;
+  taxes_paid_verified?: boolean;
+  physical_inspection_done?: boolean;
   virtual_tour_url?: string;
   virtual_tour_type?: 'none' | '360_image' | 'video' | 'matterport' | 'external';
   total_units?: number;
@@ -52,6 +55,7 @@ export const PropertyCard = ({
   id, title, price, location, bedrooms, bathrooms, area, type, image,
   images: propertyImages, featured = false, phone, user_id,
   listing_type = 'sale', verification_status = 'pending',
+  title_deed_verified, taxes_paid_verified, physical_inspection_done,
   virtual_tour_url, virtual_tour_type = 'none', total_units, vacant_units
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
@@ -194,7 +198,10 @@ export const PropertyCard = ({
         <div className="absolute top-2 left-2 md:top-3 md:left-3 flex items-center gap-1 md:gap-2 flex-wrap z-10">
           {/* Mobile-only: verification & AI badges on image */}
           <div className="flex md:hidden items-center gap-1">
-            <VerificationBadge status={verification_status} />
+            <VerificationBadge 
+              status={verification_status} 
+              details={{ titleDeedVerified: title_deed_verified, taxesPaidVerified: taxes_paid_verified, physicalInspectionDone: physical_inspection_done }}
+            />
             <QuickAIBadges 
               property={{ id, title, price, location, type, bedrooms, bathrooms, area, listing_type }}
             />
@@ -293,7 +300,10 @@ export const PropertyCard = ({
           <div>
             {/* Desktop-only: verification & AI badges inline */}
             <div className="hidden md:flex items-center gap-2 mb-1 flex-wrap">
-              <VerificationBadge status={verification_status} />
+              <VerificationBadge 
+                status={verification_status} 
+                details={{ titleDeedVerified: title_deed_verified, taxesPaidVerified: taxes_paid_verified, physicalInspectionDone: physical_inspection_done }}
+              />
               <QuickAIBadges 
                 property={{ id, title, price, location, type, bedrooms, bathrooms, area, listing_type }}
               />

@@ -39,6 +39,10 @@ export interface Property {
   // Vacancy tracking (for rentals)
   total_units?: number;
   vacant_units?: number;
+  // Verification details
+  title_deed_verified?: boolean;
+  taxes_paid_verified?: boolean;
+  physical_inspection_done?: boolean;
 }
 
 export const useProperties = () => {

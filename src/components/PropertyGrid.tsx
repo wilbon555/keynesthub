@@ -334,6 +334,9 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
                     images={property.images}
                     listing_type={property.listing_type}
                     verification_status={property.verification_status || 'verified'}
+                    title_deed_verified={property.title_deed_verified}
+                    taxes_paid_verified={property.taxes_paid_verified}
+                    physical_inspection_done={property.physical_inspection_done}
                     total_units={property.total_units}
                     vacant_units={property.vacant_units}
                   />

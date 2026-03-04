@@ -30,6 +30,9 @@ export interface AgentListing {
   building_age: number | null;
   floors: number | null;
   units: number | null;
+  title_deed_verified: boolean;
+  taxes_paid_verified: boolean;
+  physical_inspection_done: boolean;
 }
 
 export const useAgentListings = () => {
@@ -71,7 +74,12 @@ export const useAgentListings = () => {
   const verifyListing = async (
     propertyId: string, 
     status: 'verified' | 'rejected',
-    notes?: string
+    notes?: string,
+    verificationDetails?: {
+      title_deed_verified?: boolean;
+      taxes_paid_verified?: boolean;
+      physical_inspection_done?: boolean;
+    }
   ): Promise<boolean> => {
     if (!user) return false;
 
@@ -82,7 +90,8 @@ export const useAgentListings = () => {
           verification_status: status,
           verified_at: new Date().toISOString(),
           verified_by: user.id,
-          verification_notes: notes || null
+          verification_notes: notes || null,
+          ...(verificationDetails || {})
         })
         .eq('id', propertyId);
 
