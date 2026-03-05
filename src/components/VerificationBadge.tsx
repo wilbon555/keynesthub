@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Shield, ShieldCheck, Clock, CheckCircle2, Circle, FileCheck, Landmark, ClipboardCheck } from "lucide-react";
+import { Shield, ShieldCheck, ShieldAlert, Clock, CheckCircle2, Circle, FileCheck, Landmark, ClipboardCheck } from "lucide-react";
 import {
   Popover,
   PopoverContent,
@@ -47,14 +47,29 @@ const VerificationChecklist = ({ details }: { details?: VerificationDetail }) =>
 
 export const VerificationBadge = ({ status, className = '', details }: VerificationBadgeProps) => {
   if (status === 'verified') {
+    const checksCompleted = [
+      details?.titleDeedVerified,
+      details?.taxesPaidVerified,
+      details?.physicalInspectionDone,
+    ].filter(Boolean).length;
+    const isFullyVerified = checksCompleted === 3;
+
     return (
       <Popover>
         <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
           <Badge 
-            className={`bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/30 cursor-pointer hover:bg-green-500/30 transition-colors ${className}`}
+            className={`cursor-pointer hover:opacity-80 transition-colors ${
+              isFullyVerified
+                ? 'bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/30 hover:bg-green-500/30'
+                : 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30 hover:bg-amber-500/30'
+            } ${className}`}
           >
-            <ShieldCheck className="w-3 h-3 mr-1" />
-            Verified Listing
+            {isFullyVerified ? (
+              <ShieldCheck className="w-3 h-3 mr-1" />
+            ) : (
+              <ShieldAlert className="w-3 h-3 mr-1" />
+            )}
+            {isFullyVerified ? 'Fully Verified' : `Verified (${checksCompleted}/3)`}
           </Badge>
         </PopoverTrigger>
         <PopoverContent 
