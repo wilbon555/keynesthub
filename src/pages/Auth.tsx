@@ -1,39 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { Loader2, ArrowLeft } from "lucide-react";
-import { useEffect } from "react";
-import { z } from "zod";
-
-const signInSchema = z.object({
-  email: z.string().trim().email("Invalid email address").max(255, "Email too long"),
-  password: z.string().min(1, "Password is required")
-});
-
-const signUpSchema = z.object({
-  email: z.string().trim().email("Invalid email address").max(255, "Email too long"),
-  password: z.string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
-});
+import { ArrowLeft } from "lucide-react";
+import SignInForm from "@/components/auth/SignInForm";
+import SignUpForm from "@/components/auth/SignUpForm";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [searchParams] = useSearchParams();
   const { signIn, signUp, user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Redirect authenticated users to their intended destination or home
   useEffect(() => {
     if (user) {
       const redirect = searchParams.get("redirect");
@@ -41,90 +21,26 @@ const Auth = () => {
     }
   }, [user, navigate, searchParams]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    try {
-      const validated = signInSchema.parse({ email, password });
-      
-      const { error } = await signIn(validated.email, validated.password);
-      
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Sign In Failed",
-          description: error.message
-        });
-      } else {
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in."
-        });
-        const redirect = searchParams.get("redirect");
-        navigate(redirect ? decodeURIComponent(redirect) : "/");
-      }
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast({
-          variant: "destructive",
-          title: "Validation Error",
-          description: error.errors[0].message
-        });
-      }
-    }
-    
-    setIsLoading(false);
-  };
-
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    try {
-      const validated = signUpSchema.parse({ email, password });
-      
-      const { error } = await signUp(validated.email, validated.password);
-      
-      if (error) {
-        toast({
-          variant: "destructive",
-          title: "Sign Up Failed",
-          description: error.message
-        });
-      } else {
-        toast({
-          title: "Account Created!",
-          description: "Please check your email to verify your account."
-        });
-      }
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        toast({
-          variant: "destructive",
-          title: "Validation Error",
-          description: error.errors[0].message
-        });
-      }
-    }
-    
-    setIsLoading(false);
+  const handleSignUp = async (email: string, password: string, metadata?: Record<string, string>) => {
+    const redirectUrl = `${window.location.origin}/`;
+    const { error } = await signUp(email, password);
+    return { error };
   };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <Button 
-          variant="ghost" 
+      <div className="w-full max-w-lg">
+        <Button
+          variant="ghost"
           className="mb-4"
           onClick={() => navigate("/")}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
         </Button>
-        
-        <Card>
-          <CardHeader className="space-y-1">
+
+        <Card className="shadow-elegant">
+          <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-2xl text-center">Welcome to KeyNestHub</CardTitle>
             <CardDescription className="text-center">
               Sign in to your account or create a new one
@@ -132,84 +48,17 @@ const Auth = () => {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
               </TabsList>
-              
-              <TabsContent value="signin" className="space-y-4">
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-email">Email</Label>
-                    <Input
-                      id="signin-email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-password">Password</Label>
-                    <Input
-                      id="signin-password"
-                      type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Signing In...
-                      </>
-                    ) : (
-                      "Sign In"
-                    )}
-                  </Button>
-                </form>
+
+              <TabsContent value="signin">
+                <SignInForm onSignIn={signIn} isLoading={isLoading} setIsLoading={setIsLoading} />
               </TabsContent>
-              
-              <TabsContent value="signup" className="space-y-4">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Password</Label>
-                    <Input
-                      id="signup-password"
-                      type="password"
-                      placeholder="Create a password (min 8 chars, uppercase, number)"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      minLength={8}
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Creating Account...
-                      </>
-                    ) : (
-                      "Create Account"
-                    )}
-                  </Button>
-                </form>
+
+              <TabsContent value="signup">
+                <SignUpForm onSignUp={handleSignUp} isLoading={isLoading} setIsLoading={setIsLoading} />
               </TabsContent>
             </Tabs>
           </CardContent>
