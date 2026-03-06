@@ -116,7 +116,7 @@ export function SmartSearchInput({
 
       {/* AI Suggestions from last search */}
       {suggestions && suggestions.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2 p-2 bg-background/95 backdrop-blur-sm border rounded-lg shadow-lg flex flex-wrap gap-2 items-center">
           <span className="text-xs text-muted-foreground">Related:</span>
           {suggestions.map((suggestion, i) => (
             <button

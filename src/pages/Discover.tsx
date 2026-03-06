@@ -230,7 +230,7 @@ const DiscoverMap: React.FC<{
   return (
     <div className="flex-1 relative overflow-hidden">
       {/* Search Bar - Floating */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-full max-w-2xl px-4">
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-full max-w-2xl px-4 flex flex-col gap-2">
         <SmartSearchInput
           onSearch={handleSearch}
           isSearching={isSearching}
@@ -279,7 +279,7 @@ const DiscoverMap: React.FC<{
 
       {/* Results Panel */}
       {showPanel && (
-        <div className="absolute left-4 top-24 bottom-4 z-20 w-80">
+        <div className="absolute left-4 top-28 bottom-4 z-20 w-80">
           <SearchResultsPanel
             result={lastResult}
             properties={properties}
