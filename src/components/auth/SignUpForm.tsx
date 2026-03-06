@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Eye, EyeOff, Loader2, Search } from "lucide-react";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,15 +31,19 @@ const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
   </label>
 );
 
-const INDUSTRY_ROLES = [
-  "Buyer",
-  "Seller / Owner",
-  "Real Estate Agent",
-  "Property Developer",
-  "Investor",
-  "Property Manager",
-  "Mortgage Broker",
-  "Other",
+const INDUSTRY_ROLE_GROUPS = [
+  {
+    label: "Owner/Landlord",
+    roles: ["Principal Investor", "REIT", "Private Investor"],
+  },
+  {
+    label: "Roles",
+    roles: ["Lender", "Assessor", "Appraiser", "Tenant", "Property Manager", "Developer", "Economic Developer", "Service Provider", "Prospective Investor"],
+  },
+  {
+    label: "Broker/Agent",
+    roles: ["Buyer Rep", "Tenant Rep", "Listing Rep", "Landlord Rep"],
+  },
 ];
 
 const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
@@ -48,7 +52,8 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [industryRole, setIndustryRole] = useState("");
+  const [industryRole, setIndustryRole] = useState("Service Provider");
+  const [roleSearch, setRoleSearch] = useState("");
   const [phone, setPhone] = useState("");
   const [postalAddress, setPostalAddress] = useState("");
   const { toast } = useToast();
@@ -147,7 +152,7 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
         </div>
       </div>
 
-      {/* Industry Role dropdown */}
+      {/* Industry Role searchable dropdown */}
       <div>
         <RequiredLabel>Industry Role</RequiredLabel>
         <Select value={industryRole} onValueChange={setIndustryRole}>
@@ -155,9 +160,34 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
             <SelectValue placeholder="Select your role" />
           </SelectTrigger>
           <SelectContent>
-            {INDUSTRY_ROLES.map((role) => (
-              <SelectItem key={role} value={role}>{role}</SelectItem>
-            ))}
+            <div className="px-2 pb-2 pt-1 sticky top-0 bg-popover">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+                <input
+                  placeholder="Search roles..."
+                  value={roleSearch}
+                  onChange={(e) => setRoleSearch(e.target.value)}
+                  className="w-full h-8 pl-8 pr-3 text-sm rounded-md border border-input bg-background outline-none focus:ring-1 focus:ring-ring"
+                  onKeyDown={(e) => e.stopPropagation()}
+                />
+              </div>
+            </div>
+            {INDUSTRY_ROLE_GROUPS.map((group) => {
+              const filtered = group.roles.filter((r) =>
+                r.toLowerCase().includes(roleSearch.toLowerCase())
+              );
+              if (filtered.length === 0) return null;
+              return (
+                <SelectGroup key={group.label}>
+                  <SelectLabel className="text-xs uppercase tracking-wider text-muted-foreground font-medium px-2 py-1.5">
+                    {group.label}
+                  </SelectLabel>
+                  {filtered.map((role) => (
+                    <SelectItem key={role} value={role}>{role}</SelectItem>
+                  ))}
+                </SelectGroup>
+              );
+            })}
           </SelectContent>
         </Select>
       </div>
