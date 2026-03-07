@@ -246,7 +246,7 @@ export const PropertyCard = ({
         {/* Mobile-only: price overlay on bottom-left of image */}
         <div className="absolute bottom-2 left-2 z-10 md:hidden">
           <span className="bg-black/70 backdrop-blur-sm text-white font-bold text-sm px-2.5 py-1 rounded-xl">
-            {price}
+            {formatPriceWithSuffix(price, listing_type, stay_type)}
           </span>
         </div>
 
