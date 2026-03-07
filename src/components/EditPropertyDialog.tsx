@@ -57,6 +57,7 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
         bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : undefined,
         total_units: formData.listing_type === 'rent' ? totalUnits : undefined,
         vacant_units: formData.listing_type === 'rent' ? vacantUnits : undefined,
+        stay_type: formData.listing_type === 'rent' ? formData.stay_type : undefined,
         uploadedFiles: uploadedFiles.length > 0 ? uploadedFiles : undefined,
       });
       onClose();
