@@ -271,6 +271,7 @@ export type Database = {
           price: string
           region: string | null
           status: string | null
+          stay_type: string
           taxes_paid_verified: boolean
           title: string
           title_deed_verified: boolean
@@ -309,6 +310,7 @@ export type Database = {
           price: string
           region?: string | null
           status?: string | null
+          stay_type?: string
           taxes_paid_verified?: boolean
           title: string
           title_deed_verified?: boolean
@@ -347,6 +349,7 @@ export type Database = {
           price?: string
           region?: string | null
           status?: string | null
+          stay_type?: string
           taxes_paid_verified?: boolean
           title?: string
           title_deed_verified?: boolean

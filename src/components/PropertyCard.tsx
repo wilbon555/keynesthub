@@ -49,14 +49,22 @@ interface PropertyCardProps {
   virtual_tour_type?: 'none' | '360_image' | 'video' | 'matterport' | 'external';
   total_units?: number;
   vacant_units?: number;
+  stay_type?: 'long-term' | 'short-term';
 }
+
+const formatPriceWithSuffix = (price: string, listingType: string, stayType?: string) => {
+  if (listingType === 'sale') return price;
+  if (stayType === 'short-term') return `${price}/night`;
+  return `${price}/mo`;
+};
 
 export const PropertyCard = ({
   id, title, price, location, bedrooms, bathrooms, area, type, image,
   images: propertyImages, featured = false, phone, user_id,
   listing_type = 'sale', verification_status = 'pending',
   title_deed_verified, taxes_paid_verified, physical_inspection_done,
-  virtual_tour_url, virtual_tour_type = 'none', total_units, vacant_units
+  virtual_tour_url, virtual_tour_type = 'none', total_units, vacant_units,
+  stay_type
 }: PropertyCardProps) => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
@@ -238,7 +246,7 @@ export const PropertyCard = ({
         {/* Mobile-only: price overlay on bottom-left of image */}
         <div className="absolute bottom-2 left-2 z-10 md:hidden">
           <span className="bg-black/70 backdrop-blur-sm text-white font-bold text-sm px-2.5 py-1 rounded-xl">
-            {price}
+            {formatPriceWithSuffix(price, listing_type, stay_type)}
           </span>
         </div>
 
@@ -318,7 +326,7 @@ export const PropertyCard = ({
           </div>
           
           <div className="hidden md:block text-xl md:text-2xl font-bold text-primary">
-            {price}
+            {formatPriceWithSuffix(price, listing_type, stay_type)}
           </div>
           
           {/* Icons only on mobile, icons + text labels on desktop */}

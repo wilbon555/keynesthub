@@ -32,6 +32,7 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
     listing_type: property.listing_type,
     total_units: property.total_units?.toString() || "1",
     vacant_units: property.vacant_units?.toString() || "1",
+    stay_type: (property as any).stay_type || "long-term",
   });
   
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -56,6 +57,7 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
         bathrooms: formData.bathrooms ? parseInt(formData.bathrooms) : undefined,
         total_units: formData.listing_type === 'rent' ? totalUnits : undefined,
         vacant_units: formData.listing_type === 'rent' ? vacantUnits : undefined,
+        stay_type: formData.listing_type === 'rent' ? formData.stay_type : undefined,
         uploadedFiles: uploadedFiles.length > 0 ? uploadedFiles : undefined,
       });
       onClose();
@@ -86,12 +88,16 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="price">Price *</Label>
+              <Label htmlFor="price">
+                {formData.listing_type === 'rent' 
+                  ? formData.stay_type === 'short-term' ? 'Nightly Rate *' : 'Monthly Rate *'
+                  : 'Price *'}
+              </Label>
               <Input
                 id="price"
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                placeholder="e.g., $250,000"
+                placeholder={formData.stay_type === 'short-term' ? "e.g., Ksh500/night" : "e.g., $250,000"}
                 required
               />
             </div>
@@ -111,6 +117,25 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
               </Select>
             </div>
           </div>
+
+          {/* Stay type for rentals */}
+          {formData.listing_type === 'rent' && (
+            <div>
+              <Label htmlFor="stay_type">Stay Type</Label>
+              <Select
+                value={formData.stay_type}
+                onValueChange={(value) => setFormData({ ...formData, stay_type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="long-term">Long-term (Monthly/Semester)</SelectItem>
+                  <SelectItem value="short-term">Short-term (Airbnb / Nightly)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Vacancy tracking for rentals */}
           {formData.listing_type === 'rent' && (

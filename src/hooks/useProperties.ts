@@ -39,6 +39,8 @@ export interface Property {
   // Vacancy tracking (for rentals)
   total_units?: number;
   vacant_units?: number;
+  // Stay type for rentals
+  stay_type?: 'long-term' | 'short-term';
   // Verification details
   title_deed_verified?: boolean;
   taxes_paid_verified?: boolean;

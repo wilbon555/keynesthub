@@ -45,6 +45,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       // Vacancy tracking for rentals
       totalUnits: z.coerce.number().min(1, "Total units must be at least 1").optional(),
       vacantUnits: z.coerce.number().min(0, "Vacant units cannot be negative").optional(),
+      stayType: z.enum(['long-term', 'short-term']).optional(),
       priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       phone: z
@@ -87,6 +88,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       maintenanceQuality: "",
       totalUnits: undefined,
       vacantUnits: undefined,
+      stayType: 'long-term' as const,
       priceMin: 1,
       priceMax: 1,
       phone: "",
@@ -172,6 +174,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
         // Vacancy tracking for rentals
         total_units: values.listingType === 'rent' ? (values.totalUnits || 1) : undefined,
         vacant_units: values.listingType === 'rent' ? (values.vacantUnits ?? values.totalUnits ?? 1) : undefined,
+        stay_type: values.listingType === 'rent' ? (values.stayType || 'long-term') : undefined,
         uploadedFiles: selectedFiles // Pass files to be uploaded
       };
 
@@ -431,49 +434,77 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
 
                     {/* Vacancy tracking fields for rentals */}
                     {form.watch("listingType") === "rent" && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border border-border">
-                        <div className="col-span-2">
-                          <p className="text-sm font-medium text-foreground mb-2">📊 Vacancy Tracking</p>
-                          <p className="text-xs text-muted-foreground">Track available units to show real-time availability to potential tenants.</p>
+                      <div className="space-y-4">
+                        {/* Stay Type selector */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <FormField
+                            control={form.control}
+                            name="stayType"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Stay Type</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value || 'long-term'}>
+                                  <FormControl>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="Select stay type" />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    <SelectItem value="long-term">Long-term (Monthly/Semester)</SelectItem>
+                                    <SelectItem value="short-term">Short-term (Airbnb / Nightly)</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                         </div>
-                        <FormField
-                          control={form.control}
-                          name="totalUnits"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Total Units/Rooms</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  min={1} 
-                                  placeholder="e.g., 30" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
 
-                        <FormField
-                          control={form.control}
-                          name="vacantUnits"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Currently Vacant</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  min={0}
-                                  max={form.watch("totalUnits") || 999}
-                                  placeholder="e.g., 15" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        {/* Vacancy tracking */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg border border-border">
+                          <div className="col-span-2">
+                            <p className="text-sm font-medium text-foreground mb-2">📊 Vacancy Tracking</p>
+                            <p className="text-xs text-muted-foreground">Track available units to show real-time availability to potential tenants.</p>
+                          </div>
+                          <FormField
+                            control={form.control}
+                            name="totalUnits"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Total Units/Rooms</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min={1} 
+                                    placeholder="e.g., 30" 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name="vacantUnits"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Currently Vacant</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min={0}
+                                    max={form.watch("totalUnits") || 999}
+                                    placeholder="e.g., 15" 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
                       </div>
                     )}
 
@@ -696,7 +727,13 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           const currency = getCurrencyInfo(country);
                           return (
                             <FormItem>
-                              <FormLabel>Price Min ({currency.symbol})</FormLabel>
+                              <FormLabel>
+                                {form.watch("listingType") === "rent" 
+                                  ? form.watch("stayType") === "short-term" 
+                                    ? `Nightly Rate Min (${currency.symbol})` 
+                                    : `Price Min /mo (${currency.symbol})`
+                                  : `Price Min (${currency.symbol})`}
+                              </FormLabel>
                               <FormControl>
                                 <Input 
                                   type="number" 
@@ -721,7 +758,13 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           const currency = getCurrencyInfo(country);
                           return (
                             <FormItem>
-                              <FormLabel>Price Max ({currency.symbol})</FormLabel>
+                              <FormLabel>
+                                {form.watch("listingType") === "rent" 
+                                  ? form.watch("stayType") === "short-term" 
+                                    ? `Nightly Rate Max (${currency.symbol})` 
+                                    : `Price Max /mo (${currency.symbol})`
+                                  : `Price Max (${currency.symbol})`}
+                              </FormLabel>
                               <FormControl>
                                 <Input 
                                   type="number" 
