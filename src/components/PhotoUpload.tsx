@@ -758,7 +758,13 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           const currency = getCurrencyInfo(country);
                           return (
                             <FormItem>
-                              <FormLabel>Price Max ({currency.symbol})</FormLabel>
+                              <FormLabel>
+                                {form.watch("listingType") === "rent" 
+                                  ? form.watch("stayType") === "short-term" 
+                                    ? `Nightly Rate Max (${currency.symbol})` 
+                                    : `Price Max /mo (${currency.symbol})`
+                                  : `Price Max (${currency.symbol})`}
+                              </FormLabel>
                               <FormControl>
                                 <Input 
                                   type="number" 
