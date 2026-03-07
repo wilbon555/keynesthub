@@ -45,6 +45,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       // Vacancy tracking for rentals
       totalUnits: z.coerce.number().min(1, "Total units must be at least 1").optional(),
       vacantUnits: z.coerce.number().min(0, "Vacant units cannot be negative").optional(),
+      stayType: z.enum(['long-term', 'short-term']).optional(),
       priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
       phone: z
