@@ -32,6 +32,7 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
     listing_type: property.listing_type,
     total_units: property.total_units?.toString() || "1",
     vacant_units: property.vacant_units?.toString() || "1",
+    stay_type: (property as any).stay_type || "long-term",
   });
   
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
