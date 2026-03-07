@@ -326,7 +326,7 @@ export const PropertyCard = ({
           </div>
           
           <div className="hidden md:block text-xl md:text-2xl font-bold text-primary">
-            {price}
+            {formatPriceWithSuffix(price, listing_type, stay_type)}
           </div>
           
           {/* Icons only on mobile, icons + text labels on desktop */}
