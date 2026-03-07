@@ -1,0 +1,1 @@
+ALTER TABLE public.properties ADD COLUMN IF NOT EXISTS stay_type text NOT NULL DEFAULT 'long-term';
