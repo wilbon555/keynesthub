@@ -118,6 +118,25 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
             </div>
           </div>
 
+          {/* Stay type for rentals */}
+          {formData.listing_type === 'rent' && (
+            <div>
+              <Label htmlFor="stay_type">Stay Type</Label>
+              <Select
+                value={formData.stay_type}
+                onValueChange={(value) => setFormData({ ...formData, stay_type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="long-term">Long-term (Monthly/Semester)</SelectItem>
+                  <SelectItem value="short-term">Short-term (Airbnb / Nightly)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {/* Vacancy tracking for rentals */}
           {formData.listing_type === 'rent' && (
             <div className="p-4 bg-muted/50 rounded-lg border border-border space-y-3">
