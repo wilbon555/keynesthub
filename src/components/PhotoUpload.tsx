@@ -88,6 +88,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       maintenanceQuality: "",
       totalUnits: undefined,
       vacantUnits: undefined,
+      stayType: 'long-term' as const,
       priceMin: 1,
       priceMax: 1,
       phone: "",
