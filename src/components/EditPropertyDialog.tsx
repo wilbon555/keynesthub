@@ -88,12 +88,16 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="price">Price *</Label>
+              <Label htmlFor="price">
+                {formData.listing_type === 'rent' 
+                  ? formData.stay_type === 'short-term' ? 'Nightly Rate *' : 'Monthly Rate *'
+                  : 'Price *'}
+              </Label>
               <Input
                 id="price"
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                placeholder="e.g., $250,000"
+                placeholder={formData.stay_type === 'short-term' ? "e.g., Ksh500/night" : "e.g., $250,000"}
                 required
               />
             </div>
