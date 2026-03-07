@@ -174,6 +174,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
         // Vacancy tracking for rentals
         total_units: values.listingType === 'rent' ? (values.totalUnits || 1) : undefined,
         vacant_units: values.listingType === 'rent' ? (values.vacantUnits ?? values.totalUnits ?? 1) : undefined,
+        stay_type: values.listingType === 'rent' ? (values.stayType || 'long-term') : undefined,
         uploadedFiles: selectedFiles // Pass files to be uploaded
       };
 
