@@ -18,6 +18,7 @@ import MortgageCalculator from "./pages/MortgageCalculator";
 import BecomeAgent from "./pages/BecomeAgent";
 import Install from "./pages/Install";
 import Discover from "./pages/Discover";
+import PropertyDetail from "./pages/PropertyDetail";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // Buy pages
@@ -63,6 +64,7 @@ const App = () => {
         <IntentTriageModal />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/property/:id" element={<PropertyDetail />} />
           <Route path="/discover" element={<Discover />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

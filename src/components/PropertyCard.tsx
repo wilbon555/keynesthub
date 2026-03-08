@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -66,6 +67,7 @@ export const PropertyCard = ({
   virtual_tour_url, virtual_tour_type = 'none', total_units, vacant_units,
   stay_type
 }: PropertyCardProps) => {
+  const navigate = useNavigate();
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
@@ -297,7 +299,7 @@ export const PropertyCard = ({
       
       <CardContent 
         className="p-3 md:p-4 cursor-pointer" 
-        onClick={() => setIsGalleryOpen(true)}
+        onClick={() => navigate(`/property/${id}`)}
       >
         <div className="space-y-2 md:space-y-3">
           <div>
