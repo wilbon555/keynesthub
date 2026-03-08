@@ -188,11 +188,8 @@ export const Navigation = () => {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <a href="/about" className="block rounded-md px-3 py-2 hover:bg-accent text-foreground text-sm font-medium">About Us</a>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+
+
 
               </NavigationMenuList>
             </NavigationMenu>
@@ -200,10 +197,6 @@ export const Navigation = () => {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")}>
-              <Home className="w-4 h-4 mr-2" />
-              Home
-            </Button>
             <Button 
               variant="ghost" 
               size="sm" 
@@ -225,6 +218,9 @@ export const Navigation = () => {
                 Admin
               </Button>
             )}
+            <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>
+              About Us
+            </Button>
             {user ? (
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />
