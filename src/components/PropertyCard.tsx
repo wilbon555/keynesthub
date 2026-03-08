@@ -67,6 +67,7 @@ export const PropertyCard = ({
   virtual_tour_url, virtual_tour_type = 'none', total_units, vacant_units,
   stay_type
 }: PropertyCardProps) => {
+  const navigate = useNavigate();
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
