@@ -299,7 +299,7 @@ export const PropertyCard = ({
       
       <CardContent 
         className="p-3 md:p-4 cursor-pointer" 
-        onClick={() => setIsGalleryOpen(true)}
+        onClick={() => navigate(`/property/${id}`)}
       >
         <div className="space-y-2 md:space-y-3">
           <div>
