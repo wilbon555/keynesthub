@@ -22,15 +22,18 @@ const PricingPlans = () => {
 
   const handleChoosePremium = () => {
     if (!user) {
-      navigate("/auth?redirect=%2Fsell%2Fpricing-plans");
+      navigate("/auth?redirect=%2Fsell%2Fcheckout%3Fplan%3Dpremium");
       return;
     }
-    // For now, show that this is coming soon
-    navigate("/sell/list-property");
+    navigate("/sell/checkout?plan=premium");
   };
 
   const handleContactSales = () => {
-    navigate("/about");
+    if (!user) {
+      navigate("/auth?redirect=%2Fsell%2Fcheckout%3Fplan%3Dprofessional");
+      return;
+    }
+    navigate("/sell/checkout?plan=professional");
   };
 
   return (
