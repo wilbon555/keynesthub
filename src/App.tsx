@@ -28,6 +28,7 @@ import NewDevelopments from "./pages/buy/NewDevelopments";
 import ListProperty from "./pages/sell/ListProperty";
 import PricingPlans from "./pages/sell/PricingPlans";
 import AgentAssistance from "./pages/sell/AgentAssistance";
+import Checkout from "./pages/sell/Checkout";
 
 // Rent pages
 import Apartments from "./pages/rent/Apartments";
