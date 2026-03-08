@@ -18,6 +18,7 @@ import MortgageCalculator from "./pages/MortgageCalculator";
 import BecomeAgent from "./pages/BecomeAgent";
 import Install from "./pages/Install";
 import Discover from "./pages/Discover";
+import PropertyDetail from "./pages/PropertyDetail";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // Buy pages

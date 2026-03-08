@@ -35,7 +35,7 @@ const formatPriceWithSuffix = (price: string, listingType: string, stayType?: st
   return `${price}/mo`;
 };
 
-const PropertyDetailJsonLd = ({ property }: { property: Property }) => {
+const PropertyDetailJsonLd = ({ property }: { property: PropertyWithTour }) => {
   useEffect(() => {
     const existing = document.getElementById("property-detail-jsonld");
     if (existing) existing.remove();
