@@ -88,6 +88,8 @@ export const PropertyCard = ({
   }, [isGalleryOpen, id, addToRecentlyViewed, recordView]);
   
   const isOwner = user && user_id && user.id === user_id;
+  const { isAgent, isAdmin } = useUserRoles();
+  const canSeePhone = isAgent || isAdmin;
   
   const handleRemoveProperty = async (e: React.MouseEvent) => {
     e.stopPropagation();

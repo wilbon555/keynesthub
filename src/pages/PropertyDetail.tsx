@@ -144,6 +144,7 @@ const PropertyDetail = () => {
 
   const images = property?.images?.length ? property.images : [property?.image || "/placeholder.svg"];
   const isOwner = user && property?.user_id && user.id === property.user_id;
+  const { isAgent, isAdmin } = useUserRoles();
 
   if (loading) {
     return (
