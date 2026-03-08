@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import { useState, useEffect, useMemo } from 'react';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { MapPin } from 'lucide-react';
+import { MapPin, Loader2 } from 'lucide-react';
 
 // Fix default marker icons
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -20,17 +20,69 @@ interface PropertyLocationMapProps {
   longitude?: number;
 }
 
-const defaultCenter: [number, number] = [-1.2921, 36.8219]; // Nairobi
+const defaultCenter: [number, number] = [-1.2921, 36.8219];
+
+// Recenter map when coords change
+const RecenterMap = ({ center }: { center: [number, number] }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, 15);
+  }, [center, map]);
+  return null;
+};
 
 export const PropertyLocationMap = ({ location, region, country, latitude, longitude }: PropertyLocationMapProps) => {
-  const center: [number, number] = useMemo(() => {
-    if (latitude != null && longitude != null) return [latitude, longitude];
-    return defaultCenter;
-  }, [latitude, longitude]);
+  const [geocodedCenter, setGeocodedCenter] = useState<[number, number] | null>(null);
+  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [geocodeFailed, setGeocodeFailed] = useState(false);
 
-  const hasCoords = latitude != null && longitude != null;
+  const hasExplicitCoords = latitude != null && longitude != null;
 
-  if (!hasCoords) {
+  // Geocode via Nominatim when no explicit coords
+  useEffect(() => {
+    if (hasExplicitCoords) return;
+
+    const query = [location, region, country].filter(Boolean).join(', ');
+    if (!query) { setGeocodeFailed(true); return; }
+
+    let cancelled = false;
+    setIsGeocoding(true);
+    setGeocodeFailed(false);
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`, {
+      headers: { 'Accept': 'application/json' },
+    })
+      .then(r => r.json())
+      .then((results: any[]) => {
+        if (cancelled) return;
+        if (results.length > 0) {
+          setGeocodedCenter([parseFloat(results[0].lat), parseFloat(results[0].lon)]);
+        } else {
+          setGeocodeFailed(true);
+        }
+      })
+      .catch(() => { if (!cancelled) setGeocodeFailed(true); })
+      .finally(() => { if (!cancelled) setIsGeocoding(false); });
+
+    return () => { cancelled = true; };
+  }, [location, region, country, hasExplicitCoords]);
+
+  const center: [number, number] | null = useMemo(() => {
+    if (hasExplicitCoords) return [latitude!, longitude!];
+    return geocodedCenter;
+  }, [hasExplicitCoords, latitude, longitude, geocodedCenter]);
+
+  // Loading state
+  if (!hasExplicitCoords && isGeocoding) {
+    return (
+      <div className="w-full h-[300px] rounded-xl bg-muted/50 flex items-center justify-center">
+        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  // No coords available — show text fallback
+  if (!center || geocodeFailed) {
     return (
       <div className="w-full h-[300px] rounded-xl bg-muted/50 flex items-center justify-center">
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
@@ -53,6 +105,7 @@ export const PropertyLocationMap = ({ location, region, country, latitude, longi
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <RecenterMap center={center} />
         <Marker position={center} />
       </MapContainer>
     </div>
