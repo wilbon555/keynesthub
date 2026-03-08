@@ -141,8 +141,13 @@ export const HeroSection = () => {
               </div>
               <div className="text-lg md:text-2xl font-bold">50K+</div>
               <div className="text-xs md:text-sm opacity-90">Customers</div>
-            </div>
-            <div className="flex flex-col items-center space-y-1 md:space-y-2 text-primary-foreground">
+            </motion.div>
+            <motion.div
+              className="flex flex-col items-center space-y-1 md:space-y-2 text-primary-foreground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
               <div className="w-9 h-9 md:w-12 md:h-12 bg-primary-foreground/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                 <Award className="w-4 h-4 md:w-6 md:h-6" />
               </div>
