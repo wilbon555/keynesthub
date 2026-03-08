@@ -229,6 +229,11 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     if (files.length > 0) {
+      if (!canUploadMore(selectedFiles.length)) {
+        setShowUpgrade(true);
+        toast.error(`Photo limit reached for your ${tier} plan.`);
+        return;
+      }
       setSelectedFiles(prev => [...prev, ...files]);
       toast.success("Photo captured and ready to upload");
     }
