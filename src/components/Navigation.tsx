@@ -213,7 +213,9 @@ export const Navigation = () => {
               <Sparkles className="w-4 h-4 mr-2" />
               AI Discover
             </Button>
-            <ContactDropdown variant="ghost" size="sm" />
+            <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>
+              About Us
+            </Button>
             {user && (
               <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
                 <LayoutDashboard className="w-4 h-4 mr-2" />
@@ -340,7 +342,6 @@ export const Navigation = () => {
                 </a>
 
                 <div className="flex flex-col space-y-2 pt-4">
-                  <ContactDropdown variant="ghost" size="sm" className="justify-start" />
                   {user && (
                     <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate("/dashboard")}>
                       <LayoutDashboard className="w-4 h-4 mr-2" />
