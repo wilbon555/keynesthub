@@ -401,8 +401,6 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
     </Dialog>
   );
 };
-  const [formData, setFormData] = useState({
-    title: property.title,
     price: property.price,
     location: property.location,
     bedrooms: property.bedrooms?.toString() || "",
