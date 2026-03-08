@@ -207,6 +207,20 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     if (files.length > 0) {
+      const totalAfterAdd = selectedFiles.length + files.length;
+      if (totalAfterAdd > limits.maxPhotos) {
+        const allowed = limits.maxPhotos - selectedFiles.length;
+        if (allowed <= 0) {
+          setShowUpgrade(true);
+          toast.error(`You've reached the ${limits.maxPhotos} photo limit for your ${tier} plan.`);
+          return;
+        }
+        const trimmed = files.slice(0, allowed);
+        setSelectedFiles(prev => [...prev, ...trimmed]);
+        toast.warning(`Only ${allowed} more photo(s) allowed on your ${tier} plan. ${files.length - allowed} file(s) were skipped.`);
+        setShowUpgrade(true);
+        return;
+      }
       setSelectedFiles(prev => [...prev, ...files]);
       toast.success(`${files.length} file(s) ready to upload`);
     }
