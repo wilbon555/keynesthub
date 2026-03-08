@@ -21,15 +21,23 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 });
 
-const propertyIcon = new L.Icon({
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
+const createPropertyIcon = (title: string, price: string) => {
+  const shortTitle = title.length > 20 ? title.substring(0, 20) + '…' : title;
+  return L.divIcon({
+    className: 'custom-property-marker',
+    html: `
+      <div style="display:flex;flex-direction:column;align-items:center;pointer-events:none;">
+        <div style="background:hsl(var(--primary));color:hsl(var(--primary-foreground));font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.25);max-width:160px;overflow:hidden;text-overflow:ellipsis;line-height:1.3;">
+          ${shortTitle}<br/><span style="font-size:10px;opacity:0.9;">${price}</span>
+        </div>
+        <div style="width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid hsl(var(--primary));margin-top:-1px;"></div>
+      </div>
+    `,
+    iconSize: [160, 50],
+    iconAnchor: [80, 50],
+    popupAnchor: [0, -50],
+  });
+};
 
 interface Property {
   id: string;
