@@ -25,6 +25,7 @@ import { useProperties, Property } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { usePropertyViews } from "@/hooks/usePropertyViews";
+import { useUserRoles } from "@/hooks/useUserRoles";
 import { toast } from "sonner";
 
 interface PropertyCardProps {
@@ -87,6 +88,8 @@ export const PropertyCard = ({
   }, [isGalleryOpen, id, addToRecentlyViewed, recordView]);
   
   const isOwner = user && user_id && user.id === user_id;
+  const { isAgent, isAdmin } = useUserRoles();
+  const canSeePhone = isAgent || isAdmin;
   
   const handleRemoveProperty = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -353,7 +356,7 @@ export const PropertyCard = ({
               {phone && (
                 <div className="text-xs md:text-sm text-muted-foreground flex items-center gap-2">
                   <MessageCircle className="h-3.5 w-3.5 md:h-4 md:w-4" />
-                  <span>Contact: {phone.length >= 6 ? `${phone.replace(/\D/g, '').slice(0, 3)}-***-**${phone.replace(/\D/g, '').slice(-2)}` : phone}</span>
+                  <span>Contact: {canSeePhone ? phone : '***-***-****'}</span>
                 </div>
               )}
               <Button

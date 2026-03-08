@@ -21,6 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { usePropertyViews } from "@/hooks/usePropertyViews";
+import { useUserRoles } from "@/hooks/useUserRoles";
 import {
   MapPin, Bed, Bath, Square, MessageCircle, ArrowLeft, Video,
   Calendar, Building2, Layers, Clock, ChevronLeft, ChevronRight,
@@ -143,6 +144,7 @@ const PropertyDetail = () => {
 
   const images = property?.images?.length ? property.images : [property?.image || "/placeholder.svg"];
   const isOwner = user && property?.user_id && user.id === property.user_id;
+  const { isAgent, isAdmin } = useUserRoles();
 
   if (loading) {
     return (
@@ -463,14 +465,10 @@ const PropertyDetail = () => {
                   Submit an inquiry and a KeyNestHub agent will contact you to schedule a viewing.
                 </p>
 
-                {property.phone && (
+                {property.phone && (isAgent || isAdmin) && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Phone className="w-4 h-4" />
-                    <span>
-                      {property.phone.length >= 6
-                        ? `${property.phone.replace(/\D/g, "").slice(0, 3)}-***-**${property.phone.replace(/\D/g, "").slice(-2)}`
-                        : property.phone}
-                    </span>
+                    <span>{property.phone}</span>
                   </div>
                 )}
 
