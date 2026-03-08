@@ -188,11 +188,8 @@ export const Navigation = () => {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
-                <NavigationMenuItem>
-                  <NavigationMenuLink asChild>
-                    <a href="/about" className="block rounded-md px-3 py-2 hover:bg-accent text-foreground text-sm font-medium">About Us</a>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+
+
 
               </NavigationMenuList>
             </NavigationMenu>
