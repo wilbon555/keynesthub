@@ -11,6 +11,7 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import ShareButtons from "@/components/ShareButtons";
 import { VirtualTourViewer } from "@/components/VirtualTourViewer";
 import { QuickAIBadges } from "@/components/ai/QuickAIBadges";
+import { PropertyLocationMap } from "@/components/PropertyLocationMap";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -431,6 +432,16 @@ const PropertyDetail = () => {
                 </p>
               </div>
             )}
+
+            {/* Location Map */}
+            <div>
+              <h2 className="text-lg font-semibold text-foreground mb-3">Location</h2>
+              <PropertyLocationMap
+                location={property.location}
+                region={property.region}
+                country={property.country}
+              />
+            </div>
 
             {/* Listed date */}
             <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2 border-t border-border">
