@@ -184,7 +184,7 @@ const PricingPlans = () => {
                 <p className="text-muted-foreground mb-4">
                   For large-scale developers, agencies, or unique requirements, we offer custom pricing and features.
                 </p>
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => navigate("/about#contact")}>
                   Contact Our Team
                 </Button>
               </CardContent>
