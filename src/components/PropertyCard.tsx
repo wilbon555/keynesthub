@@ -25,6 +25,7 @@ import { useProperties, Property } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { usePropertyViews } from "@/hooks/usePropertyViews";
+import { useUserRoles } from "@/hooks/useUserRoles";
 import { toast } from "sonner";
 
 interface PropertyCardProps {
