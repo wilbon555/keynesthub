@@ -21,6 +21,7 @@ interface VerificationBadgeProps {
 }
 
 export const VerificationBadge = ({ status, className = '', details }: VerificationBadgeProps) => {
+  const isMobile = useIsMobile();
   if (status === 'verified') {
     const checksCompleted = [
       details?.titleDeedVerified,
