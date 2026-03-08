@@ -169,8 +169,8 @@ const PricingPlans = () => {
                     <span className="text-foreground">Marketing boost campaigns</span>
                   </li>
                 </ul>
-                <Button variant="outline" className="w-full">
-                  Contact Sales
+                <Button variant="outline" className="w-full" onClick={handleContactSales}>
+                  {user && tier === "professional" ? "Current Plan" : "Contact Sales"}
                 </Button>
               </CardContent>
             </Card>
