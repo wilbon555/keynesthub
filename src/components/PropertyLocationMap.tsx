@@ -49,20 +49,32 @@ export const PropertyLocationMap = ({ location, region, country, latitude, longi
     setIsGeocoding(true);
     setGeocodeFailed(false);
 
-    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`, {
-      headers: { 'Accept': 'application/json' },
-    })
-      .then(r => r.json())
-      .then((results: any[]) => {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+
+    const doFetch = async () => {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const r = await globalThis.fetch(url, {
+          signal: controller.signal,
+          headers: { 'Accept': 'application/json', 'User-Agent': 'KeyNestHub/1.0' },
+        });
+        clearTimeout(timeoutId);
+        const results: any[] = await r.json();
         if (cancelled) return;
         if (results.length > 0) {
           setGeocodedCenter([parseFloat(results[0].lat), parseFloat(results[0].lon)]);
         } else {
           setGeocodeFailed(true);
         }
-      })
-      .catch(() => { if (!cancelled) setGeocodeFailed(true); })
-      .finally(() => { if (!cancelled) setIsGeocoding(false); });
+      } catch {
+        if (!cancelled) setGeocodeFailed(true);
+      } finally {
+        if (!cancelled) setIsGeocoding(false);
+      }
+    };
+
+    doFetch();
 
     return () => { cancelled = true; };
   }, [location, region, country, hasExplicitCoords]);
