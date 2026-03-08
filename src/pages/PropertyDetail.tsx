@@ -21,6 +21,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { usePropertyViews } from "@/hooks/usePropertyViews";
+import { useUserRoles } from "@/hooks/useUserRoles";
 import {
   MapPin, Bed, Bath, Square, MessageCircle, ArrowLeft, Video,
   Calendar, Building2, Layers, Clock, ChevronLeft, ChevronRight,
