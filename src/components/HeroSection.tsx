@@ -153,7 +153,7 @@ export const HeroSection = () => {
               </div>
               <div className="text-lg md:text-2xl font-bold">15+</div>
               <div className="text-xs md:text-sm opacity-90">Years Exp.</div>
-            </div>
+            </motion.div>
           </div>
         </div>
         
