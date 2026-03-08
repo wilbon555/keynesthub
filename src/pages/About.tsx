@@ -1,7 +1,7 @@
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
-import { Building2, Eye, Target, Users, Shield, Lightbulb } from "lucide-react";
+import { Building2, Eye, Target, Users, Shield, Lightbulb, Mail, Phone, MapPin, MessageSquare } from "lucide-react";
 
 const About = () => {
   return (
