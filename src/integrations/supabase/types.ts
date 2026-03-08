@@ -529,6 +529,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       viewings: {
         Row: {
           buyer_id: string | null
@@ -595,6 +619,14 @@ export type Database = {
     }
     Functions: {
       decrement_vacant_units: { Args: { property_id: string }; Returns: number }
+      get_listing_duration_days: {
+        Args: { p_tier: Database["public"]["Enums"]["subscription_tier"] }
+        Returns: number
+      }
+      get_photo_limit: {
+        Args: { p_tier: Database["public"]["Enums"]["subscription_tier"] }
+        Returns: number
+      }
       get_property_view_stats: {
         Args: { owner_user_id: string }
         Returns: {
@@ -620,6 +652,7 @@ export type Database = {
     }
     Enums: {
       app_role: "buyer" | "owner" | "agent" | "admin"
+      subscription_tier: "basic" | "premium" | "professional"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -748,6 +781,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["buyer", "owner", "agent", "admin"],
+      subscription_tier: ["basic", "premium", "professional"],
     },
   },
 } as const
