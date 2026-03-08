@@ -46,6 +46,16 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
 
   const totalPhotoCount = existingImages.length + uploadedFiles.length;
 
+  const handleMoveExistingImage = (index: number, direction: 'left' | 'right') => {
+    setExistingImages(prev => {
+      const newArr = [...prev];
+      const targetIndex = direction === 'left' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= newArr.length) return prev;
+      [newArr[index], newArr[targetIndex]] = [newArr[targetIndex], newArr[index]];
+      return newArr;
+    });
+  };
+
   const handleRemoveExistingImage = (index: number) => {
     setExistingImages(prev => prev.filter((_, i) => i !== index));
     toast.success("Image marked for removal");
