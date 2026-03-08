@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,14 +6,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Property } from "@/hooks/useProperties";
-import { Upload, X, Home } from "lucide-react";
+import { X, Home, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface EditPropertyDialogProps {
   isOpen: boolean;
   onClose: () => void;
   property: Property;
-  onSave: (updatedProperty: Partial<Property> & { uploadedFiles?: File[] }) => Promise<void>;
+  onSave: (updatedProperty: Partial<Property> & { uploadedFiles?: File[]; images?: string[] }) => Promise<void>;
 }
 
 export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPropertyDialogProps) => {
@@ -34,9 +35,44 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
     vacant_units: property.vacant_units?.toString() || "1",
     stay_type: (property as any).stay_type || "long-term",
   });
-  
+
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>(
+    (property.images || []).filter(img => img && img !== "/placeholder.svg")
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { tier, limits } = useSubscription();
+
+  const totalPhotoCount = existingImages.length + uploadedFiles.length;
+
+  const handleRemoveExistingImage = (index: number) => {
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+    toast.success("Image marked for removal");
+  };
+
+  const handleRemoveNewFile = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAddFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const newTotal = totalPhotoCount + files.length;
+    if (newTotal > limits.maxPhotos) {
+      const allowed = limits.maxPhotos - totalPhotoCount;
+      if (allowed <= 0) {
+        toast.error(`Photo limit reached (${limits.maxPhotos}) for your ${tier} plan.`);
+        return;
+      }
+      setUploadedFiles(prev => [...prev, ...files.slice(0, allowed)]);
+      toast.warning(`Only ${allowed} more photo(s) allowed on your ${tier} plan.`);
+    } else {
+      setUploadedFiles(prev => [...prev, ...files]);
+    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +81,7 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
     try {
       const totalUnits = parseInt(formData.total_units) || 1;
       const vacantUnits = parseInt(formData.vacant_units) || 0;
-      
-      // Validate vacant units doesn't exceed total
+
       if (vacantUnits > totalUnits) {
         throw new Error("Vacant units cannot exceed total units");
       }
@@ -59,6 +94,7 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
         vacant_units: formData.listing_type === 'rent' ? vacantUnits : undefined,
         stay_type: formData.listing_type === 'rent' ? formData.stay_type : undefined,
         uploadedFiles: uploadedFiles.length > 0 ? uploadedFiles : undefined,
+        images: existingImages,
       });
       onClose();
     } catch (error: any) {
@@ -89,7 +125,7 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="price">
-                {formData.listing_type === 'rent' 
+                {formData.listing_type === 'rent'
                   ? formData.stay_type === 'short-term' ? 'Nightly Rate *' : 'Monthly Rate *'
                   : 'Price *'}
               </Label>
@@ -118,7 +154,6 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
             </div>
           </div>
 
-          {/* Stay type for rentals */}
           {formData.listing_type === 'rent' && (
             <div>
               <Label htmlFor="stay_type">Stay Type</Label>
@@ -137,7 +172,6 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
             </div>
           )}
 
-          {/* Vacancy tracking for rentals */}
           {formData.listing_type === 'rent' && (
             <div className="p-4 bg-muted/50 rounded-lg border border-border space-y-3">
               <div className="flex items-center gap-2">
@@ -145,7 +179,7 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
                 <p className="text-sm font-medium text-foreground">Vacancy Tracking</p>
               </div>
               <p className="text-xs text-muted-foreground">
-                Track available units in real-time. When a booking is approved, vacant units will automatically decrease.
+                Track available units in real-time.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -156,7 +190,6 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
                     min={1}
                     value={formData.total_units}
                     onChange={(e) => setFormData({ ...formData, total_units: e.target.value })}
-                    placeholder="e.g., 30"
                   />
                 </div>
                 <div>
@@ -168,7 +201,6 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
                     max={parseInt(formData.total_units) || 999}
                     value={formData.vacant_units}
                     onChange={(e) => setFormData({ ...formData, vacant_units: e.target.value })}
-                    placeholder="e.g., 15"
                   />
                 </div>
               </div>
@@ -272,47 +304,85 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
             />
           </div>
 
-          <div>
-            <Label>Update Photos (optional)</Label>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files || []);
-                    setUploadedFiles(files);
-                  }}
-                  className="flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setUploadedFiles([])}
-                  disabled={uploadedFiles.length === 0}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              {uploadedFiles.length > 0 && (
-                <div className="grid grid-cols-3 gap-2">
-                  {uploadedFiles.map((file, idx) => (
-                    <div key={idx} className="relative">
+          {/* Photo Management Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Property Photos ({totalPhotoCount}/{limits.maxPhotos})</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={totalPhotoCount >= limits.maxPhotos}
+              >
+                <Plus className="h-4 w-4 mr-1" />
+                Add Photos
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                multiple
+                className="hidden"
+                onChange={handleAddFiles}
+              />
+            </div>
+
+            {/* Existing Images */}
+            {existingImages.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">Current photos</p>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {existingImages.map((url, idx) => (
+                    <div key={`existing-${idx}`} className="relative group">
                       <img
-                        src={URL.createObjectURL(file)}
-                        alt={`Preview ${idx + 1}`}
-                        className="w-full h-20 object-cover rounded border"
+                        src={url}
+                        alt={`Property ${idx + 1}`}
+                        className="w-full h-20 object-cover rounded border border-border"
                       />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveExistingImage(idx)}
+                        className="absolute top-1 right-1 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
                     </div>
                   ))}
                 </div>
-              )}
-              <p className="text-sm text-muted-foreground">
-                Leave empty to keep current photos, or upload new ones to replace them
+              </div>
+            )}
+
+            {/* Newly Added Files */}
+            {uploadedFiles.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-2">New photos to add</p>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {uploadedFiles.map((file, idx) => (
+                    <div key={`new-${idx}`} className="relative group">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`New ${idx + 1}`}
+                        className="w-full h-20 object-cover rounded border border-primary/50"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveNewFile(idx)}
+                        className="absolute top-1 right-1 w-6 h-6 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {totalPhotoCount === 0 && (
+              <p className="text-sm text-muted-foreground text-center py-4 border border-dashed border-border rounded-lg">
+                No photos. Click "Add Photos" to upload.
               </p>
-            </div>
+            )}
           </div>
 
           <div className="flex gap-2 justify-end">
