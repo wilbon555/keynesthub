@@ -155,12 +155,12 @@ export const HeroSection = () => {
               <div className="text-xs md:text-sm opacity-90">Years Exp.</div>
             </motion.div>
           </div>
-        </div>
+        </motion.div>
         
         {/* Search Section */}
         <div className="mt-6 md:mt-12 animate-slide-up" ref={searchRef}>
           <SearchSection />
-        </motion.div>
+        </div>
       </div>
 
       <PhotoUpload open={showUpload} onOpenChange={setShowUpload} />
