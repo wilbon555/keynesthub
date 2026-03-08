@@ -36,7 +36,7 @@ export const VerificationBadge = ({ status, className = '', details }: Verificat
 
     return (
       <DropdownMenu>
-        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
           <Badge
             className={`cursor-pointer hover:opacity-80 transition-colors ${
               isFullyVerified
