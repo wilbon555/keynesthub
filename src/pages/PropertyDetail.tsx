@@ -11,6 +11,7 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import ShareButtons from "@/components/ShareButtons";
 import { VirtualTourViewer } from "@/components/VirtualTourViewer";
 import { QuickAIBadges } from "@/components/ai/QuickAIBadges";
+import { PropertyLocationMap } from "@/components/PropertyLocationMap";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
