@@ -1,15 +1,35 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { GoogleMap, useJsApiLoader, OverlayView, InfoWindow } from '@react-google-maps/api';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { supabase } from '@/integrations/supabase/client';
 import { Navigation } from '@/components/Navigation';
 import { SmartSearchInput } from '@/components/discover/SmartSearchInput';
 import { SearchResultsPanel } from '@/components/discover/SearchResultsPanel';
 import { useSmartSearch } from '@/hooks/useSmartSearch';
-import { Loader2, Home, Locate, Layers, Map as MapIcon, Satellite, X } from 'lucide-react';
+import { Loader2, Locate, Layers, X, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+
+// Fix default marker icons
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
+
+const propertyIcon = new L.Icon({
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 interface Property {
   id: string;
@@ -26,211 +46,126 @@ interface Property {
   verification_status?: string;
 }
 
-const containerStyle = {
-  width: '100%',
-  height: '100%',
-};
+interface MarkerData {
+  property: Property;
+  position: [number, number];
+}
 
-const defaultCenter = {
-  lat: -1.2921,
-  lng: 36.8219,
-};
+const defaultCenter: [number, number] = [-1.2921, 36.8219];
 
-const libraries: ("places")[] = ["places"];
-
-const CustomMarker: React.FC<{
-  position: google.maps.LatLngLiteral;
-  onClick: () => void;
-  isSelected: boolean;
-}> = ({ position, onClick, isSelected }) => {
-  return (
-    <OverlayView
-      position={position}
-      mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-      getPixelPositionOffset={(width, height) => ({
-        x: -(width / 2),
-        y: -height,
-      })}
-    >
-      <button
-        onClick={onClick}
-        className={cn(
-          "flex items-center justify-center w-10 h-10 rounded-full shadow-lg cursor-pointer transition-all duration-200 hover:scale-110",
-          isSelected
-            ? 'bg-primary scale-110 ring-2 ring-primary/50'
-            : 'bg-primary hover:bg-primary/90'
-        )}
-        aria-label="Property location"
-      >
-        <Home className="w-5 h-5 text-primary-foreground" />
-      </button>
-    </OverlayView>
-  );
-};
-
-// Separate component that uses the Google Maps hook - only rendered when apiKey is available
-const DiscoverMap: React.FC<{
-  apiKey: string;
-  properties: Property[];
-}> = ({ apiKey, properties }) => {
-  const [markers, setMarkers] = useState<Array<{ property: Property; position: google.maps.LatLngLiteral }>>([]);
-  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [mapType, setMapType] = useState<'roadmap' | 'satellite' | 'hybrid'>('roadmap');
-  const [showPanel, setShowPanel] = useState(true);
-  const { toast } = useToast();
-
-  const { search, isSearching, lastResult, clearSearch } = useSmartSearch();
-
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: 'google-map-script',
-    googleMapsApiKey: apiKey,
-    libraries,
-  });
-
-  // Geocode properties when map is loaded
-  useEffect(() => {
-    if (!isLoaded || !map || properties.length === 0) return;
-
-    const geocodeProperties = async () => {
-      const geocoder = new google.maps.Geocoder();
-      const newMarkers: Array<{ property: Property; position: google.maps.LatLngLiteral }> = [];
-      const bounds = new google.maps.LatLngBounds();
-
-      for (const property of properties) {
-        try {
-          const result = await new Promise<google.maps.GeocoderResult[]>((resolve, reject) => {
-            geocoder.geocode({ address: property.location + ', Kenya' }, (results, status) => {
-              if (status === 'OK' && results) {
-                resolve(results);
-              } else {
-                reject(new Error(`Geocoding failed: ${status}`));
-              }
-            });
-          });
-
-          if (result[0]) {
-            const position = {
-              lat: result[0].geometry.location.lat(),
-              lng: result[0].geometry.location.lng(),
-            };
-            newMarkers.push({ property, position });
-            bounds.extend(position);
-          }
-        } catch (err) {
-          console.error(`Failed to geocode: ${property.location}`, err);
-        }
-      }
-
-      setMarkers(newMarkers);
-
-      if (newMarkers.length > 0) {
-        map.fitBounds(bounds, 50);
-        google.maps.event.addListenerOnce(map, 'bounds_changed', () => {
-          if (map.getZoom()! > 12) {
-            map.setZoom(12);
-          }
+// Geocode properties using Nominatim
+const geocodeProperties = async (properties: Property[]): Promise<MarkerData[]> => {
+  const markers: MarkerData[] = [];
+  for (const property of properties) {
+    try {
+      const query = `${property.location}, Kenya`;
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
+        { headers: { 'Accept': 'application/json' } }
+      );
+      const results = await res.json();
+      if (results.length > 0) {
+        markers.push({
+          property,
+          position: [parseFloat(results[0].lat), parseFloat(results[0].lon)],
         });
       }
-    };
+      // Rate limit: Nominatim requires 1 req/sec
+      await new Promise(r => setTimeout(r, 1100));
+    } catch (err) {
+      console.error(`Failed to geocode: ${property.location}`, err);
+    }
+  }
+  return markers;
+};
 
-    geocodeProperties();
-  }, [isLoaded, map, properties]);
+// Component to fit bounds and handle map actions
+const MapController: React.FC<{
+  markers: MarkerData[];
+  flyTo?: [number, number] | null;
+  flyToZoom?: number;
+}> = ({ markers, flyTo, flyToZoom }) => {
+  const map = useMap();
+  const fitted = useRef(false);
 
-  const onLoad = useCallback((map: google.maps.Map) => {
-    setMap(map);
-  }, []);
+  useEffect(() => {
+    if (markers.length > 0 && !fitted.current) {
+      const bounds = L.latLngBounds(markers.map(m => m.position));
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 12 });
+      fitted.current = true;
+    }
+  }, [markers, map]);
 
-  const onUnmount = useCallback(() => {
-    setMap(null);
-  }, []);
+  useEffect(() => {
+    if (flyTo) {
+      map.flyTo(flyTo, flyToZoom ?? 14);
+    }
+  }, [flyTo, flyToZoom, map]);
+
+  return null;
+};
+
+const DiscoverMap: React.FC<{ properties: Property[] }> = ({ properties }) => {
+  const [markers, setMarkers] = useState<MarkerData[]>([]);
+  const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [showPanel, setShowPanel] = useState(true);
+  const [geocoding, setGeocoding] = useState(true);
+  const [flyTo, setFlyTo] = useState<[number, number] | null>(null);
+  const { toast } = useToast();
+  const { search, isSearching, lastResult, clearSearch } = useSmartSearch();
+
+  // Geocode on mount
+  useEffect(() => {
+    if (properties.length === 0) { setGeocoding(false); return; }
+    let cancelled = false;
+    geocodeProperties(properties).then(result => {
+      if (!cancelled) {
+        setMarkers(result);
+        setGeocoding(false);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [properties]);
 
   const handleSearch = async (query: string) => {
     const result = await search(query, properties);
-    if (result?.matchedProperties && result.matchedProperties.length > 0) {
+    if (result?.matchedProperties?.length > 0) {
       const matchedIds = new Set(result.matchedProperties.map((p: any) => p.id));
       const matchedMarkers = markers.filter(m => matchedIds.has(m.property.id));
-      
-      if (matchedMarkers.length > 0 && map) {
-        const bounds = new google.maps.LatLngBounds();
-        matchedMarkers.forEach(m => bounds.extend(m.position));
-        map.fitBounds(bounds, 50);
+      if (matchedMarkers.length > 0) {
+        // Fly to first matched marker
+        setFlyTo(matchedMarkers[0].position);
       }
     }
   };
 
   const handlePropertySelect = (property: Property) => {
     setSelectedProperty(property);
-    
     const marker = markers.find(m => m.property.id === property.id);
-    if (marker && map) {
-      map.panTo(marker.position);
-      map.setZoom(14);
+    if (marker) {
+      setFlyTo(marker.position);
     }
   };
 
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
-      toast({
-        title: "Geolocation not supported",
-        description: "Your browser doesn't support geolocation.",
-        variant: "destructive",
-      });
+      toast({ title: "Geolocation not supported", variant: "destructive" });
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-        if (map) {
-          map.panTo(location);
-          map.setZoom(14);
-        }
-      },
-      () => {
-        toast({
-          title: "Location error",
-          description: "Unable to get your location.",
-          variant: "destructive",
-        });
-      }
+      (pos) => setFlyTo([pos.coords.latitude, pos.coords.longitude]),
+      () => toast({ title: "Location error", description: "Unable to get your location.", variant: "destructive" })
     );
-  };
-
-  const toggleMapType = () => {
-    const types: Array<'roadmap' | 'satellite' | 'hybrid'> = ['roadmap', 'satellite', 'hybrid'];
-    const currentIndex = types.indexOf(mapType);
-    const nextIndex = (currentIndex + 1) % types.length;
-    setMapType(types[nextIndex]);
-    if (map) {
-      map.setMapTypeId(types[nextIndex]);
-    }
   };
 
   const displayMarkers = lastResult?.matchedProperties
     ? markers.filter(m => lastResult.matchedProperties?.some((p: any) => p.id === m.property.id))
     : markers;
 
-  if (loadError) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <p className="text-destructive">Failed to load map.</p>
-          <Link to="/" className="text-primary hover:underline mt-2 inline-block">
-            Return to Home
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1 relative overflow-hidden">
-      {/* Search Bar - Floating */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 w-full max-w-2xl px-4 flex flex-col gap-2">
+      {/* Search Bar */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] w-full max-w-2xl px-4 flex flex-col gap-2">
         <SmartSearchInput
           onSearch={handleSearch}
           isSearching={isSearching}
@@ -240,7 +175,7 @@ const DiscoverMap: React.FC<{
       </div>
 
       {/* Map Controls */}
-      <div className="absolute top-4 right-4 z-20 flex flex-col gap-2">
+      <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
         <Button
           variant="outline"
           size="icon"
@@ -249,19 +184,6 @@ const DiscoverMap: React.FC<{
           title="Locate me"
         >
           <Locate className="w-4 h-4" />
-        </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-background/95 backdrop-blur-sm shadow-lg"
-          onClick={toggleMapType}
-          title={`Switch to ${mapType === 'roadmap' ? 'satellite' : mapType === 'satellite' ? 'hybrid' : 'roadmap'} view`}
-        >
-          {mapType === 'satellite' || mapType === 'hybrid' ? (
-            <MapIcon className="w-4 h-4" />
-          ) : (
-            <Satellite className="w-4 h-4" />
-          )}
         </Button>
         <Button
           variant="outline"
@@ -279,7 +201,7 @@ const DiscoverMap: React.FC<{
 
       {/* Results Panel */}
       {showPanel && (
-        <div className="absolute left-4 top-28 bottom-4 z-20 w-80">
+        <div className="absolute left-4 top-28 bottom-4 z-[1000] w-80">
           <SearchResultsPanel
             result={lastResult}
             properties={properties}
@@ -291,115 +213,81 @@ const DiscoverMap: React.FC<{
         </div>
       )}
 
-      {/* Clear Search Button */}
+      {/* Clear Search */}
       {lastResult && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={clearSearch}
-            className="shadow-lg"
-          >
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000]">
+          <Button variant="secondary" size="sm" onClick={clearSearch} className="shadow-lg">
             <X className="w-4 h-4 mr-2" />
             Clear Search
           </Button>
         </div>
       )}
 
-      {/* Google Map */}
-      {isLoaded ? (
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={defaultCenter}
-          zoom={10}
-          onLoad={onLoad}
-          onUnmount={onUnmount}
-          options={{
-            mapTypeId: mapType,
-            mapTypeControl: false,
-            streetViewControl: false,
-            fullscreenControl: false,
-            zoomControl: true,
-            zoomControlOptions: {
-              position: google.maps.ControlPosition.RIGHT_BOTTOM,
-            },
-          }}
-        >
-          {displayMarkers.map((marker) => (
-            <CustomMarker
-              key={marker.property.id}
-              position={marker.position}
-              isSelected={selectedProperty?.id === marker.property.id}
-              onClick={() => handlePropertySelect(marker.property)}
-            />
-          ))}
+      {/* Geocoding overlay */}
+      {geocoding && (
+        <div className="absolute inset-0 z-[999] bg-muted/50 flex items-center justify-center">
+          <div className="bg-background/95 backdrop-blur-sm rounded-lg p-4 shadow-lg flex items-center gap-3">
+            <Loader2 className="w-5 h-5 animate-spin text-primary" />
+            <span className="text-sm text-muted-foreground">Locating properties on map…</span>
+          </div>
+        </div>
+      )}
 
-          {selectedProperty && (
-            <InfoWindow
-              position={markers.find(m => m.property.id === selectedProperty.id)?.position}
-              onCloseClick={() => setSelectedProperty(null)}
-            >
-              <div className="p-2 max-w-xs">
-                {selectedProperty.image && (
+      {/* Leaflet Map */}
+      <MapContainer
+        center={defaultCenter}
+        zoom={7}
+        style={{ width: '100%', height: '100%' }}
+        className="z-0"
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <MapController markers={markers} flyTo={flyTo} />
+
+        {displayMarkers.map(marker => (
+          <Marker
+            key={marker.property.id}
+            position={marker.position}
+            icon={propertyIcon}
+            eventHandlers={{ click: () => handlePropertySelect(marker.property) }}
+          >
+            <Popup>
+              <div className="max-w-[220px]">
+                {marker.property.image && (
                   <img
-                    src={selectedProperty.image}
-                    alt={selectedProperty.title}
+                    src={marker.property.image}
+                    alt={marker.property.title}
                     className="w-full h-24 object-cover rounded-md mb-2"
                   />
                 )}
-                <h3 className="font-semibold text-sm">{selectedProperty.title}</h3>
-                <p className="text-primary font-bold text-sm">{selectedProperty.price}</p>
-                <p className="text-xs text-muted-foreground">{selectedProperty.location}</p>
+                <h3 className="font-semibold text-sm">{marker.property.title}</h3>
+                <p className="font-bold text-sm text-green-600">{marker.property.price}</p>
+                <p className="text-xs text-gray-500">{marker.property.location}</p>
+                <div className="flex gap-2 text-xs text-gray-500 mt-1">
+                  {marker.property.bedrooms && <span>{marker.property.bedrooms} beds</span>}
+                  {marker.property.bathrooms && <span>{marker.property.bathrooms} baths</span>}
+                </div>
                 <Link
-                  to={`/buy/${selectedProperty.type.toLowerCase()}`}
+                  to={`/property/${marker.property.id}`}
                   className="text-xs text-primary hover:underline mt-2 inline-block"
                 >
                   View Details →
                 </Link>
               </div>
-            </InfoWindow>
-          )}
-        </GoogleMap>
-      ) : (
-        <div className="w-full h-full flex items-center justify-center bg-muted">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        </div>
-      )}
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
     </div>
   );
 };
 
 export default function Discover() {
-  const [apiKey, setApiKey] = useState<string | null>(null);
-  const [apiKeyLoading, setApiKeyLoading] = useState(true);
   const [properties, setProperties] = useState<Property[]>([]);
   const [propertiesLoading, setPropertiesLoading] = useState(true);
-  const { toast } = useToast();
 
-  // Fetch API key
-  useEffect(() => {
-    const fetchApiKey = async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke('get-google-maps-key');
-        if (error) throw error;
-        if (data?.apiKey) {
-          setApiKey(data.apiKey);
-        }
-      } catch (err) {
-        console.error('Failed to fetch Google Maps API key:', err);
-        toast({
-          title: "Map Error",
-          description: "Failed to load map. Please try again later.",
-          variant: "destructive",
-        });
-      } finally {
-        setApiKeyLoading(false);
-      }
-    };
-    fetchApiKey();
-  }, [toast]);
-
-  // Fetch properties
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -408,7 +296,6 @@ export default function Discover() {
           .select('*')
           .eq('verification_status', 'verified')
           .eq('status', 'available');
-
         if (error) throw error;
         setProperties(data || []);
       } catch (err) {
@@ -420,7 +307,7 @@ export default function Discover() {
     fetchProperties();
   }, []);
 
-  if (apiKeyLoading || propertiesLoading) {
+  if (propertiesLoading) {
     return (
       <div className="h-screen flex flex-col bg-background">
         <Navigation />
@@ -431,26 +318,10 @@ export default function Discover() {
     );
   }
 
-  if (!apiKey) {
-    return (
-      <div className="h-screen flex flex-col bg-background">
-        <Navigation />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-destructive">Failed to load map.</p>
-            <Link to="/" className="text-primary hover:underline mt-2 inline-block">
-              Return to Home
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="h-screen flex flex-col bg-background">
       <Navigation />
-      <DiscoverMap apiKey={apiKey} properties={properties} />
+      <DiscoverMap properties={properties} />
     </div>
   );
 }
