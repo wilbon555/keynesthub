@@ -118,7 +118,12 @@ export const HeroSection = () => {
           
           {/* Stats - horizontal row on mobile */}
           <div className="grid grid-cols-3 gap-4 md:gap-8 pt-4 md:pt-8">
-            <div className="flex flex-col items-center space-y-1 md:space-y-2 text-primary-foreground">
+            <motion.div
+              className="flex flex-col items-center space-y-1 md:space-y-2 text-primary-foreground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
               <div className="w-9 h-9 md:w-12 md:h-12 bg-primary-foreground/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 md:w-6 md:h-6" />
               </div>
