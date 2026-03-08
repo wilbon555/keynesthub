@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Property } from "@/hooks/useProperties";
-import { X, Home, Trash2, Plus } from "lucide-react";
+import { X, Home, Trash2, Plus, ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 
