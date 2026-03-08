@@ -222,6 +222,7 @@ export const Navigation = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>
               About Us
             </Button>
+            <ThemeToggle />
             {user ? (
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />

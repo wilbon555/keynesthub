@@ -540,7 +540,7 @@ const PropertyDetail = () => {
           title={property.title}
         />
       )}
-    </div>
+    </PageTransition>
   );
 };
 
