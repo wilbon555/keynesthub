@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuTrigger, NavigationMenuContent, NavigationMenuLink } from "@/components/ui/navigation-menu";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Menu, X, User, LogOut, Shield, LayoutDashboard, Settings, Home, Sparkles, ChevronDown } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -196,7 +197,7 @@ export const Navigation = () => {
           </div>
 
           {/* Desktop CTA */}
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="hidden md:flex items-center space-x-2">
             <Button 
               variant="ghost" 
               size="sm" 
@@ -221,6 +222,7 @@ export const Navigation = () => {
             <Button variant="ghost" size="sm" onClick={() => navigate("/about")}>
               About Us
             </Button>
+            <ThemeToggle />
             {user ? (
               <Button variant="outline" size="sm" onClick={handleSignOut}>
                 <LogOut className="w-4 h-4 mr-2" />

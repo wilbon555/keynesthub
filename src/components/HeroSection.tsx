@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { SearchSection } from "./SearchSection";
 import { PhotoUpload } from "./PhotoUpload";
 import { TrendingUp, Users, Award, Search } from "lucide-react";
+import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-image.jpg";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
@@ -50,7 +51,12 @@ export const HeroSection = () => {
       
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
-        <div className="max-w-4xl mx-auto space-y-4 md:space-y-8 animate-fade-in">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+          className="max-w-4xl mx-auto space-y-4 md:space-y-8"
+        >
           <div className="space-y-2 md:space-y-4">
             <h1 className="text-3xl md:text-6xl font-bold text-primary-foreground leading-tight">
               Find Your Perfect
@@ -111,29 +117,44 @@ export const HeroSection = () => {
           
           {/* Stats - horizontal row on mobile */}
           <div className="grid grid-cols-3 gap-4 md:gap-8 pt-4 md:pt-8">
-            <div className="flex flex-col items-center space-y-1 md:space-y-2 text-primary-foreground">
+            <motion.div
+              className="flex flex-col items-center space-y-1 md:space-y-2 text-primary-foreground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
               <div className="w-9 h-9 md:w-12 md:h-12 bg-primary-foreground/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 md:w-6 md:h-6" />
               </div>
               <div className="text-lg md:text-2xl font-bold">10K+</div>
               <div className="text-xs md:text-sm opacity-90">Properties</div>
-            </div>
-            <div className="flex flex-col items-center space-y-1 md:space-y-2 text-primary-foreground">
+            </motion.div>
+            <motion.div
+              className="flex flex-col items-center space-y-1 md:space-y-2 text-primary-foreground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+            >
               <div className="w-9 h-9 md:w-12 md:h-12 bg-primary-foreground/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                 <Users className="w-4 h-4 md:w-6 md:h-6" />
               </div>
               <div className="text-lg md:text-2xl font-bold">50K+</div>
               <div className="text-xs md:text-sm opacity-90">Customers</div>
-            </div>
-            <div className="flex flex-col items-center space-y-1 md:space-y-2 text-primary-foreground">
+            </motion.div>
+            <motion.div
+              className="flex flex-col items-center space-y-1 md:space-y-2 text-primary-foreground"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+            >
               <div className="w-9 h-9 md:w-12 md:h-12 bg-primary-foreground/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                 <Award className="w-4 h-4 md:w-6 md:h-6" />
               </div>
               <div className="text-lg md:text-2xl font-bold">15+</div>
               <div className="text-xs md:text-sm opacity-90">Years Exp.</div>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
         
         {/* Search Section */}
         <div className="mt-6 md:mt-12 animate-slide-up" ref={searchRef}>
