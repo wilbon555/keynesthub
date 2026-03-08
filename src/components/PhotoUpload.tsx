@@ -312,7 +312,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
               <div className="space-y-4">
                 {selectedFiles.length > 0 ? (
                   <>
-                    <h3 className="font-medium">Selected Files ({selectedFiles.length})</h3>
+                    <h3 className="font-medium">Selected Files ({selectedFiles.length}/{limits.maxPhotos})</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-60 overflow-y-auto">
                       {selectedFiles.map((file, index) => (
                         <div key={index} className="relative group">
