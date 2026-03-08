@@ -42,6 +42,7 @@ import AgentsDirectory from "./pages/agents/AgentsDirectory";
 // Market pages
 import PropertyTrends from "./pages/market/PropertyTrends";
 import NeighborhoodGuide from "./pages/neighborhoods/NeighborhoodGuide";
+import About from "./pages/About";
 const queryClient = new QueryClient();
 
 const App = () => (
