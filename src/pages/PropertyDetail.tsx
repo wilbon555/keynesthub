@@ -188,7 +188,10 @@ const PropertyDetail = () => {
     setIsGalleryOpen(true);
   };
 
-  const contactButtonText = property.listing_type === "rent" ? "Inquire to Rent" : "Contact Owner";
+  const isShortTerm = property.listing_type === "rent" && property.stay_type === "short-term";
+  const contactButtonText = property.listing_type === "rent"
+    ? (isShortTerm ? "Book Now" : "Inquire to Rent")
+    : "Contact Owner";
 
   return (
     <div className="min-h-screen bg-background">
