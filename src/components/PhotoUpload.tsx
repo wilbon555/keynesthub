@@ -25,8 +25,10 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<"select" | "details">("select");
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const { addProperty } = useProperties();
   const { user } = useAuth();
+  const { tier, limits, canUploadMore } = useSubscription();
 
   const detailsSchema = z
     .object({
