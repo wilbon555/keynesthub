@@ -36,7 +36,7 @@ export const VerificationBadge = ({ status, className = '', details }: Verificat
 
     return (
       <DropdownMenu>
-        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+        <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
           <Badge
             className={`cursor-pointer hover:opacity-80 transition-colors ${
               isFullyVerified
@@ -55,8 +55,10 @@ export const VerificationBadge = ({ status, className = '', details }: Verificat
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="start"
-          className="w-56 p-3"
+          className="w-56 p-3 z-[100]"
           onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerDownOutside={(e) => e.stopPropagation()}
         >
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
             Verification Details
