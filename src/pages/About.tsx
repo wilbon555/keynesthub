@@ -1,9 +1,44 @@
+import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
-import { Building2, Eye, Target, Users, Shield, Lightbulb, Mail, Phone, MapPin, MessageSquare } from "lucide-react";
+import { Building2, Eye, Target, Users, Shield, Lightbulb, Mail, Phone, MapPin, MessageSquare, Send, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const About = () => {
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const { error } = await supabase.from("contact_messages").insert({
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        subject: formData.subject.trim() || null,
+        message: formData.message.trim(),
+      });
+      if (error) throw error;
+      toast.success("Message sent! We'll get back to you soon.");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (error) {
+      console.error("Contact form error:", error);
+      toast.error("Failed to send message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-14 md:pb-0">
       <Navigation />
@@ -43,7 +78,6 @@ const About = () => {
       {/* Mission & Vision */}
       <section className="bg-muted py-16 md:py-24">
         <div className="container mx-auto px-4 max-w-5xl grid md:grid-cols-2 gap-12">
-          {/* Mission */}
           <div className="flex gap-5">
             <div className="shrink-0 w-12 h-12 rounded-full bg-primary flex items-center justify-center mt-1">
               <Target className="w-6 h-6 text-primary-foreground" />
@@ -55,8 +89,6 @@ const About = () => {
               </p>
             </div>
           </div>
-
-          {/* Vision */}
           <div className="flex gap-5">
             <div className="shrink-0 w-12 h-12 rounded-full bg-accent flex items-center justify-center mt-1">
               <Eye className="w-6 h-6 text-accent-foreground" />
@@ -73,7 +105,7 @@ const About = () => {
 
       {/* Contact Section */}
       <section id="contact" className="py-16 md:py-24 bg-muted/50">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4 max-w-5xl">
           <div className="text-center mb-10">
             <MessageSquare className="w-10 h-10 text-primary mx-auto mb-4" />
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">Get in Touch</h2>
@@ -81,34 +113,104 @@ const About = () => {
               Have questions or need assistance? Reach out to our team anytime.
             </p>
           </div>
-          <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
-            <a
-              href="mailto:keynesthub@gmail.com"
-              className="flex flex-col items-center gap-3 p-6 rounded-xl bg-card border border-border shadow-card hover:shadow-md transition-shadow"
-            >
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Mail className="w-6 h-6 text-primary" />
+
+          <div className="grid md:grid-cols-2 gap-10 max-w-4xl mx-auto">
+            {/* Contact Info Cards */}
+            <div className="flex flex-col gap-4">
+              <a
+                href="mailto:keynesthub@gmail.com"
+                className="flex items-center gap-4 p-5 rounded-xl bg-card border border-border shadow-card hover:shadow-md transition-shadow"
+              >
+                <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Mail className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-foreground block">Email Us</span>
+                  <span className="text-xs text-muted-foreground">keynesthub@gmail.com</span>
+                </div>
+              </a>
+              <a
+                href="tel:+254701555240"
+                className="flex items-center gap-4 p-5 rounded-xl bg-card border border-border shadow-card hover:shadow-md transition-shadow"
+              >
+                <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Phone className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-foreground block">Call Us</span>
+                  <span className="text-xs text-muted-foreground">+254 701 555 240</span>
+                </div>
+              </a>
+              <div className="flex items-center gap-4 p-5 rounded-xl bg-card border border-border shadow-card">
+                <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <MapPin className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-foreground block">Visit Us</span>
+                  <span className="text-xs text-muted-foreground">Nairobi, Kenya</span>
+                </div>
               </div>
-              <span className="text-sm font-medium text-foreground">Email Us</span>
-              <span className="text-xs text-muted-foreground">keynesthub@gmail.com</span>
-            </a>
-            <a
-              href="tel:+254701555240"
-              className="flex flex-col items-center gap-3 p-6 rounded-xl bg-card border border-border shadow-card hover:shadow-md transition-shadow"
-            >
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Phone className="w-6 h-6 text-primary" />
-              </div>
-              <span className="text-sm font-medium text-foreground">Call Us</span>
-              <span className="text-xs text-muted-foreground">+254 701 555 240</span>
-            </a>
-            <div className="flex flex-col items-center gap-3 p-6 rounded-xl bg-card border border-border shadow-card">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <MapPin className="w-6 h-6 text-primary" />
-              </div>
-              <span className="text-sm font-medium text-foreground">Visit Us</span>
-              <span className="text-xs text-muted-foreground">Nairobi, Kenya</span>
             </div>
+
+            {/* Contact Form */}
+            <form onSubmit={handleSubmit} className="p-6 rounded-xl bg-card border border-border shadow-card space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="contact-name">Name *</Label>
+                <Input
+                  id="contact-name"
+                  placeholder="Your full name"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  required
+                  maxLength={100}
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contact-email">Email *</Label>
+                <Input
+                  id="contact-email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  required
+                  maxLength={255}
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contact-subject">Subject</Label>
+                <Input
+                  id="contact-subject"
+                  placeholder="What's this about?"
+                  value={formData.subject}
+                  onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
+                  maxLength={200}
+                  disabled={isSubmitting}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contact-message">Message *</Label>
+                <Textarea
+                  id="contact-message"
+                  placeholder="Tell us how we can help..."
+                  value={formData.message}
+                  onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                  required
+                  maxLength={2000}
+                  rows={4}
+                  disabled={isSubmitting}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sending...</>
+                ) : (
+                  <><Send className="w-4 h-4 mr-2" /> Send Message</>
+                )}
+              </Button>
+            </form>
           </div>
         </div>
       </section>
