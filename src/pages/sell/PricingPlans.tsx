@@ -122,8 +122,8 @@ const PricingPlans = () => {
                     <span className="text-foreground">Performance analytics</span>
                   </li>
                 </ul>
-                <Button className="w-full">
-                  Choose Premium
+                <Button className="w-full" onClick={handleChoosePremium}>
+                  {user && tier === "premium" ? "Current Plan" : "Choose Premium"}
                 </Button>
               </CardContent>
             </Card>
