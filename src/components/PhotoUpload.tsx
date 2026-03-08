@@ -759,21 +759,19 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                       />
                     )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {form.watch("listingType") === "rent" ? (
                       <FormField
                         control={form.control}
-                        name="priceMin"
+                        name="price"
                         render={({ field }) => {
                           const country = form.watch("country");
                           const currency = getCurrencyInfo(country);
                           return (
                             <FormItem>
                               <FormLabel>
-                                {form.watch("listingType") === "rent" 
-                                  ? form.watch("stayType") === "short-term" 
-                                    ? `Nightly Rate Min (${currency.symbol})` 
-                                    : `Price Min /mo (${currency.symbol})`
-                                  : `Price Min (${currency.symbol})`}
+                                {form.watch("stayType") === "short-term" 
+                                  ? `Nightly Rate (${currency.symbol})` 
+                                  : `Monthly Rent (${currency.symbol})`}
                               </FormLabel>
                               <FormControl>
                                 <Input 
@@ -781,7 +779,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                   min={1} 
                                   max={1000000000}
                                   step={1} 
-                                  placeholder={`1 ${currency.code}`} 
+                                  placeholder={`Enter amount in ${currency.code}`} 
                                   {...field} 
                                 />
                               </FormControl>
@@ -790,37 +788,58 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           );
                         }}
                       />
-
-                      <FormField
-                        control={form.control}
-                        name="priceMax"
-                        render={({ field }) => {
-                          const country = form.watch("country");
-                          const currency = getCurrencyInfo(country);
-                          return (
-                            <FormItem>
-                              <FormLabel>
-                                {form.watch("listingType") === "rent" 
-                                  ? form.watch("stayType") === "short-term" 
-                                    ? `Nightly Rate Max (${currency.symbol})` 
-                                    : `Price Max /mo (${currency.symbol})`
-                                  : `Price Max (${currency.symbol})`}
-                              </FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  min={1} 
-                                  max={1000000000}
-                                  step={1} 
-                                  placeholder={`1000000 ${currency.code}`} 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          );
-                        }}
-                      />
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="priceMin"
+                          render={({ field }) => {
+                            const country = form.watch("country");
+                            const currency = getCurrencyInfo(country);
+                            return (
+                              <FormItem>
+                                <FormLabel>Price Min ({currency.symbol})</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min={1} 
+                                    max={1000000000}
+                                    step={1} 
+                                    placeholder={`1 ${currency.code}`} 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="priceMax"
+                          render={({ field }) => {
+                            const country = form.watch("country");
+                            const currency = getCurrencyInfo(country);
+                            return (
+                              <FormItem>
+                                <FormLabel>Price Max ({currency.symbol})</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min={1} 
+                                    max={1000000000}
+                                    step={1} 
+                                    placeholder={`1000000 ${currency.code}`} 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      </div>
+                    )}
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
