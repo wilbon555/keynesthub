@@ -3,8 +3,36 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Star, Zap, Crown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const PricingPlans = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { tier } = useSubscription();
+
+  const handleGetStarted = () => {
+    if (user) {
+      navigate("/sell/list-property");
+    } else {
+      navigate("/auth?redirect=%2Fsell%2Flist-property");
+    }
+  };
+
+  const handleChoosePremium = () => {
+    if (!user) {
+      navigate("/auth?redirect=%2Fsell%2Fpricing-plans");
+      return;
+    }
+    // For now, show that this is coming soon
+    navigate("/sell/list-property");
+  };
+
+  const handleContactSales = () => {
+    navigate("/about");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -48,8 +76,8 @@ const PricingPlans = () => {
                     <span className="text-foreground">Contact form inquiries</span>
                   </li>
                 </ul>
-                <Button variant="outline" className="w-full">
-                  Get Started Free
+                <Button variant="outline" className="w-full" onClick={handleGetStarted}>
+                  {user && tier === "basic" ? "Current Plan" : "Get Started Free"}
                 </Button>
               </CardContent>
             </Card>
@@ -94,8 +122,8 @@ const PricingPlans = () => {
                     <span className="text-foreground">Performance analytics</span>
                   </li>
                 </ul>
-                <Button className="w-full">
-                  Choose Premium
+                <Button className="w-full" onClick={handleChoosePremium}>
+                  {user && tier === "premium" ? "Current Plan" : "Choose Premium"}
                 </Button>
               </CardContent>
             </Card>
@@ -141,8 +169,8 @@ const PricingPlans = () => {
                     <span className="text-foreground">Marketing boost campaigns</span>
                   </li>
                 </ul>
-                <Button variant="outline" className="w-full">
-                  Contact Sales
+                <Button variant="outline" className="w-full" onClick={handleContactSales}>
+                  {user && tier === "professional" ? "Current Plan" : "Contact Sales"}
                 </Button>
               </CardContent>
             </Card>

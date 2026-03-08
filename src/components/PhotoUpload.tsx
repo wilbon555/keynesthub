@@ -13,6 +13,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
+import { UpgradePrompt } from "@/components/UpgradePrompt";
 interface PhotoUploadProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -23,8 +25,10 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<"select" | "details">("select");
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const { addProperty } = useProperties();
   const { user } = useAuth();
+  const { tier, limits, canUploadMore } = useSubscription();
 
   const detailsSchema = z
     .object({
@@ -203,6 +207,20 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     if (files.length > 0) {
+      const totalAfterAdd = selectedFiles.length + files.length;
+      if (totalAfterAdd > limits.maxPhotos) {
+        const allowed = limits.maxPhotos - selectedFiles.length;
+        if (allowed <= 0) {
+          setShowUpgrade(true);
+          toast.error(`You've reached the ${limits.maxPhotos} photo limit for your ${tier} plan.`);
+          return;
+        }
+        const trimmed = files.slice(0, allowed);
+        setSelectedFiles(prev => [...prev, ...trimmed]);
+        toast.warning(`Only ${allowed} more photo(s) allowed on your ${tier} plan. ${files.length - allowed} file(s) were skipped.`);
+        setShowUpgrade(true);
+        return;
+      }
       setSelectedFiles(prev => [...prev, ...files]);
       toast.success(`${files.length} file(s) ready to upload`);
     }
@@ -211,6 +229,11 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     if (files.length > 0) {
+      if (!canUploadMore(selectedFiles.length)) {
+        setShowUpgrade(true);
+        toast.error(`Photo limit reached for your ${tier} plan.`);
+        return;
+      }
       setSelectedFiles(prev => [...prev, ...files]);
       toast.success("Photo captured and ready to upload");
     }
@@ -221,6 +244,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[80vh]">
         <SheetHeader>
@@ -289,7 +313,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
               <div className="space-y-4">
                 {selectedFiles.length > 0 ? (
                   <>
-                    <h3 className="font-medium">Selected Files ({selectedFiles.length})</h3>
+                    <h3 className="font-medium">Selected Files ({selectedFiles.length}/{limits.maxPhotos})</h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-h-60 overflow-y-auto">
                       {selectedFiles.map((file, index) => (
                         <div key={index} className="relative group">
@@ -824,5 +848,13 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
         </ScrollArea>
       </SheetContent>
     </Sheet>
+
+    <UpgradePrompt
+      open={showUpgrade}
+      onOpenChange={setShowUpgrade}
+      currentTier={tier}
+      reason={`Your ${tier} plan allows up to ${limits.maxPhotos} photos per listing. Upgrade to upload more photos and unlock premium features.`}
+    />
+    </>
   );
 };
