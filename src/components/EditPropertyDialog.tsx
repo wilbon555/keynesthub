@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Property } from "@/hooks/useProperties";
-import { X, Home, Trash2, Plus } from "lucide-react";
+import { X, Home, Trash2, Plus, ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
 
@@ -45,6 +45,16 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
   const { tier, limits } = useSubscription();
 
   const totalPhotoCount = existingImages.length + uploadedFiles.length;
+
+  const handleMoveExistingImage = (index: number, direction: 'left' | 'right') => {
+    setExistingImages(prev => {
+      const newArr = [...prev];
+      const targetIndex = direction === 'left' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= newArr.length) return prev;
+      [newArr[index], newArr[targetIndex]] = [newArr[targetIndex], newArr[index]];
+      return newArr;
+    });
+  };
 
   const handleRemoveExistingImage = (index: number) => {
     setExistingImages(prev => prev.filter((_, i) => i !== index));
@@ -331,15 +341,40 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
             {/* Existing Images */}
             {existingImages.length > 0 && (
               <div>
-                <p className="text-xs text-muted-foreground mb-2">Current photos</p>
+                <p className="text-xs text-muted-foreground mb-2">Current photos (drag to reorder · first = cover)</p>
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
                   {existingImages.map((url, idx) => (
                     <div key={`existing-${idx}`} className="relative group">
                       <img
                         src={url}
                         alt={`Property ${idx + 1}`}
-                        className="w-full h-20 object-cover rounded border border-border"
+                        className={`w-full h-20 object-cover rounded border ${idx === 0 ? 'border-primary ring-2 ring-primary/30' : 'border-border'}`}
                       />
+                      {idx === 0 && (
+                        <span className="absolute top-1 left-1 text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded font-medium">
+                          Cover
+                        </span>
+                      )}
+                      <div className="absolute bottom-1 left-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {idx > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleMoveExistingImage(idx, 'left')}
+                            className="w-5 h-5 bg-background/90 border border-border rounded flex items-center justify-center hover:bg-accent"
+                          >
+                            <ArrowLeft className="h-3 w-3" />
+                          </button>
+                        )}
+                        {idx < existingImages.length - 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleMoveExistingImage(idx, 'right')}
+                            className="w-5 h-5 bg-background/90 border border-border rounded flex items-center justify-center hover:bg-accent"
+                          >
+                            <ArrowRight className="h-3 w-3" />
+                          </button>
+                        )}
+                      </div>
                       <button
                         type="button"
                         onClick={() => handleRemoveExistingImage(idx)}
