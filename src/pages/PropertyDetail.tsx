@@ -94,7 +94,7 @@ const PropertyDetail = () => {
   const { addToRecentlyViewed } = useRecentlyViewed();
   const { recordView } = usePropertyViews();
 
-  const [property, setProperty] = useState<Property | null>(null);
+  const [property, setProperty] = useState<PropertyWithTour | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
