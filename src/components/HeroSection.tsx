@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-image.jpg";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
-import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export const HeroSection = () => {
   const [showUpload, setShowUpload] = useState(false);
