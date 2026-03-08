@@ -1,89 +1,36 @@
-import { useState, useEffect, useCallback } from 'react';
-import { GoogleMap, useJsApiLoader, Marker } from '@react-google-maps/api';
-import { supabase } from '@/integrations/supabase/client';
-import { Loader2, MapPin } from 'lucide-react';
+import { useMemo } from 'react';
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { MapPin } from 'lucide-react';
+
+// Fix default marker icons
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+});
 
 interface PropertyLocationMapProps {
   location: string;
   region?: string;
   country?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
-const mapContainerStyle = {
-  width: '100%',
-  height: '100%',
-};
+const defaultCenter: [number, number] = [-1.2921, 36.8219]; // Nairobi
 
-const defaultCenter = { lat: -1.2921, lng: 36.8219 }; // Nairobi
+export const PropertyLocationMap = ({ location, region, country, latitude, longitude }: PropertyLocationMapProps) => {
+  const center: [number, number] = useMemo(() => {
+    if (latitude != null && longitude != null) return [latitude, longitude];
+    return defaultCenter;
+  }, [latitude, longitude]);
 
-/** Inner component — only mounted once apiKey is known & stable */
-const MapInner = ({ apiKey, location, region, country }: { apiKey: string } & PropertyLocationMapProps) => {
-  const [center, setCenter] = useState(defaultCenter);
-  const [geocoded, setGeocoded] = useState(false);
+  const hasCoords = latitude != null && longitude != null;
 
-  const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: apiKey,
-    id: 'property-location-map',
-  });
-
-  const onMapLoad = useCallback(() => {
-    if (!window.google || geocoded) return;
-    const geocoder = new window.google.maps.Geocoder();
-    const query = [location, region, country].filter(Boolean).join(', ');
-    geocoder.geocode({ address: query }, (results, status) => {
-      if (status === 'OK' && results?.[0]) {
-        const { lat, lng } = results[0].geometry.location;
-        setCenter({ lat: lat(), lng: lng() });
-        setGeocoded(true);
-      }
-    });
-  }, [location, region, country, geocoded]);
-
-  if (!isLoaded) {
-    return (
-      <div className="w-full h-[300px] rounded-xl bg-muted/50 flex items-center justify-center">
-        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full h-[300px] rounded-xl overflow-hidden border border-border">
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}
-        center={center}
-        zoom={15}
-        onLoad={onMapLoad}
-        options={{
-          disableDefaultUI: true,
-          zoomControl: true,
-          mapTypeControl: false,
-          streetViewControl: false,
-          fullscreenControl: true,
-        }}
-      >
-        <Marker position={center} />
-      </GoogleMap>
-    </div>
-  );
-};
-
-export const PropertyLocationMap = ({ location, region, country }: PropertyLocationMapProps) => {
-  const [apiKey, setApiKey] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchKey = async () => {
-      try {
-        const { data } = await supabase.functions.invoke('get-google-maps-key');
-        if (data?.apiKey) setApiKey(data.apiKey);
-      } catch (e) {
-        console.error('Failed to fetch Maps key:', e);
-      }
-    };
-    fetchKey();
-  }, []);
-
-  if (!apiKey) {
+  if (!hasCoords) {
     return (
       <div className="w-full h-[300px] rounded-xl bg-muted/50 flex items-center justify-center">
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
@@ -94,5 +41,20 @@ export const PropertyLocationMap = ({ location, region, country }: PropertyLocat
     );
   }
 
-  return <MapInner apiKey={apiKey} location={location} region={region} country={country} />;
+  return (
+    <div className="w-full h-[300px] rounded-xl overflow-hidden border border-border">
+      <MapContainer
+        center={center}
+        zoom={15}
+        style={{ width: '100%', height: '100%' }}
+        scrollWheelZoom={false}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <Marker position={center} />
+      </MapContainer>
+    </div>
+  );
 };

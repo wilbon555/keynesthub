@@ -72,7 +72,7 @@ export default defineConfig(({ mode }) => ({
           vendor: ['react', 'react-dom', 'react-router-dom'],
           ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-popover', '@radix-ui/react-select', '@radix-ui/react-tabs', '@radix-ui/react-toast'],
           charts: ['recharts'],
-          map: ['@react-google-maps/api'],
+          map: ['leaflet', 'react-leaflet'],
           query: ['@tanstack/react-query'],
         },
       },
