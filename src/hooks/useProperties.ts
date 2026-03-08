@@ -251,14 +251,18 @@ export const useProperties = () => {
         imageUrls = await Promise.all(uploadPromises);
       }
 
-      const { uploadedFiles, ...dataWithoutFiles } = propertyData;
+      const { uploadedFiles, images: existingImages, ...dataWithoutFiles } = propertyData;
       
       const updateData: any = { ...dataWithoutFiles };
       
-      // Only update images if new ones were uploaded
-      if (imageUrls && imageUrls.length > 0) {
-        updateData.image = imageUrls[0];
-        updateData.images = imageUrls;
+      // Merge existing images (after removals) with newly uploaded ones
+      const finalImages = [...(existingImages || []), ...(imageUrls || [])];
+      if (finalImages.length > 0) {
+        updateData.image = finalImages[0];
+        updateData.images = finalImages;
+      } else {
+        updateData.image = '/placeholder.svg';
+        updateData.images = ['/placeholder.svg'];
       }
 
       const { error } = await supabase
