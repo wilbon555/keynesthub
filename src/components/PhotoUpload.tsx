@@ -244,6 +244,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="h-[80vh]">
         <SheetHeader>
