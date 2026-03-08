@@ -48,9 +48,14 @@ import NeighborhoodGuide from "./pages/neighborhoods/NeighborhoodGuide";
 import About from "./pages/About";
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  const [showSplash, setShowSplash] = useState(true);
+  const handleSplashFinished = useCallback(() => setShowSplash(false), []);
+
+  return (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      {showSplash && <SplashScreen onFinished={handleSplashFinished} />}
       <Toaster />
       <Sonner />
       <PropertyChatBot />
