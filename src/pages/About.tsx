@@ -71,6 +71,48 @@ const About = () => {
         </div>
       </section>
 
+      {/* Contact Section */}
+      <section id="contact" className="py-16 md:py-24 bg-muted/50">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="text-center mb-10">
+            <MessageSquare className="w-10 h-10 text-primary mx-auto mb-4" />
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">Get in Touch</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto">
+              Have questions or need assistance? Reach out to our team anytime.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            <a
+              href="mailto:keynesthub@gmail.com"
+              className="flex flex-col items-center gap-3 p-6 rounded-xl bg-card border border-border shadow-card hover:shadow-md transition-shadow"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Mail className="w-6 h-6 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Email Us</span>
+              <span className="text-xs text-muted-foreground">keynesthub@gmail.com</span>
+            </a>
+            <a
+              href="tel:+254701555240"
+              className="flex flex-col items-center gap-3 p-6 rounded-xl bg-card border border-border shadow-card hover:shadow-md transition-shadow"
+            >
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Phone className="w-6 h-6 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Call Us</span>
+              <span className="text-xs text-muted-foreground">+254 701 555 240</span>
+            </a>
+            <div className="flex flex-col items-center gap-3 p-6 rounded-xl bg-card border border-border shadow-card">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <MapPin className="w-6 h-6 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Visit Us</span>
+              <span className="text-xs text-muted-foreground">Nairobi, Kenya</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-16 md:py-20 text-center container mx-auto px-4">
         <Building2 className="w-10 h-10 text-primary mx-auto mb-4" />
