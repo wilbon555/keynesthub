@@ -57,8 +57,6 @@ export const VerificationBadge = ({ status, className = '', details }: Verificat
           align="start"
           className="w-56 p-3 z-[100]"
           onClick={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
-          onPointerDownOutside={(e) => e.stopPropagation()}
         >
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
             Verification Details
