@@ -214,11 +214,6 @@ export const PropertyCard = ({
               property={{ id, title, price, location, type, bedrooms, bathrooms, area, listing_type }}
             />
           </div>
-          {featured && (
-            <Badge className="bg-gradient-primary border-0 text-primary-foreground text-[10px] md:text-xs">
-              Featured
-            </Badge>
-          )}
           {listing_type === 'rent' && vacant_units !== undefined && total_units !== undefined && (
             <Badge
               className={`border-0 text-[10px] md:text-xs ${
