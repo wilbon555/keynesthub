@@ -64,7 +64,7 @@ const About = () => {
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Our Vision</h2>
               <p className="text-muted-foreground leading-relaxed">
-                To become the leading ecosystem for real estate in the region — a trusted platform where every "key" finds its "nest," connecting communities with the spaces they call home.
+                To become the leading ecosystem for real estate in the region, a trusted platform where every "key" finds its "nest," connecting communities with the spaces they call home.
               </p>
             </div>
           </div>
