@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
-import { Shield, ShieldCheck, ShieldAlert, Clock, ChevronDown } from "lucide-react";
+import { Shield, ShieldCheck, ShieldAlert, Clock, ChevronDown, Check, Circle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,7 @@ interface VerificationBadgeProps {
 }
 
 export const VerificationBadge = ({ status, className = '', details }: VerificationBadgeProps) => {
+  const isMobile = useIsMobile();
   if (status === 'verified') {
     const checksCompleted = [
       details?.titleDeedVerified,
@@ -58,14 +60,24 @@ export const VerificationBadge = ({ status, className = '', details }: Verificat
           className="w-56 p-3 z-[100]"
           onClick={(e) => e.stopPropagation()}
         >
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 md:mb-2">
             Verification Details
           </p>
-          <div className="space-y-1.5">
+          <div className="space-y-1 md:space-y-1.5">
             {items.map((item) => (
-              <div key={item.label} className="flex items-center gap-2">
-                <Checkbox checked={item.checked} disabled className="pointer-events-none h-3 w-3 md:h-4 md:w-4" />
-                <span className={`text-xs md:text-sm ${item.checked ? 'text-foreground' : 'text-muted-foreground'}`}>
+              <div key={item.label} className="flex items-center gap-1.5 md:gap-2">
+                {isMobile ? (
+                  item.checked ? (
+                    <div className="h-3.5 w-3.5 rounded-full bg-green-500 flex items-center justify-center shrink-0">
+                      <Check className="h-2 w-2 text-white" strokeWidth={3} />
+                    </div>
+                  ) : (
+                    <Circle className="h-3.5 w-3.5 text-muted-foreground/40 shrink-0" strokeWidth={1.5} />
+                  )
+                ) : (
+                  <Checkbox checked={item.checked} disabled className="pointer-events-none h-4 w-4" />
+                )}
+                <span className={`text-[11px] md:text-sm ${item.checked ? 'text-foreground' : 'text-muted-foreground/70'}`}>
                   {item.label}
                 </span>
               </div>
