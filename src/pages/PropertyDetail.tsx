@@ -190,22 +190,26 @@ const PropertyDetail = () => {
     ? (isShortTerm ? "Book Now" : "Inquire to Rent")
     : "Contact Owner";
 
+  const breadcrumbItems = [
+    { label: property.listing_type === "rent" ? "Rent" : "Buy", href: property.listing_type === "rent" ? "/rent/apartments" : "/buy/residential" },
+    { label: property.type, href: property.listing_type === "rent" ? "/rent/apartments" : "/buy/residential" },
+    { label: property.title },
+  ];
+
   return (
-    <div className="min-h-screen bg-background">
+    <PageTransition className="min-h-screen bg-background">
       <Navigation />
+      <PageHead
+        title={`${property.title} - ${property.price}`}
+        description={property.description || `${property.type} property in ${property.location} for ${property.listing_type === "rent" ? "rent" : "sale"} at ${property.price}`}
+        ogImage={images[0] !== "/placeholder.svg" ? images[0] : undefined}
+        ogType="article"
+      />
       <PropertyDetailJsonLd property={property} />
 
-      {/* Back button */}
+      {/* Breadcrumbs + Back */}
       <div className="container mx-auto px-4 pt-4 max-w-5xl">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="text-muted-foreground hover:text-foreground mb-2"
-        >
-          <ArrowLeft className="w-4 h-4 mr-1" />
-          Back
-        </Button>
+        <Breadcrumbs items={breadcrumbItems} />
       </div>
 
       {/* Hero Image Gallery */}
