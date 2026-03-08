@@ -171,7 +171,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       // Create property from form data (without images first)
       const newProperty = {
         title: values.description.split('.')[0] || "New Property Listing",
-        price: `${currency.symbol}${values.priceMin.toLocaleString()} - ${currency.symbol}${values.priceMax.toLocaleString()}`,
+        price: values.listingType === 'rent'
+          ? `${currency.symbol}${(values.price || 0).toLocaleString()}`
+          : `${currency.symbol}${(values.priceMin || 0).toLocaleString()} - ${currency.symbol}${(values.priceMax || 0).toLocaleString()}`,
         location: `${values.location}, ${values.region}`,
         area: values.area || "TBD",
         bedrooms: values.bedrooms,

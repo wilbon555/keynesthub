@@ -110,7 +110,9 @@ export const PropertyCard = ({
     created_at: '', updated_at: '',
   };
 
-  const contactButtonText = listing_type === 'rent' ? 'Inquire to Rent' : 'Contact Owner';
+  const contactButtonText = listing_type === 'rent' 
+    ? (stay_type === 'short-term' ? 'Book Now' : 'Inquire to Rent') 
+    : 'Contact Owner';
   
   const images = propertyImages && propertyImages.length > 0 
     ? propertyImages 
