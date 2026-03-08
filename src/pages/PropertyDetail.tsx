@@ -123,7 +123,7 @@ const PropertyDetail = () => {
         ...data,
         image: data.images?.[0] || data.image || "/placeholder.svg",
         images: data.images?.length ? data.images : [data.image || "/placeholder.svg"],
-      } as Property;
+      } as PropertyWithTour;
 
       setProperty(prop);
       setLoading(false);
