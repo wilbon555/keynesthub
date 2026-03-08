@@ -89,6 +89,9 @@ const App = () => (
           <Route path="/investment-tips" element={<InvestmentTips />} />
           <Route path="/mortgage-calculator" element={<MortgageCalculator />} />
           
+          {/* About */}
+          <Route path="/about" element={<About />} />
+
           {/* Neighborhood Guides */}
           <Route path="/neighborhoods" element={<NeighborhoodGuide />} />
           <Route path="/neighborhoods/:slug" element={<NeighborhoodGuide />} />
