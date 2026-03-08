@@ -42,7 +42,7 @@ const BookProperty = () => {
         .select("*")
         .eq("id", id)
         .single();
-      setProperty(data);
+      setProperty(data as Property);
       setLoading(false);
     };
     fetchProperty();
