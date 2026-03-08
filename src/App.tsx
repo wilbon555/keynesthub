@@ -19,6 +19,7 @@ import BecomeAgent from "./pages/BecomeAgent";
 import Install from "./pages/Install";
 import Discover from "./pages/Discover";
 import PropertyDetail from "./pages/PropertyDetail";
+import BookProperty from "./pages/BookProperty";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // Buy pages
