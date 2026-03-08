@@ -24,6 +24,11 @@ import {
 } from "lucide-react";
 import type { Property } from "@/hooks/useProperties";
 
+interface PropertyWithTour extends Property {
+  virtual_tour_url?: string;
+  virtual_tour_type?: string;
+}
+
 const formatPriceWithSuffix = (price: string, listingType: string, stayType?: string) => {
   if (listingType === 'sale') return price;
   if (stayType === 'short-term') return `${price}/night`;
