@@ -16,7 +16,7 @@ const About = () => {
             About <span className="text-[hsl(35,85%,65%)]">KeyNestHub</span>
           </h1>
           <p className="text-lg md:text-xl leading-relaxed opacity-90">
-            We connect buyers, sellers, and agents across the region to find the perfect property — whether it's a suburban home, a modern apartment, or a commercial office space. At KeyNestHub, every key finds its nest.
+            We connect buyers, sellers, and agents across the region to find the perfect property, whether it's a suburban home, a modern apartment, or a commercial office space. At KeyNestHub, every key finds its nest.
           </p>
         </div>
       </section>
@@ -51,7 +51,7 @@ const About = () => {
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Our Mission</h2>
               <p className="text-muted-foreground leading-relaxed">
-                To simplify the property search and rental process through transparency, verified listings, and innovative technology — empowering individuals and businesses to make confident real estate decisions.
+                To simplify the property search and rental process through transparency, verified listings, and innovative technology, empowering individuals and businesses to make confident real estate decisions.
               </p>
             </div>
           </div>
@@ -64,7 +64,7 @@ const About = () => {
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Our Vision</h2>
               <p className="text-muted-foreground leading-relaxed">
-                To become the leading ecosystem for real estate in the region — a trusted platform where every "key" finds its "nest," connecting communities with the spaces they call home.
+                To become the leading ecosystem for real estate in the region, a trusted platform where every "key" finds its "nest," connecting communities with the spaces they call home.
               </p>
             </div>
           </div>
