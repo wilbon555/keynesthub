@@ -203,7 +203,7 @@ export const PropertyCard = ({
         </div>
 
         {/* Top-left badges - verification & AI overlaid on image for mobile */}
-        <div className="absolute top-2 left-2 md:top-3 md:left-3 flex items-center gap-1 md:gap-2 flex-wrap z-20" onClick={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
+        <div className="absolute top-2 left-2 md:top-3 md:left-3 flex items-center gap-1 md:gap-2 flex-wrap z-30" onClick={(e) => e.stopPropagation()}>
           {/* Mobile-only: verification & AI badges on image */}
           <div className="flex md:hidden items-center gap-1">
             <VerificationBadge 
