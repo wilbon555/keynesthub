@@ -50,15 +50,30 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       totalUnits: z.coerce.number().min(1, "Total units must be at least 1").optional(),
       vacantUnits: z.coerce.number().min(0, "Vacant units cannot be negative").optional(),
       stayType: z.enum(['long-term', 'short-term']).optional(),
-      priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
-      priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000"),
+      price: z.coerce.number().min(1, "Price must be at least 1").max(1000000000, "Price cannot exceed 1,000,000,000").optional(),
+      priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000").optional(),
+      priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000").optional(),
       phone: z
         .string()
         .min(7, "Phone is required")
         .regex(/^[+0-9()\-\s]+$/, "Invalid phone number"),
       description: z.string().min(10, "Please add a brief description"),
     })
-    .refine((data) => data.priceMax >= data.priceMin, {
+    .refine((data) => {
+      if (data.listingType === 'rent') {
+        return data.price && data.price >= 1;
+      }
+      return data.priceMin && data.priceMin >= 1;
+    }, {
+      message: "Price is required",
+      path: ["price"],
+    })
+    .refine((data) => {
+      if (data.listingType === 'sale') {
+        return data.priceMax && data.priceMax >= (data.priceMin || 0);
+      }
+      return true;
+    }, {
       message: "Max price must be greater than or equal to Min price",
       path: ["priceMax"],
     })
@@ -156,7 +171,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       // Create property from form data (without images first)
       const newProperty = {
         title: values.description.split('.')[0] || "New Property Listing",
-        price: `${currency.symbol}${values.priceMin.toLocaleString()} - ${currency.symbol}${values.priceMax.toLocaleString()}`,
+        price: values.listingType === 'rent'
+          ? `${currency.symbol}${(values.price || 0).toLocaleString()}`
+          : `${currency.symbol}${(values.priceMin || 0).toLocaleString()} - ${currency.symbol}${(values.priceMax || 0).toLocaleString()}`,
         location: `${values.location}, ${values.region}`,
         area: values.area || "TBD",
         bedrooms: values.bedrooms,
@@ -742,21 +759,19 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                       />
                     )}
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {form.watch("listingType") === "rent" ? (
                       <FormField
                         control={form.control}
-                        name="priceMin"
+                        name="price"
                         render={({ field }) => {
                           const country = form.watch("country");
                           const currency = getCurrencyInfo(country);
                           return (
                             <FormItem>
                               <FormLabel>
-                                {form.watch("listingType") === "rent" 
-                                  ? form.watch("stayType") === "short-term" 
-                                    ? `Nightly Rate Min (${currency.symbol})` 
-                                    : `Price Min /mo (${currency.symbol})`
-                                  : `Price Min (${currency.symbol})`}
+                                {form.watch("stayType") === "short-term" 
+                                  ? `Nightly Rate (${currency.symbol})` 
+                                  : `Monthly Rent (${currency.symbol})`}
                               </FormLabel>
                               <FormControl>
                                 <Input 
@@ -764,7 +779,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                   min={1} 
                                   max={1000000000}
                                   step={1} 
-                                  placeholder={`1 ${currency.code}`} 
+                                  placeholder={`Enter amount in ${currency.code}`} 
                                   {...field} 
                                 />
                               </FormControl>
@@ -773,38 +788,58 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           );
                         }}
                       />
-
-                      <FormField
-                        control={form.control}
-                        name="priceMax"
-                        render={({ field }) => {
-                          const country = form.watch("country");
-                          const currency = getCurrencyInfo(country);
-                          return (
-                            <FormItem>
-                              <FormLabel>
-                                {form.watch("listingType") === "rent" 
-                                  ? form.watch("stayType") === "short-term" 
-                                    ? `Nightly Rate Max (${currency.symbol})` 
-                                    : `Price Max /mo (${currency.symbol})`
-                                  : `Price Max (${currency.symbol})`}
-                              </FormLabel>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  min={1} 
-                                  max={1000000000}
-                                  step={1} 
-                                  placeholder={`1000000 ${currency.code}`} 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          );
-                        }}
-                      />
-                    </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="priceMin"
+                          render={({ field }) => {
+                            const country = form.watch("country");
+                            const currency = getCurrencyInfo(country);
+                            return (
+                              <FormItem>
+                                <FormLabel>Price Min ({currency.symbol})</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min={1} 
+                                    max={1000000000}
+                                    step={1} 
+                                    placeholder={`1 ${currency.code}`} 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="priceMax"
+                          render={({ field }) => {
+                            const country = form.watch("country");
+                            const currency = getCurrencyInfo(country);
+                            return (
+                              <FormItem>
+                                <FormLabel>Price Max ({currency.symbol})</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    type="number" 
+                                    min={1} 
+                                    max={1000000000}
+                                    step={1} 
+                                    placeholder={`1000000 ${currency.code}`} 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            );
+                          }}
+                        />
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <FormField
