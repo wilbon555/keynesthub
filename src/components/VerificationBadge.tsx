@@ -61,11 +61,11 @@ export const VerificationBadge = ({ status, className = '', details }: Verificat
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
             Verification Details
           </p>
-          <div className="space-y-2.5">
+          <div className="space-y-1.5">
             {items.map((item) => (
-              <div key={item.label} className="flex items-center gap-2.5">
-                <Checkbox checked={item.checked} disabled className="pointer-events-none" />
-                <span className={`text-sm ${item.checked ? 'text-foreground' : 'text-muted-foreground'}`}>
+              <div key={item.label} className="flex items-center gap-2">
+                <Checkbox checked={item.checked} disabled className="pointer-events-none h-3 w-3 md:h-4 md:w-4" />
+                <span className={`text-xs md:text-sm ${item.checked ? 'text-foreground' : 'text-muted-foreground'}`}>
                   {item.label}
                 </span>
               </div>
