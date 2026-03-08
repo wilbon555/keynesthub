@@ -16,25 +16,13 @@ const mapContainerStyle = {
 
 const defaultCenter = { lat: -1.2921, lng: 36.8219 }; // Nairobi
 
-export const PropertyLocationMap = ({ location, region, country }: PropertyLocationMapProps) => {
-  const [apiKey, setApiKey] = useState<string | null>(null);
+/** Inner component — only mounted once apiKey is known & stable */
+const MapInner = ({ apiKey, location, region, country }: { apiKey: string } & PropertyLocationMapProps) => {
   const [center, setCenter] = useState(defaultCenter);
   const [geocoded, setGeocoded] = useState(false);
 
-  useEffect(() => {
-    const fetchKey = async () => {
-      try {
-        const { data } = await supabase.functions.invoke('get-google-maps-key');
-        if (data?.apiKey) setApiKey(data.apiKey);
-      } catch (e) {
-        console.error('Failed to fetch Maps key:', e);
-      }
-    };
-    fetchKey();
-  }, []);
-
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: apiKey || '',
+    googleMapsApiKey: apiKey,
     id: 'property-location-map',
   });
 
@@ -50,17 +38,6 @@ export const PropertyLocationMap = ({ location, region, country }: PropertyLocat
       }
     });
   }, [location, region, country, geocoded]);
-
-  if (!apiKey) {
-    return (
-      <div className="w-full h-[300px] rounded-xl bg-muted/50 flex items-center justify-center">
-        <div className="flex items-center gap-2 text-muted-foreground text-sm">
-          <MapPin className="w-4 h-4" />
-          <span>{[location, region, country].filter(Boolean).join(', ')}</span>
-        </div>
-      </div>
-    );
-  }
 
   if (!isLoaded) {
     return (
@@ -89,4 +66,33 @@ export const PropertyLocationMap = ({ location, region, country }: PropertyLocat
       </GoogleMap>
     </div>
   );
+};
+
+export const PropertyLocationMap = ({ location, region, country }: PropertyLocationMapProps) => {
+  const [apiKey, setApiKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchKey = async () => {
+      try {
+        const { data } = await supabase.functions.invoke('get-google-maps-key');
+        if (data?.apiKey) setApiKey(data.apiKey);
+      } catch (e) {
+        console.error('Failed to fetch Maps key:', e);
+      }
+    };
+    fetchKey();
+  }, []);
+
+  if (!apiKey) {
+    return (
+      <div className="w-full h-[300px] rounded-xl bg-muted/50 flex items-center justify-center">
+        <div className="flex items-center gap-2 text-muted-foreground text-sm">
+          <MapPin className="w-4 h-4" />
+          <span>{[location, region, country].filter(Boolean).join(', ')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return <MapInner apiKey={apiKey} location={location} region={region} country={country} />;
 };
