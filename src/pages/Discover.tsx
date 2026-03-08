@@ -67,9 +67,9 @@ const geocodeProperties = async (properties: Property[]): Promise<MarkerData[]> 
   for (const property of properties) {
     try {
       const query = `${property.location}, Kenya`;
-      const res = await fetch(
+      const res = await globalThis.fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
-        { headers: { 'Accept': 'application/json' } }
+        { headers: { 'Accept': 'application/json', 'User-Agent': 'KeyNestHub/1.0' } }
       );
       const results = await res.json();
       if (results.length > 0) {
