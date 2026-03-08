@@ -16,7 +16,7 @@ const About = () => {
             About <span className="text-[hsl(35,85%,65%)]">KeyNestHub</span>
           </h1>
           <p className="text-lg md:text-xl leading-relaxed opacity-90">
-            We connect buyers, sellers, and agents across the region to find the perfect property, whether it's a suburban home, a modern apartment, or a commercial office space. At KeyNestHub, every key finds its nest.
+            We connect buyers, sellers, and agents to find the perfect property, because every key deserves its nest.
           </p>
         </div>
       </section>
