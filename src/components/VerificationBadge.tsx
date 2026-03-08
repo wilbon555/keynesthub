@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge";
-import { Shield, ShieldCheck, ShieldAlert, Clock, ChevronDown } from "lucide-react";
+import { Shield, ShieldCheck, ShieldAlert, Clock, ChevronDown, Check, Circle } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   DropdownMenu,
   DropdownMenuContent,
