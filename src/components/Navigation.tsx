@@ -353,9 +353,9 @@ export const Navigation = () => {
                       Sign Out
                     </Button>
                   ) : (
-                    <Button variant="hero" size="sm" className="justify-start" onClick={() => navigate("/auth")}>
+                    <Button variant="hero" size="sm" className="justify-start" onClick={() => navigate("/sell/pricing-plans")}>
                       <User className="w-4 h-4 mr-2" />
-                      Sign In
+                      Get Started
                     </Button>
                   )}
                 </div>
