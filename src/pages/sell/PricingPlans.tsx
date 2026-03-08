@@ -76,8 +76,8 @@ const PricingPlans = () => {
                     <span className="text-foreground">Contact form inquiries</span>
                   </li>
                 </ul>
-                <Button variant="outline" className="w-full">
-                  Get Started Free
+                <Button variant="outline" className="w-full" onClick={handleGetStarted}>
+                  {user && tier === "basic" ? "Current Plan" : "Get Started Free"}
                 </Button>
               </CardContent>
             </Card>
