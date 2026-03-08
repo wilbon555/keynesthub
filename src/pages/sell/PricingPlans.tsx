@@ -14,9 +14,9 @@ const PricingPlans = () => {
 
   const handleGetStarted = () => {
     if (user) {
-      navigate("/sell/list-property");
+      navigate("/");
     } else {
-      navigate("/auth?redirect=%2Fsell%2Flist-property");
+      navigate("/auth");
     }
   };
 
