@@ -42,6 +42,7 @@ import AgentsDirectory from "./pages/agents/AgentsDirectory";
 // Market pages
 import PropertyTrends from "./pages/market/PropertyTrends";
 import NeighborhoodGuide from "./pages/neighborhoods/NeighborhoodGuide";
+import About from "./pages/About";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -88,6 +89,9 @@ const App = () => (
           <Route path="/investment-tips" element={<InvestmentTips />} />
           <Route path="/mortgage-calculator" element={<MortgageCalculator />} />
           
+          {/* About */}
+          <Route path="/about" element={<About />} />
+
           {/* Neighborhood Guides */}
           <Route path="/neighborhoods" element={<NeighborhoodGuide />} />
           <Route path="/neighborhoods/:slug" element={<NeighborhoodGuide />} />
