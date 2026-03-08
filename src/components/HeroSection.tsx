@@ -160,7 +160,7 @@ export const HeroSection = () => {
         {/* Search Section */}
         <div className="mt-6 md:mt-12 animate-slide-up" ref={searchRef}>
           <SearchSection />
-        </div>
+        </motion.div>
       </div>
 
       <PhotoUpload open={showUpload} onOpenChange={setShowUpload} />
