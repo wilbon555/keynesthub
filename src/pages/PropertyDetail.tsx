@@ -139,13 +139,7 @@ const PropertyDetail = () => {
     fetchProperty();
   }, [id]);
 
-  // Update page title
-  useEffect(() => {
-    if (property) {
-      document.title = `${property.title} - ${property.price} | KeyNestHub`;
-    }
-    return () => { document.title = "KeyNestHub - Premium Real Estate Platform"; };
-  }, [property]);
+  // Remove manual title management - PageHead handles it now
 
   const images = property?.images?.length ? property.images : [property?.image || "/placeholder.svg"];
   const isOwner = user && property?.user_id && user.id === property.user_id;
