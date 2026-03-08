@@ -847,5 +847,13 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
         </ScrollArea>
       </SheetContent>
     </Sheet>
+
+    <UpgradePrompt
+      open={showUpgrade}
+      onOpenChange={setShowUpgrade}
+      currentTier={tier}
+      reason={`Your ${tier} plan allows up to ${limits.maxPhotos} photos per listing. Upgrade to upload more photos and unlock premium features.`}
+    />
+    </>
   );
 };
