@@ -52,7 +52,12 @@ export const HeroSection = () => {
       
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
-        <div className="max-w-4xl mx-auto space-y-4 md:space-y-8 animate-fade-in">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+          className="max-w-4xl mx-auto space-y-4 md:space-y-8"
+        >
           <div className="space-y-2 md:space-y-4">
             <h1 className="text-3xl md:text-6xl font-bold text-primary-foreground leading-tight">
               Find Your Perfect
