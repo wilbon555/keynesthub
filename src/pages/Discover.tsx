@@ -258,7 +258,7 @@ const DiscoverMap: React.FC<{ properties: Property[] }> = ({ properties }) => {
           <Marker
             key={marker.property.id}
             position={marker.position}
-            icon={propertyIcon}
+            icon={createPropertyIcon(marker.property.title, marker.property.price)}
             eventHandlers={{ click: () => handlePropertySelect(marker.property) }}
           >
             <Popup>
