@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles } from "@/hooks/useUserRoles";
 import { useToast } from "@/hooks/use-toast";
-import { ContactDropdown } from "@/components/ContactDropdown";
+
 import keyNestHubLogo from "@/assets/keynesthub-logo.png";
 
 export const Navigation = () => {
