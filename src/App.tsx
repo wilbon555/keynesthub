@@ -73,7 +73,7 @@ const App = () => {
   const handleSplashFinished = useCallback(() => setShowSplash(false), []);
 
   return (
-  <HelmetProvider>
+  <>
   <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
