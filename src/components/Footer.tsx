@@ -57,6 +57,7 @@ const Footer = () => {
     { label: "Rent Property", path: "/rent/apartments" },
     { label: "List Property", path: "/sell/list-property" },
     { label: "Find Agent", path: "/agents/find-agent" },
+    { label: "About Us", path: "/about" },
   ];
 
   const resources = [

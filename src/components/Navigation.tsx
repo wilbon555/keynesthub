@@ -188,6 +188,12 @@ export const Navigation = () => {
                   </NavigationMenuContent>
                 </NavigationMenuItem>
 
+                <NavigationMenuItem>
+                  <NavigationMenuLink asChild>
+                    <a href="/about" className="block rounded-md px-3 py-2 hover:bg-accent text-foreground text-sm font-medium">About Us</a>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+
               </NavigationMenuList>
             </NavigationMenu>
           </div>
@@ -328,6 +334,10 @@ export const Navigation = () => {
                     <a href="/neighborhoods" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Neighborhood Guides</a>
                   </CollapsibleContent>
                 </Collapsible>
+
+                <a href="/about" className="flex items-center py-2 text-primary font-semibold hover:text-primary/80 transition-smooth">
+                  About Us
+                </a>
 
                 <div className="flex flex-col space-y-2 pt-4">
                   <ContactDropdown variant="ghost" size="sm" className="justify-start" />
