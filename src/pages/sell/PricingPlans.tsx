@@ -3,8 +3,36 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, Star, Zap, Crown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useSubscription } from "@/hooks/useSubscription";
 
 const PricingPlans = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { tier } = useSubscription();
+
+  const handleGetStarted = () => {
+    if (user) {
+      navigate("/sell/list-property");
+    } else {
+      navigate("/auth?redirect=%2Fsell%2Flist-property");
+    }
+  };
+
+  const handleChoosePremium = () => {
+    if (!user) {
+      navigate("/auth?redirect=%2Fsell%2Fpricing-plans");
+      return;
+    }
+    // For now, show that this is coming soon
+    navigate("/sell/list-property");
+  };
+
+  const handleContactSales = () => {
+    navigate("/about");
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
