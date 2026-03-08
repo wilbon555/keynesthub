@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Eye, EyeOff, Loader2, Search } from "lucide-react";
+import { Eye, EyeOff, Loader2, Search, Check, X } from "lucide-react";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 
@@ -31,6 +31,16 @@ const RequiredLabel = ({ children }: { children: React.ReactNode }) => (
   </label>
 );
 
+const FieldError = ({ message }: { message?: string }) =>
+  message ? <p className="text-xs text-destructive mt-1 animate-fade-in">{message}</p> : null;
+
+const PasswordRule = ({ met, label }: { met: boolean; label: string }) => (
+  <div className={`flex items-center gap-1.5 text-xs transition-colors ${met ? "text-green-600 dark:text-green-400" : "text-muted-foreground"}`}>
+    {met ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+    {label}
+  </div>
+);
+
 const INDUSTRY_ROLE_GROUPS = [
   {
     label: "Owner/Landlord",
@@ -56,10 +66,32 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
   const [roleSearch, setRoleSearch] = useState("");
   const [phone, setPhone] = useState("");
   const [postalAddress, setPostalAddress] = useState("");
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
+
+  const markTouched = useCallback((field: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  }, []);
+
+  // Inline validation
+  const errors: Record<string, string | undefined> = {};
+  if (touched.firstName && !firstName.trim()) errors.firstName = "First name is required";
+  if (touched.lastName && !lastName.trim()) errors.lastName = "Last name is required";
+  if (touched.email && email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = "Invalid email address";
+  if (touched.email && !email) errors.email = "Email is required";
+  if (touched.phone && !phone.trim()) errors.phone = "Phone number is required";
+  if (touched.postalAddress && !postalAddress.trim()) errors.postalAddress = "Postal address is required";
+
+  const pwRules = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    number: /[0-9]/.test(password),
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Touch all fields
+    setTouched({ firstName: true, lastName: true, email: true, phone: true, postalAddress: true, password: true });
     setIsLoading(true);
 
     try {
@@ -91,7 +123,7 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* First Name / Last Name - two columns */}
+      {/* First Name / Last Name */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <RequiredLabel>First Name</RequiredLabel>
@@ -99,9 +131,11 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
             placeholder="John"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="h-11 border-input bg-card"
+            onBlur={() => markTouched("firstName")}
+            className={`h-11 border-input bg-card ${errors.firstName ? "border-destructive focus-visible:ring-destructive" : ""}`}
             required
           />
+          <FieldError message={errors.firstName} />
         </div>
         <div>
           <RequiredLabel>Last Name</RequiredLabel>
@@ -109,9 +143,11 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
             placeholder="Doe"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="h-11 border-input bg-card"
+            onBlur={() => markTouched("lastName")}
+            className={`h-11 border-input bg-card ${errors.lastName ? "border-destructive focus-visible:ring-destructive" : ""}`}
             required
           />
+          <FieldError message={errors.lastName} />
         </div>
       </div>
 
@@ -123,12 +159,14 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
           placeholder="john.doe@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="h-11 border-input bg-card"
+          onBlur={() => markTouched("email")}
+          className={`h-11 border-input bg-card ${errors.email ? "border-destructive focus-visible:ring-destructive" : ""}`}
           required
         />
+        <FieldError message={errors.email} />
       </div>
 
-      {/* Password with show/hide */}
+      {/* Password with show/hide + strength rules */}
       <div>
         <RequiredLabel>Password</RequiredLabel>
         <div className="relative">
@@ -137,6 +175,7 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
             placeholder="Min 8 chars, 1 uppercase, 1 number"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onBlur={() => markTouched("password")}
             className="h-11 pr-10 border-input bg-card"
             required
             minLength={8}
@@ -150,6 +189,13 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
+        {(touched.password || password.length > 0) && (
+          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+            <PasswordRule met={pwRules.length} label="8+ characters" />
+            <PasswordRule met={pwRules.uppercase} label="Uppercase letter" />
+            <PasswordRule met={pwRules.number} label="Number" />
+          </div>
+        )}
       </div>
 
       {/* Industry Role searchable dropdown */}
@@ -200,9 +246,11 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
           placeholder="+1 (555) 000-0000"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="h-11 border-input bg-card"
+          onBlur={() => markTouched("phone")}
+          className={`h-11 border-input bg-card ${errors.phone ? "border-destructive focus-visible:ring-destructive" : ""}`}
           required
         />
+        <FieldError message={errors.phone} />
       </div>
 
       {/* Postal Address */}
@@ -212,9 +260,11 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
           placeholder="12345 or 12345-6789"
           value={postalAddress}
           onChange={(e) => setPostalAddress(e.target.value)}
-          className="h-11 border-input bg-card"
+          onBlur={() => markTouched("postalAddress")}
+          className={`h-11 border-input bg-card ${errors.postalAddress ? "border-destructive focus-visible:ring-destructive" : ""}`}
           required
         />
+        <FieldError message={errors.postalAddress} />
       </div>
 
       <Button type="submit" className="w-full h-11 text-base font-semibold" disabled={isLoading}>
