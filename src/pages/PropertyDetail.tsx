@@ -464,14 +464,10 @@ const PropertyDetail = () => {
                   Submit an inquiry and a KeyNestHub agent will contact you to schedule a viewing.
                 </p>
 
-                {property.phone && (
+                {property.phone && (isAgent || isAdmin) && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Phone className="w-4 h-4" />
-                    <span>
-                      {property.phone.length >= 6
-                        ? `${property.phone.replace(/\D/g, "").slice(0, 3)}-***-**${property.phone.replace(/\D/g, "").slice(-2)}`
-                        : property.phone}
-                    </span>
+                    <span>{property.phone}</span>
                   </div>
                 )}
 
