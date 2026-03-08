@@ -80,8 +80,8 @@ const App = () => {
       {showSplash && <SplashScreen onFinished={handleSplashFinished} />}
       <Toaster />
       <Sonner />
-      <PropertyChatBot />
       <BrowserRouter>
+        <PropertyChatBot />
         <IntentTriageModal />
         <Suspense fallback={<PageLoader />}>
           <Routes>
