@@ -335,6 +335,10 @@ export const Navigation = () => {
                   </CollapsibleContent>
                 </Collapsible>
 
+                <a href="/about" className="flex items-center py-2 text-primary font-semibold hover:text-primary/80 transition-smooth">
+                  About Us
+                </a>
+
                 <div className="flex flex-col space-y-2 pt-4">
                   <ContactDropdown variant="ghost" size="sm" className="justify-start" />
                   {user && (
