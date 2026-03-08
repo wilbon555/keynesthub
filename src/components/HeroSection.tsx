@@ -27,15 +27,24 @@ export const HeroSection = () => {
 
   return (
     <section className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center bg-gradient-hero overflow-hidden pb-4 md:pb-0">
-      {/* Background Image */}
+      {/* Background Video */}
       <div className="absolute inset-0">
-        <img 
-          src={heroImage} 
-          alt="Premium real estate properties in Kenya - KeyNestHub" 
-          className="w-full h-full object-cover opacity-20"
-          loading="eager"
-          fetchPriority="high"
-        />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster={heroImage}
+          className="w-full h-full object-cover opacity-25"
+        >
+          <source src="https://videos.pexels.com/video-files/7578548/7578548-hd_1920_1080_30fps.mp4" type="video/mp4" />
+          {/* Fallback image if video fails */}
+          <img 
+            src={heroImage} 
+            alt="Premium real estate properties in Kenya - KeyNestHub" 
+            className="w-full h-full object-cover"
+          />
+        </video>
         <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/20" />
       </div>
       
