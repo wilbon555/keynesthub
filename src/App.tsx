@@ -19,6 +19,7 @@ import BecomeAgent from "./pages/BecomeAgent";
 import Install from "./pages/Install";
 import Discover from "./pages/Discover";
 import PropertyDetail from "./pages/PropertyDetail";
+import BookProperty from "./pages/BookProperty";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 // Buy pages
@@ -65,6 +66,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/property/:id" element={<PropertyDetail />} />
+          <Route path="/book/:id" element={<ProtectedRoute><BookProperty /></ProtectedRoute>} />
           <Route path="/discover" element={<Discover />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

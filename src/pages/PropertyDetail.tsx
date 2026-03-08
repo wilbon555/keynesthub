@@ -479,7 +479,7 @@ const PropertyDetail = () => {
                     size="lg"
                     onClick={() => {
                       if (isShortTerm) {
-                        navigate(`/sell/checkout?property=${property.id}`);
+                        navigate(`/book/${property.id}`);
                       } else {
                         setShowContactDialog(true);
                       }
