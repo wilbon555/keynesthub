@@ -51,7 +51,7 @@ const About = () => {
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">Our Mission</h2>
               <p className="text-muted-foreground leading-relaxed">
-                To simplify the property search and rental process through transparency, verified listings, and innovative technology — empowering individuals and businesses to make confident real estate decisions.
+                To simplify the property search and rental process through transparency, verified listings, and innovative technology, empowering individuals and businesses to make confident real estate decisions.
               </p>
             </div>
           </div>
