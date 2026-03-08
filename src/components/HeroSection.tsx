@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { SearchSection } from "./SearchSection";
 import { PhotoUpload } from "./PhotoUpload";
 import { TrendingUp, Users, Award, Search } from "lucide-react";
+import { motion } from "framer-motion";
 import heroImage from "@/assets/hero-image.jpg";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export const HeroSection = () => {
