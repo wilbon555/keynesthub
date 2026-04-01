@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { MobileBottomNav } from "@/components/MobileBottomNav";
+
 import { PhotoGallery } from "@/components/PhotoGallery";
 import ContactDialog from "@/components/ContactDialog";
 import { VerificationBadge, AgentVerifiedBadge } from "@/components/VerificationBadge";
