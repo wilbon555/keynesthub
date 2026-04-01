@@ -501,7 +501,7 @@ const PropertyDetail = () => {
       </div>
 
       <Footer />
-      <MobileBottomNav />
+      
 
       {/* Dialogs */}
       <PhotoGallery

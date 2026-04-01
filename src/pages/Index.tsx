@@ -21,7 +21,7 @@ const Index = () => {
       <HeroSection />
       <PropertyGrid defaultStatus="available" />
       <Footer />
-      <MobileBottomNav />
+      
     </div>
   );
 };

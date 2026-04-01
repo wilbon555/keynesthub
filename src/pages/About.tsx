@@ -231,7 +231,7 @@ const About = () => {
       </section>
 
       <Footer />
-      <MobileBottomNav />
+      
     </div>
   );
 };
