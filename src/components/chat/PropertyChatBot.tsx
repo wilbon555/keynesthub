@@ -174,7 +174,7 @@ export const PropertyChatBot = () => {
   }
 
   return (
-    <Card className="fixed bottom-6 right-6 z-50 w-[380px] h-[500px] flex flex-col shadow-xl border-0 overflow-hidden">
+    <Card className="fixed bottom-16 right-2 left-2 z-50 h-[60vh] md:bottom-6 md:right-6 md:left-auto md:w-[380px] md:h-[500px] flex flex-col shadow-xl border-0 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-primary text-primary-foreground">
         <div className="flex items-center gap-2">
