@@ -9,6 +9,7 @@ import { ThemeProvider } from "next-themes";
 import { PropertyChatBot } from "@/components/chat/PropertyChatBot";
 import { IntentTriageModal } from "@/components/onboarding/IntentTriageModal";
 import { SplashScreen } from "@/components/SplashScreen";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -83,6 +84,7 @@ const App = () => {
       <BrowserRouter>
         <PropertyChatBot />
         <IntentTriageModal />
+        <MobileBottomNav />
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Index />} />

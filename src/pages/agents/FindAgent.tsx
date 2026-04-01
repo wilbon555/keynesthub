@@ -45,7 +45,7 @@ const FindAgent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-14 md:pb-0">
       <Navigation />
       
       <main className="container mx-auto px-4 py-8">

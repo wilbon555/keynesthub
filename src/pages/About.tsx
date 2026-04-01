@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { MobileBottomNav } from "@/components/MobileBottomNav";
+
 import { Building2, Eye, Target, Users, Shield, Lightbulb, Mail, Phone, MapPin, MessageSquare, Send, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -231,7 +231,7 @@ const About = () => {
       </section>
 
       <Footer />
-      <MobileBottomNav />
+      
     </div>
   );
 };

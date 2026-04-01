@@ -4,7 +4,7 @@ import { PropertyGrid } from "@/components/PropertyGrid";
 import { Footer } from "@/components/Footer";
 import { PropertyJsonLd } from "@/components/seo/PropertyJsonLd";
 import { PageHead } from "@/components/seo/PageHead";
-import { MobileBottomNav } from "@/components/MobileBottomNav";
+
 import { useProperties } from "@/hooks/useProperties";
 
 const Index = () => {
@@ -21,7 +21,7 @@ const Index = () => {
       <HeroSection />
       <PropertyGrid defaultStatus="available" />
       <Footer />
-      <MobileBottomNav />
+      
     </div>
   );
 };
