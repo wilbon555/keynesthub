@@ -148,7 +148,7 @@ export const PropertyChatBot = () => {
   if (isMinimized) {
     return (
       <Card 
-        className="fixed bottom-6 right-6 z-50 w-72 cursor-pointer shadow-lg hover:shadow-xl transition-shadow"
+        className="fixed bottom-20 right-4 z-50 w-64 md:bottom-6 md:right-6 md:w-72 cursor-pointer shadow-lg hover:shadow-xl transition-shadow"
         onClick={() => setIsMinimized(false)}
       >
         <div className="flex items-center justify-between p-3 bg-primary text-primary-foreground rounded-lg">
