@@ -84,6 +84,7 @@ const App = () => {
       <BrowserRouter>
         <PropertyChatBot />
         <IntentTriageModal />
+        <MobileBottomNav />
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Index />} />
