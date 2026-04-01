@@ -137,7 +137,7 @@ export const PropertyChatBot = () => {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90"
+        className="fixed bottom-20 right-4 z-50 h-12 w-12 md:bottom-6 md:right-6 md:h-14 md:w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90"
         size="icon"
       >
         <MessageCircle className="h-6 w-6" />
@@ -148,7 +148,7 @@ export const PropertyChatBot = () => {
   if (isMinimized) {
     return (
       <Card 
-        className="fixed bottom-6 right-6 z-50 w-72 cursor-pointer shadow-lg hover:shadow-xl transition-shadow"
+        className="fixed bottom-20 right-4 z-50 w-64 md:bottom-6 md:right-6 md:w-72 cursor-pointer shadow-lg hover:shadow-xl transition-shadow"
         onClick={() => setIsMinimized(false)}
       >
         <div className="flex items-center justify-between p-3 bg-primary text-primary-foreground rounded-lg">
@@ -174,7 +174,7 @@ export const PropertyChatBot = () => {
   }
 
   return (
-    <Card className="fixed bottom-6 right-6 z-50 w-[380px] h-[500px] flex flex-col shadow-xl border-0 overflow-hidden">
+    <Card className="fixed bottom-16 right-2 left-2 z-50 h-[60vh] md:bottom-6 md:right-6 md:left-auto md:w-[380px] md:h-[500px] flex flex-col shadow-xl border-0 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between p-4 bg-primary text-primary-foreground">
         <div className="flex items-center gap-2">
