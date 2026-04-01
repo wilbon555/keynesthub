@@ -1,6 +1,7 @@
-import { Home, Search, Building2, User } from "lucide-react";
+import { Home, Search, Building2, User, Moon, Sun } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "next-themes";
 
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
@@ -13,6 +14,7 @@ export const MobileBottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   const handleNav = (path: string) => {
     if (path === "/dashboard" && !user) {
@@ -40,6 +42,14 @@ export const MobileBottomNav = () => {
             </button>
           );
         })}
+        <button
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="flex flex-col items-center justify-center gap-0.5 flex-1 min-h-[48px] transition-colors text-muted-foreground"
+          aria-label="Toggle theme"
+        >
+          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          <span className="text-[10px] font-medium">Theme</span>
+        </button>
       </div>
     </nav>
   );
