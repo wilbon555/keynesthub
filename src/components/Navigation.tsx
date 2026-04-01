@@ -251,7 +251,7 @@ export const Navigation = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden border-t border-border animate-fade-in">
-            <ScrollArea className="h-[calc(100vh-4rem)] py-4">
+            <ScrollArea className="h-[calc(100vh-4rem-3.5rem)] py-4 pb-16">
               <div className="flex flex-col space-y-2 px-4">
                 {/* Home link for mobile */}
                 <a href="/" className="flex items-center py-2 text-primary font-semibold hover:text-primary/80 transition-smooth">
