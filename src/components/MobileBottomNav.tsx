@@ -25,7 +25,7 @@ export const MobileBottomNav = () => {
   };
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-sm border-t border-border">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border">
       <div className="flex items-center justify-around h-14">
         {navItems.map(({ icon: Icon, label, path }) => {
           const isActive = location.pathname === path;
