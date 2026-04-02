@@ -26,6 +26,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<"select" | "details">("select");
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { addProperty } = useProperties();
   const { user } = useAuth();
   const { tier, limits, canUploadMore } = useSubscription();
@@ -39,7 +40,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       listingType: z.enum(['sale', 'rent'], { required_error: "Please select listing type" }),
       bedrooms: z.coerce.number().min(0, "Bedrooms must be 0 or more").optional(),
       bathrooms: z.coerce.number().min(0, "Bathrooms must be 0 or more").optional(),
-      area: z.string().min(1, "Area/Square footage is required"),
+      area: z.string().optional(),
       // Apartment-specific fields
       units: z.coerce.number().min(1, "Units must be at least 1").optional(),
       floors: z.coerce.number().min(1, "Floors must be at least 1").optional(),
@@ -160,6 +161,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       toast.error("Please log in to list a property");
       return;
     }
+    setIsSubmitting(true);
 
     console.log('Submitting property form with values:', { ...values, uploadedFiles: selectedFiles.length });
     console.log('Current user:', user?.id);
@@ -175,7 +177,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
           ? `${currency.symbol}${(values.price || 0).toLocaleString()}`
           : `${currency.symbol}${(values.priceMin || 0).toLocaleString()} - ${currency.symbol}${(values.priceMax || 0).toLocaleString()}`,
         location: `${values.location}, ${values.region}`,
-        area: values.area || "TBD",
+        area: values.area || (values.listingType === 'rent' ? 'N/A' : 'TBD'),
         bedrooms: values.bedrooms,
         bathrooms: values.bathrooms,
         type: values.propertyType,
@@ -186,12 +188,12 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
         description: values.description,
         status: 'available' as const,
         listing_type: values.listingType,
-        // Apartment-specific fields
-        units: values.units,
-        floors: values.floors,
-        building_age: values.buildingAge,
-        developer: values.developer,
-        maintenance_quality: values.maintenanceQuality,
+        // Apartment-specific fields (only for sale)
+        units: values.listingType === 'sale' ? values.units : undefined,
+        floors: values.listingType === 'sale' ? values.floors : undefined,
+        building_age: values.listingType === 'sale' ? values.buildingAge : undefined,
+        developer: values.listingType === 'sale' ? values.developer : undefined,
+        maintenance_quality: values.listingType === 'sale' ? values.maintenanceQuality : undefined,
         // Vacancy tracking for rentals
         total_units: values.listingType === 'rent' ? (values.totalUnits || 1) : undefined,
         vacant_units: values.listingType === 'rent' ? (values.vacantUnits ?? values.totalUnits ?? 1) : undefined,
@@ -218,6 +220,8 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
     } catch (error) {
       console.error('Unexpected error in onSubmit:', error);
       toast.error('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -549,9 +553,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                       </div>
                     )}
 
-                    {/* Bedrooms, Bathrooms, Area fields for applicable property types */}
+                    {/* Bedrooms, Bathrooms fields for applicable property types */}
                     {["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType")) && (
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className={`grid grid-cols-1 gap-4 ${form.watch("listingType") === "rent" ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
                         <FormField
                           control={form.control}
                           name="bedrooms"
@@ -565,7 +569,6 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                   onValueChange={(value) => {
                                     const num = parseInt(value);
                                     field.onChange(num);
-                                    // Auto-set bathrooms to match bedrooms (ensuite default)
                                     form.setValue("bathrooms", num);
                                   }} 
                                   value={field.value?.toString()}
@@ -593,7 +596,6 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                     {...field}
                                     onChange={(e) => {
                                       field.onChange(e);
-                                      // Auto-set bathrooms to match bedrooms (ensuite default)
                                       const num = parseInt(e.target.value) || 0;
                                       form.setValue("bathrooms", num);
                                     }}
@@ -632,27 +634,30 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           )}
                         />
 
-                        <FormField
-                          control={form.control}
-                          name="area"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Area (sq ft)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder="e.g., 2500 sq ft" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        {/* Area field only for sale listings */}
+                        {form.watch("listingType") !== "rent" && (
+                          <FormField
+                            control={form.control}
+                            name="area"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Area (sq ft)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="e.g., 2500 sq ft" 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
                       </div>
                     )}
 
-                    {/* Apartment-specific fields */}
-                    {form.watch("propertyType") === "Apartment" && (
+                    {/* Apartment-specific fields - only for sale listings */}
+                    {form.watch("propertyType") === "Apartment" && form.watch("listingType") !== "rent" && (
                       <>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <FormField
@@ -758,8 +763,8 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                       </>
                     )}
 
-                    {/* Area field for other property types */}
-                    {!["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType")) && (
+                    {/* Area field for other property types - only for sale listings */}
+                    {form.watch("listingType") !== "rent" && !["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType")) && (
                       <FormField
                         control={form.control}
                         name="area"
@@ -891,8 +896,10 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                     />
 
                     <div className="flex gap-2">
-                      <Button type="button" variant="outline" onClick={() => setStep("select")}>Back</Button>
-                      <Button type="submit" className="flex-1">Upload the Property</Button>
+                      <Button type="button" variant="outline" onClick={() => setStep("select")} disabled={isSubmitting}>Back</Button>
+                      <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                        {isSubmitting ? "Uploading..." : "Upload the Property"}
+                      </Button>
                     </div>
                   </form>
                 </Form>
