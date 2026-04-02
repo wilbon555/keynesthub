@@ -161,6 +161,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       toast.error("Please log in to list a property");
       return;
     }
+    setIsSubmitting(true);
 
     console.log('Submitting property form with values:', { ...values, uploadedFiles: selectedFiles.length });
     console.log('Current user:', user?.id);
