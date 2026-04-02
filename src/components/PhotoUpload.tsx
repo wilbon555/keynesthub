@@ -896,8 +896,10 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                     />
 
                     <div className="flex gap-2">
-                      <Button type="button" variant="outline" onClick={() => setStep("select")}>Back</Button>
-                      <Button type="submit" className="flex-1">Upload the Property</Button>
+                      <Button type="button" variant="outline" onClick={() => setStep("select")} disabled={isSubmitting}>Back</Button>
+                      <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                        {isSubmitting ? "Uploading..." : "Upload the Property"}
+                      </Button>
                     </div>
                   </form>
                 </Form>
