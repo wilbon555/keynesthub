@@ -67,6 +67,7 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
   const [phone, setPhone] = useState("");
   const [postalAddress, setPostalAddress] = useState("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [showVerification, setShowVerification] = useState(false);
   const { toast } = useToast();
 
   const markTouched = useCallback((field: string) => {
