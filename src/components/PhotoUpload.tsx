@@ -220,6 +220,8 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
     } catch (error) {
       console.error('Unexpected error in onSubmit:', error);
       toast.error('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
