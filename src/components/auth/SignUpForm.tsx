@@ -124,6 +124,24 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
     setIsLoading(false);
   };
 
+  if (showVerification) {
+    return (
+      <div className="text-center py-8 space-y-4">
+        <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+          <MailCheck className="w-8 h-8 text-primary" />
+        </div>
+        <h3 className="text-xl font-semibold text-foreground">Verify Your Email</h3>
+        <p className="text-muted-foreground max-w-sm mx-auto">
+          We've sent a verification link to <span className="font-medium text-foreground">{email}</span>. 
+          Please check your inbox and click the link to activate your account.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Didn't receive the email? Check your spam folder or try signing up again.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* First Name / Last Name */}
