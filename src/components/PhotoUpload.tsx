@@ -562,7 +562,12 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                               </FormLabel>
                               {form.watch("listingType") === "rent" ? (
                                 <Select 
-                                  onValueChange={(value) => field.onChange(parseInt(value))} 
+                                  onValueChange={(value) => {
+                                    const num = parseInt(value);
+                                    field.onChange(num);
+                                    // Auto-set bathrooms to match bedrooms (ensuite default)
+                                    form.setValue("bathrooms", num);
+                                  }} 
                                   value={field.value?.toString()}
                                 >
                                   <FormControl>
@@ -585,7 +590,13 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                     type="number" 
                                     min={0} 
                                     placeholder="e.g., 3" 
-                                    {...field} 
+                                    {...field}
+                                    onChange={(e) => {
+                                      field.onChange(e);
+                                      // Auto-set bathrooms to match bedrooms (ensuite default)
+                                      const num = parseInt(e.target.value) || 0;
+                                      form.setValue("bathrooms", num);
+                                    }}
                                   />
                                 </FormControl>
                               )}
@@ -599,7 +610,12 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           name="bathrooms"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Bathrooms</FormLabel>
+                              <FormLabel>
+                                Bathrooms
+                                {form.watch("bedrooms") !== undefined && form.watch("bathrooms") === form.watch("bedrooms") && (
+                                  <span className="ml-1 text-xs text-primary font-normal">(All Ensuite)</span>
+                                )}
+                              </FormLabel>
                               <FormControl>
                                 <Input 
                                   type="number" 
@@ -608,6 +624,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                   {...field} 
                                 />
                               </FormControl>
+                              <p className="text-xs text-muted-foreground">
+                                Defaults to ensuite (matches bedrooms). Edit manually if different.
+                              </p>
                               <FormMessage />
                             </FormItem>
                           )}

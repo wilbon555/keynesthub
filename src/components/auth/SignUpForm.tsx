@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { MailCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -67,6 +68,7 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
   const [phone, setPhone] = useState("");
   const [postalAddress, setPostalAddress] = useState("");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [showVerification, setShowVerification] = useState(false);
   const { toast } = useToast();
 
   const markTouched = useCallback((field: string) => {
@@ -110,6 +112,7 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
       if (error) {
         toast({ variant: "destructive", title: "Sign Up Failed", description: error.message });
       } else {
+        setShowVerification(true);
         toast({ title: "Account Created!", description: "Please check your email to verify your account." });
       }
     } catch (error) {
@@ -120,6 +123,24 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
 
     setIsLoading(false);
   };
+
+  if (showVerification) {
+    return (
+      <div className="text-center py-8 space-y-4">
+        <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+          <MailCheck className="w-8 h-8 text-primary" />
+        </div>
+        <h3 className="text-xl font-semibold text-foreground">Verify Your Email</h3>
+        <p className="text-muted-foreground max-w-sm mx-auto">
+          We've sent a verification link to <span className="font-medium text-foreground">{email}</span>. 
+          Please check your inbox and click the link to activate your account.
+        </p>
+        <p className="text-sm text-muted-foreground">
+          Didn't receive the email? Check your spam folder or try signing up again.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
