@@ -258,17 +258,28 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
                 id="bedrooms"
                 type="number"
                 value={formData.bedrooms}
-                onChange={(e) => setFormData({ ...formData, bedrooms: e.target.value })}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setFormData({ ...formData, bedrooms: val, bathrooms: val });
+                }}
               />
             </div>
             <div>
-              <Label htmlFor="bathrooms">Bathrooms</Label>
+              <Label htmlFor="bathrooms">
+                Bathrooms
+                {formData.bedrooms && formData.bathrooms === formData.bedrooms && (
+                  <span className="ml-1 text-xs text-primary font-normal">(All Ensuite)</span>
+                )}
+              </Label>
               <Input
                 id="bathrooms"
                 type="number"
                 value={formData.bathrooms}
                 onChange={(e) => setFormData({ ...formData, bathrooms: e.target.value })}
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Defaults to ensuite. Edit manually if different.
+              </p>
             </div>
             <div>
               <Label htmlFor="area">Area *</Label>
