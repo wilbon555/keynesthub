@@ -759,8 +759,8 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                       </>
                     )}
 
-                    {/* Area field for other property types */}
-                    {!["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType")) && (
+                    {/* Area field for other property types - only for sale listings */}
+                    {form.watch("listingType") !== "rent" && !["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType")) && (
                       <FormField
                         control={form.control}
                         name="area"
