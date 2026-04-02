@@ -110,6 +110,7 @@ const SignUpForm = ({ onSignUp, isLoading, setIsLoading }: SignUpFormProps) => {
       if (error) {
         toast({ variant: "destructive", title: "Sign Up Failed", description: error.message });
       } else {
+        setShowVerification(true);
         toast({ title: "Account Created!", description: "Please check your email to verify your account." });
       }
     } catch (error) {
