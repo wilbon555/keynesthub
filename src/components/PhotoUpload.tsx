@@ -175,7 +175,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
           ? `${currency.symbol}${(values.price || 0).toLocaleString()}`
           : `${currency.symbol}${(values.priceMin || 0).toLocaleString()} - ${currency.symbol}${(values.priceMax || 0).toLocaleString()}`,
         location: `${values.location}, ${values.region}`,
-        area: values.area || "TBD",
+        area: values.area || (values.listingType === 'rent' ? 'N/A' : 'TBD'),
         bedrooms: values.bedrooms,
         bathrooms: values.bathrooms,
         type: values.propertyType,
@@ -186,12 +186,12 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
         description: values.description,
         status: 'available' as const,
         listing_type: values.listingType,
-        // Apartment-specific fields
-        units: values.units,
-        floors: values.floors,
-        building_age: values.buildingAge,
-        developer: values.developer,
-        maintenance_quality: values.maintenanceQuality,
+        // Apartment-specific fields (only for sale)
+        units: values.listingType === 'sale' ? values.units : undefined,
+        floors: values.listingType === 'sale' ? values.floors : undefined,
+        building_age: values.listingType === 'sale' ? values.buildingAge : undefined,
+        developer: values.listingType === 'sale' ? values.developer : undefined,
+        maintenance_quality: values.listingType === 'sale' ? values.maintenanceQuality : undefined,
         // Vacancy tracking for rentals
         total_units: values.listingType === 'rent' ? (values.totalUnits || 1) : undefined,
         vacant_units: values.listingType === 'rent' ? (values.vacantUnits ?? values.totalUnits ?? 1) : undefined,
