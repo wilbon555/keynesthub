@@ -549,9 +549,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                       </div>
                     )}
 
-                    {/* Bedrooms, Bathrooms, Area fields for applicable property types */}
+                    {/* Bedrooms, Bathrooms fields for applicable property types */}
                     {["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType")) && (
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div className={`grid grid-cols-1 gap-4 ${form.watch("listingType") === "rent" ? "sm:grid-cols-2" : "sm:grid-cols-3"}`}>
                         <FormField
                           control={form.control}
                           name="bedrooms"
@@ -565,7 +565,6 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                   onValueChange={(value) => {
                                     const num = parseInt(value);
                                     field.onChange(num);
-                                    // Auto-set bathrooms to match bedrooms (ensuite default)
                                     form.setValue("bathrooms", num);
                                   }} 
                                   value={field.value?.toString()}
@@ -593,7 +592,6 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                     {...field}
                                     onChange={(e) => {
                                       field.onChange(e);
-                                      // Auto-set bathrooms to match bedrooms (ensuite default)
                                       const num = parseInt(e.target.value) || 0;
                                       form.setValue("bathrooms", num);
                                     }}
@@ -632,22 +630,25 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           )}
                         />
 
-                        <FormField
-                          control={form.control}
-                          name="area"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Area (sq ft)</FormLabel>
-                              <FormControl>
-                                <Input 
-                                  placeholder="e.g., 2500 sq ft" 
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                        {/* Area field only for sale listings */}
+                        {form.watch("listingType") !== "rent" && (
+                          <FormField
+                            control={form.control}
+                            name="area"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Area (sq ft)</FormLabel>
+                                <FormControl>
+                                  <Input 
+                                    placeholder="e.g., 2500 sq ft" 
+                                    {...field} 
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
                       </div>
                     )}
 
