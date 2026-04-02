@@ -39,7 +39,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       listingType: z.enum(['sale', 'rent'], { required_error: "Please select listing type" }),
       bedrooms: z.coerce.number().min(0, "Bedrooms must be 0 or more").optional(),
       bathrooms: z.coerce.number().min(0, "Bathrooms must be 0 or more").optional(),
-      area: z.string().min(1, "Area/Square footage is required"),
+      area: z.string().optional(),
       // Apartment-specific fields
       units: z.coerce.number().min(1, "Units must be at least 1").optional(),
       floors: z.coerce.number().min(1, "Floors must be at least 1").optional(),
