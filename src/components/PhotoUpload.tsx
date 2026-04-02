@@ -652,8 +652,8 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                       </div>
                     )}
 
-                    {/* Apartment-specific fields */}
-                    {form.watch("propertyType") === "Apartment" && (
+                    {/* Apartment-specific fields - only for sale listings */}
+                    {form.watch("propertyType") === "Apartment" && form.watch("listingType") !== "rent" && (
                       <>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           <FormField
