@@ -111,6 +111,7 @@ const App = () => {
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <EmailConfirmationHandler />
         <PropertyChatBot />
         <IntentTriageModal />
         <MobileBottomNav />
