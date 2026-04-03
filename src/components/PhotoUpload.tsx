@@ -619,15 +619,30 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                 )}
                               </FormLabel>
                               <FormControl>
-                                <Input 
-                                  type="number" 
-                                  min={0} 
-                                  placeholder="All Ensuite" 
-                                  {...field} 
-                                />
+                                <Select
+                                  value={field.value !== undefined ? String(field.value) : ""}
+                                  onValueChange={(val) => {
+                                    if (val === "ensuite") {
+                                      const bedrooms = form.getValues("bedrooms");
+                                      field.onChange(bedrooms ?? 0);
+                                    } else {
+                                      field.onChange(Number(val));
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Select bathrooms" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="ensuite">All Ensuite</SelectItem>
+                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                                      <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               </FormControl>
                               <p className="text-xs text-muted-foreground">
-                                Defaults to ensuite (matches bedrooms). Edit manually if different.
+                                "All Ensuite" matches bedroom count. Or pick a number.
                               </p>
                               <FormMessage />
                             </FormItem>
