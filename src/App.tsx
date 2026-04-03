@@ -1,10 +1,12 @@
-import { useState, useCallback, lazy, Suspense } from "react";
+import { useState, useCallback, useEffect, lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 import { PropertyChatBot } from "@/components/chat/PropertyChatBot";
 import { IntentTriageModal } from "@/components/onboarding/IntentTriageModal";
@@ -69,6 +71,33 @@ const PageLoader = () => (
   </div>
 );
 
+const EmailConfirmationHandler = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        // Check if this is an email confirmation redirect (user lands on "/" or has confirmation hash)
+        const hash = window.location.hash;
+        const isConfirmation = hash.includes('type=signup') || hash.includes('type=email');
+        const isOnLanding = location.pathname === '/';
+
+        if (isConfirmation || (isOnLanding && hash.includes('access_token'))) {
+          toast.success("Welcome to KeyNestHub! 🎉", {
+            description: "Your email has been verified successfully.",
+          });
+          navigate('/dashboard', { replace: true });
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate, location.pathname]);
+
+  return null;
+};
+
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
   const handleSplashFinished = useCallback(() => setShowSplash(false), []);
@@ -82,6 +111,7 @@ const App = () => {
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <EmailConfirmationHandler />
         <PropertyChatBot />
         <IntentTriageModal />
         <MobileBottomNav />
