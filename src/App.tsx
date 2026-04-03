@@ -76,17 +76,39 @@ const EmailConfirmationHandler = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        // Check if this is an email confirmation redirect (user lands on "/" or has confirmation hash)
-        const hash = window.location.hash;
-        const isConfirmation = hash.includes('type=signup') || hash.includes('type=email');
-        const isOnLanding = location.pathname === '/';
-
-        if (isConfirmation || (isOnLanding && hash.includes('access_token'))) {
+    // Handle hash-based confirmation on initial load
+    const hash = window.location.hash;
+    if (hash && (hash.includes('type=signup') || hash.includes('type=email') || hash.includes('access_token'))) {
+      // Supabase will auto-detect the token from the URL hash.
+      // Wait briefly for session to be established, then redirect.
+      const checkSession = async () => {
+        // Give Supabase a moment to process the hash
+        await new Promise(resolve => setTimeout(resolve, 500));
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
           toast.success("Welcome to KeyNestHub! 🎉", {
             description: "Your email has been verified successfully.",
           });
+          // Clear the hash to prevent re-processing
+          window.history.replaceState(null, '', window.location.pathname);
+          navigate('/dashboard', { replace: true });
+        }
+      };
+      checkSession();
+    }
+
+    // Also listen for auth state changes (handles delayed token processing)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        const currentHash = window.location.hash;
+        const isConfirmation = currentHash.includes('type=signup') || currentHash.includes('type=email');
+        const isOnLanding = location.pathname === '/';
+
+        if (isConfirmation || (isOnLanding && currentHash.includes('access_token'))) {
+          toast.success("Welcome to KeyNestHub! 🎉", {
+            description: "Your email has been verified successfully.",
+          });
+          window.history.replaceState(null, '', window.location.pathname);
           navigate('/dashboard', { replace: true });
         }
       }
