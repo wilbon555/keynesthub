@@ -622,7 +622,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                 <Input 
                                   type="number" 
                                   min={0} 
-                                  placeholder="e.g., 2" 
+                                  placeholder="All Ensuite" 
                                   {...field} 
                                 />
                               </FormControl>
