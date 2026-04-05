@@ -32,6 +32,7 @@ const Discover = lazy(() => import("./pages/Discover"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const BookProperty = lazy(() => import("./pages/BookProperty"));
 const About = lazy(() => import("./pages/About"));
+const Profile = lazy(() => import("./pages/Profile"));
 
 // Buy
 const Residential = lazy(() => import("./pages/buy/Residential"));
@@ -147,6 +148,7 @@ const App = () => {
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/agent-dashboard" element={<ProtectedRoute><AgentDashboard /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/install" element={<Install />} />
             
             {/* Buy Routes */}
