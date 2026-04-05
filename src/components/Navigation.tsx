@@ -342,16 +342,10 @@ export const Navigation = () => {
 
                 <div className="flex flex-col space-y-2 pt-4">
                   {user && (
-                    <>
-                      <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate("/profile")}>
-                        <User className="w-4 h-4 mr-2" />
-                        My Profile
-                      </Button>
-                      <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate("/dashboard")}>
-                        <LayoutDashboard className="w-4 h-4 mr-2" />
-                        Dashboard
-                      </Button>
-                    </>
+                    <Button variant="ghost" size="sm" className="justify-start" onClick={() => navigate("/dashboard")}>
+                      <User className="w-4 h-4 mr-2" />
+                      My Dashboard
+                    </Button>
                   )}
                   {isAdmin && (
                     <Button variant="ghost" size="sm" className="justify-start text-primary" onClick={() => navigate("/admin")}>
