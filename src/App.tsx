@@ -32,6 +32,7 @@ const Discover = lazy(() => import("./pages/Discover"));
 const PropertyDetail = lazy(() => import("./pages/PropertyDetail"));
 const BookProperty = lazy(() => import("./pages/BookProperty"));
 const About = lazy(() => import("./pages/About"));
+const Profile = lazy(() => import("./pages/Profile"));
 
 // Buy
 const Residential = lazy(() => import("./pages/buy/Residential"));
