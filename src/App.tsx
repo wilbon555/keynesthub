@@ -13,6 +13,7 @@ import { IntentTriageModal } from "@/components/onboarding/IntentTriageModal";
 import { SplashScreen } from "@/components/SplashScreen";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Eager-load the landing page for fast first paint
