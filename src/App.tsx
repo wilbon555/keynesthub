@@ -147,8 +147,8 @@ const App = () => {
             <Route path="/discover" element={<Discover />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/agent-dashboard" element={<ProtectedRoute><AgentDashboard /></ProtectedRoute>} />
-            <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+            <Route path="/agent-dashboard" element={<RoleProtectedRoute requiredRoles={['agent', 'admin']}><AgentDashboard /></RoleProtectedRoute>} />
+            <Route path="/admin" element={<RoleProtectedRoute requiredRoles={['admin']}><AdminPanel /></RoleProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/install" element={<Install />} />
             
