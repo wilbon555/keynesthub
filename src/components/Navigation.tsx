@@ -208,16 +208,10 @@ export const Navigation = () => {
               AI Discover
             </Button>
             {user && (
-              <>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/profile")}>
-                  <User className="w-4 h-4 mr-2" />
-                  Profile
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
-                  <LayoutDashboard className="w-4 h-4 mr-2" />
-                  Dashboard
-                </Button>
-              </>
+              <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
+                <User className="w-4 h-4 mr-2" />
+                My Dashboard
+              </Button>
             )}
             {isAdmin && (
               <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="text-primary">
