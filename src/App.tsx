@@ -149,7 +149,7 @@ const App = () => {
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/agent-dashboard" element={<RoleProtectedRoute requiredRoles={['agent', 'admin']}><AgentDashboard /></RoleProtectedRoute>} />
             <Route path="/admin" element={<RoleProtectedRoute requiredRoles={['admin']}><AdminPanel /></RoleProtectedRoute>} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/install" element={<Install />} />
             
             {/* Buy Routes */}
