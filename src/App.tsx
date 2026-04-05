@@ -103,7 +103,7 @@ const EmailConfirmationHandler = () => {
         } else if (attempts >= maxAttempts) {
           clearInterval(poll);
         }
-      }, 300);
+      }, 3000);
 
       return () => clearInterval(poll);
     }
