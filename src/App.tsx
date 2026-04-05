@@ -78,30 +78,39 @@ const EmailConfirmationHandler = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Handle hash-based confirmation on initial load
     const hash = window.location.hash;
-    if (hash && (hash.includes('type=signup') || hash.includes('type=email') || hash.includes('access_token'))) {
-      // Supabase will auto-detect the token from the URL hash.
-      // Wait briefly for session to be established, then redirect.
-      const checkSession = async () => {
-        // Give Supabase a moment to process the hash
-        await new Promise(resolve => setTimeout(resolve, 500));
+    const isConfirmationHash = hash && (
+      hash.includes('type=signup') || 
+      hash.includes('type=email') || 
+      hash.includes('type=recovery') ||
+      hash.includes('access_token')
+    );
+
+    if (isConfirmationHash) {
+      // Poll for session since Supabase processes the hash asynchronously
+      let attempts = 0;
+      const maxAttempts = 20;
+      const poll = setInterval(async () => {
+        attempts++;
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
+          clearInterval(poll);
           toast.success("Welcome to KeyNestHub! 🎉", {
             description: "Your email has been verified successfully.",
           });
-          // Clear the hash to prevent re-processing
           window.history.replaceState(null, '', window.location.pathname);
           navigate('/dashboard', { replace: true });
+        } else if (attempts >= maxAttempts) {
+          clearInterval(poll);
         }
-      };
-      checkSession();
+      }, 300);
+
+      return () => clearInterval(poll);
     }
 
-    // Also listen for auth state changes (handles delayed token processing)
+    // Listen for auth state changes for confirmation events
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session) {
         const currentHash = window.location.hash;
         const isConfirmation = currentHash.includes('type=signup') || currentHash.includes('type=email');
         const isOnLanding = location.pathname === '/';
