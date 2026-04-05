@@ -89,7 +89,7 @@ const EmailConfirmationHandler = () => {
     if (isConfirmationHash) {
       // Poll for session since Supabase processes the hash asynchronously
       let attempts = 0;
-      const maxAttempts = 20;
+      const maxAttempts = 200;
       const poll = setInterval(async () => {
         attempts++;
         const { data: { session } } = await supabase.auth.getSession();
