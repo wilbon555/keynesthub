@@ -30,7 +30,7 @@ export const AdminAgentApprovals = () => {
     );
   }
 
-  const ApplicationCard = ({ application, showActions = true }: { application: UserRoleWithApplication; showActions?: boolean }) => (
+  const ApplicationCard = ({ application, showActions = true, showManageActions = false }: { application: UserRoleWithApplication; showActions?: boolean; showManageActions?: boolean }) => (
     <Card className="mb-4">
       <CardContent className="p-4">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
@@ -121,6 +121,27 @@ export const AdminAgentApprovals = () => {
                 >
                   <XCircle className="h-4 w-4 mr-1" />
                   Reject
+                </Button>
+              </>
+            )}
+            {showManageActions && application.approved && (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-yellow-600 border-yellow-600 hover:bg-yellow-50"
+                  onClick={() => suspendRole(application.id)}
+                >
+                  <Ban className="h-4 w-4 mr-1" />
+                  Suspend
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => removeRole(application.id)}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Remove
                 </Button>
               </>
             )}
