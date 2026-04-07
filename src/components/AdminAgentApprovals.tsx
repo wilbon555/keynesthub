@@ -3,12 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAdminRoles, UserRoleWithApplication } from "@/hooks/useAdminRoles";
-import { CheckCircle, XCircle, Clock, Users, Loader2, Phone, Mail, MapPin, Briefcase, DollarSign, Eye } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Loader2, Phone, Mail, MapPin, Briefcase, DollarSign, Eye, Ban, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export const AdminAgentApprovals = () => {
-  const { pendingApplications, approvedRoles, loading, approveRole, rejectRole } = useAdminRoles();
+  const { pendingApplications, approvedRoles, loading, approveRole, rejectRole, suspendRole, removeRole } = useAdminRoles();
   const [selectedApplication, setSelectedApplication] = useState<UserRoleWithApplication | null>(null);
 
   const pendingAgentApplications = pendingApplications.filter(app => app.role === 'agent');
@@ -30,7 +30,7 @@ export const AdminAgentApprovals = () => {
     );
   }
 
-  const ApplicationCard = ({ application, showActions = true }: { application: UserRoleWithApplication; showActions?: boolean }) => (
+  const ApplicationCard = ({ application, showActions = true, showManageActions = false }: { application: UserRoleWithApplication; showActions?: boolean; showManageActions?: boolean }) => (
     <Card className="mb-4">
       <CardContent className="p-4">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
@@ -124,6 +124,27 @@ export const AdminAgentApprovals = () => {
                 </Button>
               </>
             )}
+            {showManageActions && application.approved && (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-yellow-600 border-yellow-600 hover:bg-yellow-50"
+                  onClick={() => suspendRole(application.id)}
+                >
+                  <Ban className="h-4 w-4 mr-1" />
+                  Suspend
+                </Button>
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => removeRole(application.id)}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Remove
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </CardContent>
@@ -189,7 +210,7 @@ export const AdminAgentApprovals = () => {
           ) : (
             <div>
               {approvedAgents.map((role) => (
-                <ApplicationCard key={role.id} application={role} showActions={false} />
+                <ApplicationCard key={role.id} application={role} showActions={false} showManageActions={true} />
               ))}
             </div>
           )}
@@ -300,6 +321,32 @@ export const AdminAgentApprovals = () => {
                   >
                     <XCircle className="h-4 w-4 mr-2" />
                     Reject
+                  </Button>
+                </div>
+              )}
+              {selectedApplication.approved && (
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    className="flex-1 text-yellow-600 border-yellow-600 hover:bg-yellow-50"
+                    onClick={() => {
+                      suspendRole(selectedApplication.id);
+                      setSelectedApplication(null);
+                    }}
+                  >
+                    <Ban className="h-4 w-4 mr-2" />
+                    Suspend Agent
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => {
+                      removeRole(selectedApplication.id);
+                      setSelectedApplication(null);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Remove Agent
                   </Button>
                 </div>
               )}

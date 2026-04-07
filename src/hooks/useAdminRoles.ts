@@ -133,7 +133,6 @@ export const useAdminRoles = () => {
 
   const rejectRole = async (roleId: string): Promise<boolean> => {
     try {
-      // Get the application details before rejecting
       const application = pendingApplications.find(app => app.id === roleId);
 
       const { error } = await supabase
@@ -143,7 +142,6 @@ export const useAdminRoles = () => {
 
       if (error) throw error;
 
-      // Send notification email
       if (application?.application) {
         sendNotificationEmail(
           application.application.email,
@@ -170,12 +168,70 @@ export const useAdminRoles = () => {
     }
   };
 
+  const suspendRole = async (roleId: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .update({ approved: false, approved_at: null, approved_by: null })
+        .eq('id', roleId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Agent Suspended",
+        description: "The agent has been suspended and moved to pending."
+      });
+
+      await fetchAllRoles();
+      return true;
+    } catch (error) {
+      console.error('Error suspending role:', error);
+      toast({
+        title: "Error",
+        description: "Failed to suspend the agent.",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
+  const removeRole = async (roleId: string): Promise<boolean> => {
+    try {
+      const application = approvedRoles.find(app => app.id === roleId);
+
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('id', roleId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Agent Removed",
+        description: "The agent role has been permanently removed."
+      });
+
+      await fetchAllRoles();
+      return true;
+    } catch (error) {
+      console.error('Error removing role:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove the agent.",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
   return {
     pendingApplications,
     approvedRoles,
     loading,
     approveRole,
     rejectRole,
+    suspendRole,
+    removeRole,
     refetch: fetchAllRoles
   };
 };
