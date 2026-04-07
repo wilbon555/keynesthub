@@ -210,7 +210,7 @@ export const AdminAgentApprovals = () => {
           ) : (
             <div>
               {approvedAgents.map((role) => (
-                <ApplicationCard key={role.id} application={role} showActions={false} />
+                <ApplicationCard key={role.id} application={role} showActions={false} showManageActions={true} />
               ))}
             </div>
           )}
@@ -321,6 +321,32 @@ export const AdminAgentApprovals = () => {
                   >
                     <XCircle className="h-4 w-4 mr-2" />
                     Reject
+                  </Button>
+                </div>
+              )}
+              {selectedApplication.approved && (
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    className="flex-1 text-yellow-600 border-yellow-600 hover:bg-yellow-50"
+                    onClick={() => {
+                      suspendRole(selectedApplication.id);
+                      setSelectedApplication(null);
+                    }}
+                  >
+                    <Ban className="h-4 w-4 mr-2" />
+                    Suspend Agent
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => {
+                      removeRole(selectedApplication.id);
+                      setSelectedApplication(null);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Remove Agent
                   </Button>
                 </div>
               )}
