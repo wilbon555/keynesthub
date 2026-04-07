@@ -60,7 +60,7 @@ const AdminPanel = () => {
         </div>
 
         <Tabs defaultValue="agents" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-lg grid-cols-3">
             <TabsTrigger value="agents" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Agent Applications
@@ -68,6 +68,10 @@ const AdminPanel = () => {
             <TabsTrigger value="properties" className="flex items-center gap-2">
               <Building className="h-4 w-4" />
               Property Verification
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Contact Messages
             </TabsTrigger>
           </TabsList>
 
@@ -77,6 +81,10 @@ const AdminPanel = () => {
 
           <TabsContent value="properties">
             <AgentListingsManager />
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <AdminContactMessages />
           </TabsContent>
         </Tabs>
       </main>
