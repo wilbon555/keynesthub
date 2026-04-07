@@ -3,12 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAdminRoles, UserRoleWithApplication } from "@/hooks/useAdminRoles";
-import { CheckCircle, XCircle, Clock, Users, Loader2, Phone, Mail, MapPin, Briefcase, DollarSign, Eye } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Loader2, Phone, Mail, MapPin, Briefcase, DollarSign, Eye, Ban, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 export const AdminAgentApprovals = () => {
-  const { pendingApplications, approvedRoles, loading, approveRole, rejectRole } = useAdminRoles();
+  const { pendingApplications, approvedRoles, loading, approveRole, rejectRole, suspendRole, removeRole } = useAdminRoles();
   const [selectedApplication, setSelectedApplication] = useState<UserRoleWithApplication | null>(null);
 
   const pendingAgentApplications = pendingApplications.filter(app => app.role === 'agent');
