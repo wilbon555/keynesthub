@@ -4,9 +4,10 @@ import { Navigation } from "@/components/Navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminAgentApprovals } from "@/components/AdminAgentApprovals";
 import { AgentListingsManager } from "@/components/AgentListingsManager";
+import { AdminContactMessages } from "@/components/AdminContactMessages";
 import { useUserRoles } from "@/hooks/useUserRoles";
 import { useAuth } from "@/hooks/useAuth";
-import { Shield, Users, Building, Loader2 } from "lucide-react";
+import { Shield, Users, Building, MessageSquare, Loader2 } from "lucide-react";
 
 const AdminPanel = () => {
   const navigate = useNavigate();
