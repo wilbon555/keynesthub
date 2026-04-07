@@ -3,13 +3,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAdminRoles, UserRoleWithApplication } from "@/hooks/useAdminRoles";
-import { CheckCircle, XCircle, Clock, Users, Loader2, Phone, Mail, MapPin, Briefcase, DollarSign, Eye, Ban, Trash2 } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Users, Loader2, Phone, Mail, MapPin, Briefcase, DollarSign, Eye, Ban, Trash2, AlertTriangle } from "lucide-react";
 import { format } from "date-fns";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export const AdminAgentApprovals = () => {
   const { pendingApplications, approvedRoles, loading, approveRole, rejectRole, suspendRole, removeRole } = useAdminRoles();
   const [selectedApplication, setSelectedApplication] = useState<UserRoleWithApplication | null>(null);
+  const [confirmAction, setConfirmAction] = useState<{ type: 'suspend' | 'remove'; role: UserRoleWithApplication } | null>(null);
 
   const pendingAgentApplications = pendingApplications.filter(app => app.role === 'agent');
   const approvedAgents = approvedRoles.filter(role => role.role === 'agent');
@@ -130,7 +132,7 @@ export const AdminAgentApprovals = () => {
                   size="sm"
                   variant="outline"
                   className="text-yellow-600 border-yellow-600 hover:bg-yellow-50"
-                  onClick={() => suspendRole(application.id)}
+                  onClick={() => setConfirmAction({ type: 'suspend', role: application })}
                 >
                   <Ban className="h-4 w-4 mr-1" />
                   Suspend
@@ -138,7 +140,7 @@ export const AdminAgentApprovals = () => {
                 <Button
                   size="sm"
                   variant="destructive"
-                  onClick={() => removeRole(application.id)}
+                  onClick={() => setConfirmAction({ type: 'remove', role: application })}
                 >
                   <Trash2 className="h-4 w-4 mr-1" />
                   Remove
@@ -330,8 +332,8 @@ export const AdminAgentApprovals = () => {
                     variant="outline"
                     className="flex-1 text-yellow-600 border-yellow-600 hover:bg-yellow-50"
                     onClick={() => {
-                      suspendRole(selectedApplication.id);
                       setSelectedApplication(null);
+                      setConfirmAction({ type: 'suspend', role: selectedApplication });
                     }}
                   >
                     <Ban className="h-4 w-4 mr-2" />
@@ -341,8 +343,8 @@ export const AdminAgentApprovals = () => {
                     variant="destructive"
                     className="flex-1"
                     onClick={() => {
-                      removeRole(selectedApplication.id);
                       setSelectedApplication(null);
+                      setConfirmAction({ type: 'remove', role: selectedApplication });
                     }}
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
@@ -354,6 +356,40 @@ export const AdminAgentApprovals = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Confirmation Dialog */}
+      <AlertDialog open={!!confirmAction} onOpenChange={() => setConfirmAction(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              {confirmAction?.type === 'suspend' ? 'Suspend Agent' : 'Remove Agent'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmAction?.type === 'suspend'
+                ? `Are you sure you want to suspend ${confirmAction.role.application?.full_name || 'this agent'}? They will lose agent privileges and be moved back to pending status.`
+                : `Are you sure you want to permanently remove ${confirmAction?.role.application?.full_name || 'this agent'}? This will delete their agent role entirely and cannot be undone.`
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className={confirmAction?.type === 'suspend' ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-destructive hover:bg-destructive/90'}
+              onClick={() => {
+                if (confirmAction?.type === 'suspend') {
+                  suspendRole(confirmAction.role.id);
+                } else if (confirmAction?.type === 'remove') {
+                  removeRole(confirmAction.role.id);
+                }
+                setConfirmAction(null);
+              }}
+            >
+              {confirmAction?.type === 'suspend' ? 'Suspend' : 'Remove'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
