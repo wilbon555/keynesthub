@@ -4,9 +4,10 @@ import { Navigation } from "@/components/Navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminAgentApprovals } from "@/components/AdminAgentApprovals";
 import { AgentListingsManager } from "@/components/AgentListingsManager";
+import { AdminContactMessages } from "@/components/AdminContactMessages";
 import { useUserRoles } from "@/hooks/useUserRoles";
 import { useAuth } from "@/hooks/useAuth";
-import { Shield, Users, Building, Loader2 } from "lucide-react";
+import { Shield, Users, Building, MessageSquare, Loader2 } from "lucide-react";
 
 const AdminPanel = () => {
   const navigate = useNavigate();
@@ -59,7 +60,7 @@ const AdminPanel = () => {
         </div>
 
         <Tabs defaultValue="agents" className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-lg grid-cols-3">
             <TabsTrigger value="agents" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
               Agent Applications
@@ -67,6 +68,10 @@ const AdminPanel = () => {
             <TabsTrigger value="properties" className="flex items-center gap-2">
               <Building className="h-4 w-4" />
               Property Verification
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Contact Messages
             </TabsTrigger>
           </TabsList>
 
@@ -76,6 +81,10 @@ const AdminPanel = () => {
 
           <TabsContent value="properties">
             <AgentListingsManager />
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <AdminContactMessages />
           </TabsContent>
         </Tabs>
       </main>
