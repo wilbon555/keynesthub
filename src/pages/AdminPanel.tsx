@@ -46,7 +46,7 @@ const AdminPanel = () => {
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-5 sm:px-6 lg:px-4 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Shield className="h-8 w-8 text-primary" />
@@ -60,18 +60,18 @@ const AdminPanel = () => {
         </div>
 
         <Tabs defaultValue="agents" className="space-y-6">
-          <TabsList className="grid w-full max-w-lg grid-cols-3">
-            <TabsTrigger value="agents" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Agent Applications
+          <TabsList className="flex w-full max-w-lg flex-nowrap overflow-x-auto scrollbar-hide">
+            <TabsTrigger value="agents" className="flex items-center gap-2 whitespace-nowrap flex-1 min-w-0">
+              <Users className="h-4 w-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">Agent Applications</span>
             </TabsTrigger>
-            <TabsTrigger value="properties" className="flex items-center gap-2">
-              <Building className="h-4 w-4" />
-              Property Verification
+            <TabsTrigger value="properties" className="flex items-center gap-2 whitespace-nowrap flex-1 min-w-0">
+              <Building className="h-4 w-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">Property Verification</span>
             </TabsTrigger>
-            <TabsTrigger value="messages" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              Contact Messages
+            <TabsTrigger value="messages" className="flex items-center gap-2 whitespace-nowrap flex-1 min-w-0">
+              <MessageSquare className="h-4 w-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">Contact Messages</span>
             </TabsTrigger>
           </TabsList>
 
