@@ -60,18 +60,21 @@ const AdminPanel = () => {
         </div>
 
         <Tabs defaultValue="agents" className="space-y-6">
-          <TabsList className="flex w-full max-w-lg flex-nowrap overflow-x-auto scrollbar-hide">
-            <TabsTrigger value="agents" className="flex items-center gap-2 whitespace-nowrap flex-1 min-w-0">
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="agents" className="flex items-center gap-1.5 px-2 py-2 text-xs sm:text-sm">
               <Users className="h-4 w-4 flex-shrink-0" />
-              <span className="whitespace-nowrap">Agent Applications</span>
+              <span className="hidden sm:inline">Agent Applications</span>
+              <span className="sm:hidden">Agents</span>
             </TabsTrigger>
-            <TabsTrigger value="properties" className="flex items-center gap-2 whitespace-nowrap flex-1 min-w-0">
+            <TabsTrigger value="properties" className="flex items-center gap-1.5 px-2 py-2 text-xs sm:text-sm">
               <Building className="h-4 w-4 flex-shrink-0" />
-              <span className="whitespace-nowrap">Property Verification</span>
+              <span className="hidden sm:inline">Property Verification</span>
+              <span className="sm:hidden">Properties</span>
             </TabsTrigger>
-            <TabsTrigger value="messages" className="flex items-center gap-2 whitespace-nowrap flex-1 min-w-0">
+            <TabsTrigger value="messages" className="flex items-center gap-1.5 px-2 py-2 text-xs sm:text-sm">
               <MessageSquare className="h-4 w-4 flex-shrink-0" />
-              <span className="whitespace-nowrap">Contact Messages</span>
+              <span className="hidden sm:inline">Contact Messages</span>
+              <span className="sm:hidden">Messages</span>
             </TabsTrigger>
           </TabsList>
 
