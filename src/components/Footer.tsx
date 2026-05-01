@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Loader2, Facebook, Youtube, Twitter } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import keyNestHubLogo from "@/assets/keynesthub-logo.png";
@@ -146,6 +146,40 @@ const Footer = () => {
               <div className="flex items-center gap-2 text-gray-400 text-sm">
                 <MapPin className="w-4 h-4" />
                 Nairobi, Kenya
+              </div>
+            </div>
+
+            {/* Social Links */}
+            <div className="pt-2">
+              <h4 className="text-sm font-semibold mb-2">Follow Us</h4>
+              <div className="flex items-center gap-3">
+                <a
+                  href="https://www.facebook.com/share/1FhoW6xjrv/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://x.com/keynesthub"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Twitter / X"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <Twitter className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://www.youtube.com/@KeyNestHub254"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <Youtube className="w-5 h-5" />
+                </a>
               </div>
             </div>
 
