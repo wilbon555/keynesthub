@@ -5,6 +5,8 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const signInSchema = z.object({
   email: z.string().trim().email("Invalid email address").max(255),
@@ -27,6 +29,8 @@ const SignInForm = ({ onSignIn, isLoading, setIsLoading }: SignInFormProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [unconfirmed, setUnconfirmed] = useState(false);
+  const [resending, setResending] = useState(false);
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -34,12 +38,21 @@ const SignInForm = ({ onSignIn, isLoading, setIsLoading }: SignInFormProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setUnconfirmed(false);
 
     try {
       const validated = signInSchema.parse({ email, password });
       const { error } = await onSignIn(validated.email, validated.password);
 
       if (error) {
+        const msg = (error.message || "").toLowerCase();
+        const isUnconfirmed =
+          msg.includes("not confirmed") ||
+          msg.includes("email not confirmed") ||
+          (error as any)?.code === "email_not_confirmed";
+        if (isUnconfirmed) {
+          setUnconfirmed(true);
+        }
         toast({ variant: "destructive", title: "Sign In Failed", description: error.message });
       } else {
         toast({ title: "Welcome back!", description: "You have successfully signed in." });
@@ -55,8 +68,51 @@ const SignInForm = ({ onSignIn, isLoading, setIsLoading }: SignInFormProps) => {
     setIsLoading(false);
   };
 
+  const handleResend = async () => {
+    if (!email) {
+      toast({ variant: "destructive", title: "Email required", description: "Enter your email above first." });
+      return;
+    }
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/` },
+    });
+    setResending(false);
+    if (error) {
+      toast({ variant: "destructive", title: "Couldn't resend", description: error.message });
+    } else {
+      toast({ title: "Confirmation sent", description: `We've resent a verification link to ${email}.` });
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {unconfirmed && (
+        <Alert variant="destructive">
+          <AlertTitle>Email not confirmed</AlertTitle>
+          <AlertDescription className="space-y-2">
+            <p>You need to verify your email before signing in.</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleResend}
+              disabled={resending}
+            >
+              {resending ? (
+                <>
+                  <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                "Resend confirmation email"
+              )}
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
       <div>
         <RequiredLabel>Email Address</RequiredLabel>
         <Input
