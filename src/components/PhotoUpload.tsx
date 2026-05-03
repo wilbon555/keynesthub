@@ -15,6 +15,36 @@ import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
+
+// Parse human-friendly price strings: "1B", "1.5 m", "100k", "2,500,000", "10 billion".
+// Returns a number or NaN if unparseable.
+const parsePriceInput = (raw: unknown): number => {
+  if (typeof raw === "number") return raw;
+  if (raw === null || raw === undefined) return NaN;
+  const s = String(raw).trim().toLowerCase().replace(/,/g, "").replace(/\s+/g, " ");
+  if (!s) return NaN;
+  // pure number
+  const pure = Number(s);
+  if (!Number.isNaN(pure)) return pure;
+  const match = s.match(/^([0-9]*\.?[0-9]+)\s*(k|thousand|m|mn|million|b|bn|billion)?$/i);
+  if (!match) return NaN;
+  const n = parseFloat(match[1]);
+  const unit = (match[2] || "").toLowerCase();
+  const mult =
+    unit.startsWith("b") ? 1_000_000_000 :
+    unit.startsWith("m") ? 1_000_000 :
+    (unit.startsWith("k") || unit === "thousand") ? 1_000 : 1;
+  return n * mult;
+};
+
+const MAX_SALE_PRICE = 10_000_000_000; // 10 Billion
+
+const priceField = z
+  .union([z.string(), z.number()])
+  .optional()
+  .transform((v) => (v === undefined || v === "" ? undefined : parsePriceInput(v)))
+  .refine((v) => v === undefined || (!Number.isNaN(v) && v >= 1), { message: "Enter a valid amount (e.g. 1.5M, 1B, 250000)" })
+  .refine((v) => v === undefined || v <= MAX_SALE_PRICE, { message: "Price cannot exceed 10,000,000,000 (10B)" });
 interface PhotoUploadProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -51,14 +81,14 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       totalUnits: z.coerce.number().min(1, "Total units must be at least 1").optional(),
       vacantUnits: z.coerce.number().min(0, "Vacant units cannot be negative").optional(),
       stayType: z.enum(['long-term', 'short-term']).optional(),
-      price: z.coerce.number().min(1, "Price must be at least 1").max(1000000000, "Price cannot exceed 1,000,000,000").optional(),
-      priceMin: z.coerce.number().min(1, "Min price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000").optional(),
-      priceMax: z.coerce.number().min(1, "Max price must be at least 1").max(1000000000, "Max price cannot exceed 1,000,000,000").optional(),
+      price: priceField,
+      priceMin: priceField,
+      priceMax: priceField,
       phone: z
         .string()
         .min(7, "Phone is required")
         .regex(/^[+0-9()\-\s]+$/, "Invalid phone number"),
-      description: z.string().min(10, "Please add a brief description"),
+      description: z.string().min(10, "Please add a brief description").max(20000, "Description is too long"),
     })
     .refine((data) => {
       if (data.listingType === 'rent') {
@@ -109,8 +139,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       totalUnits: undefined,
       vacantUnits: undefined,
       stayType: 'long-term' as const,
-      priceMin: 1,
-      priceMax: 1,
+      priceMin: undefined,
+      priceMax: undefined,
+      price: undefined,
       phone: "",
       description: "",
     },
@@ -658,10 +689,10 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                               <FormItem>
                                 <FormLabel>Area (sq ft)</FormLabel>
                                 <FormControl>
-                                  <Input 
-                                    placeholder="e.g., 2500 sq ft" 
-                                    {...field} 
-                                  />
+                                <Input
+                                  placeholder="e.g., 2500 sq ft, 0.25 acre, 5 points"
+                                  {...field}
+                                />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -787,9 +818,9 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                           <FormItem>
                             <FormLabel>Area/Size</FormLabel>
                             <FormControl>
-                              <Input 
-                                placeholder="e.g., 1 acre, 5000 sq ft" 
-                                {...field} 
+                              <Input
+                                placeholder="e.g., 0.5 acre, 1/2 acre, half an acre, 3 points, 5000 sq ft"
+                                {...field}
                               />
                             </FormControl>
                             <FormMessage />
@@ -813,13 +844,12 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                   : `Monthly Rent (${currency.symbol})`}
                               </FormLabel>
                               <FormControl>
-                                <Input 
-                                  type="number" 
-                                  min={1} 
-                                  max={1000000000}
-                                  step={1} 
-                                  placeholder={`Enter amount in ${currency.code}`} 
-                                  {...field} 
+                                <Input
+                                  type="text"
+                                  inputMode="decimal"
+                                  placeholder={`e.g. 25K, 1.2M (${currency.code})`}
+                                  {...field}
+                                  value={field.value ?? ""}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -839,15 +869,15 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                               <FormItem>
                                 <FormLabel>Price Min ({currency.symbol})</FormLabel>
                                 <FormControl>
-                                  <Input 
-                                    type="number" 
-                                    min={1} 
-                                    max={1000000000}
-                                    step={1} 
-                                    placeholder={`1 ${currency.code}`} 
-                                    {...field} 
+                                  <Input
+                                    type="text"
+                                    inputMode="decimal"
+                                    placeholder={`e.g. 500K, 1M, 1B`}
+                                    {...field}
+                                    value={field.value ?? ""}
                                   />
                                 </FormControl>
+                                <p className="text-xs text-muted-foreground">Up to 10B. Use K, M, B or full figures.</p>
                                 <FormMessage />
                               </FormItem>
                             );
@@ -863,15 +893,15 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                               <FormItem>
                                 <FormLabel>Price Max ({currency.symbol})</FormLabel>
                                 <FormControl>
-                                  <Input 
-                                    type="number" 
-                                    min={1} 
-                                    max={1000000000}
-                                    step={1} 
-                                    placeholder={`1000000 ${currency.code}`} 
-                                    {...field} 
+                                  <Input
+                                    type="text"
+                                    inputMode="decimal"
+                                    placeholder={`e.g. 10M, 2.5B`}
+                                    {...field}
+                                    value={field.value ?? ""}
                                   />
                                 </FormControl>
+                                <p className="text-xs text-muted-foreground">Up to 10B. Use K, M, B or full figures.</p>
                                 <FormMessage />
                               </FormItem>
                             );
@@ -903,7 +933,13 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                         <FormItem>
                           <FormLabel>Description</FormLabel>
                           <FormControl>
-                            <Textarea rows={4} placeholder="Describe the property, amenities, size, etc." {...field} />
+                            <Textarea
+                              rows={8}
+                              maxLength={20000}
+                              placeholder="Describe the property, amenities, size, etc. (up to 20,000 characters)"
+                              className="min-h-[180px] max-h-[60vh] resize-y whitespace-pre-wrap break-words"
+                              {...field}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
