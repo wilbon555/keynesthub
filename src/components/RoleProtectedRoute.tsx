@@ -3,6 +3,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRoles, AppRole } from "@/hooks/useUserRoles";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UnconfirmedEmailNotice } from "@/components/auth/UnconfirmedEmailNotice";
 
 interface RoleProtectedRouteProps {
   children: ReactNode;
@@ -28,6 +29,10 @@ export const RoleProtectedRoute = ({ children, requiredRoles }: RoleProtectedRou
   if (!user) {
     const redirect = encodeURIComponent(location.pathname + location.search);
     return <Navigate to={`/auth?redirect=${redirect}`} replace />;
+  }
+
+  if (!user.email_confirmed_at && !(user as any).confirmed_at) {
+    return <UnconfirmedEmailNotice />;
   }
 
   const hasRequiredRole = requiredRoles.some(role => roles.includes(role));

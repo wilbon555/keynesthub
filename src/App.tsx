@@ -15,6 +15,8 @@ import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
+import { UnconfirmedEmailNotice } from "@/components/auth/UnconfirmedEmailNotice";
+import { useAuth } from "@/hooks/useAuth";
 
 // Eager-load the landing page for fast first paint
 import Index from "./pages/Index";
@@ -131,6 +133,15 @@ const EmailConfirmationHandler = () => {
   return null;
 };
 
+const GlobalUnconfirmedBanner = () => {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  if (loading || !user) return null;
+  if (user.email_confirmed_at || (user as any).confirmed_at) return null;
+  if (location.pathname.startsWith("/auth")) return null;
+  return <UnconfirmedEmailNotice variant="banner" />;
+};
+
 const App = () => {
   const [showSplash, setShowSplash] = useState(true);
   const handleSplashFinished = useCallback(() => setShowSplash(false), []);
@@ -145,6 +156,7 @@ const App = () => {
       <Sonner />
       <BrowserRouter>
         <EmailConfirmationHandler />
+        <GlobalUnconfirmedBanner />
         <PropertyChatBot />
         <IntentTriageModal />
         <MobileBottomNav />
