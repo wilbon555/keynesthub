@@ -657,6 +657,10 @@ export type Database = {
         Args: { p_tier: Database["public"]["Enums"]["subscription_tier"] }
         Returns: number
       }
+      get_property_contact_phone: {
+        Args: { _property_id: string }
+        Returns: string
+      }
       get_property_view_stats: {
         Args: { owner_user_id: string }
         Returns: {
