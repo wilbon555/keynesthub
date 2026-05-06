@@ -14,6 +14,8 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { usePropertyViews } from "@/hooks/usePropertyViews";
 import { useProfile } from "@/hooks/useProfile";
 import { useUserRoles } from "@/hooks/useUserRoles";
+import { useSubscription } from "@/hooks/useSubscription";
+import { SubscriptionPanel } from "@/components/SubscriptionPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,7 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Home, MessageSquare, Plus, Building, Heart, Clock, Eye, Sparkles,
-  Camera, Save, Loader2, User, Mail, Phone, FileText, Shield
+  Camera, Save, Loader2, User, Mail, Phone, FileText, Shield, Crown
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useInquiries } from "@/hooks/useInquiries";
@@ -40,6 +42,8 @@ const Dashboard = () => {
   const { totalStats, getPropertyStats } = usePropertyViews();
   const { profile, loading: profileLoading, updateProfile, uploadAvatar } = useProfile();
   const { roles } = useUserRoles();
+  const { tier } = useSubscription();
+  const isPro = tier !== "basic";
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -156,6 +160,13 @@ const Dashboard = () => {
                             {role}
                           </Badge>
                         ))}
+                        {isPro ? (
+                          <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white border-0">
+                            <Crown className="w-3 h-3 mr-1" /> PRO
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline">FREE</Badge>
+                        )}
                       </div>
                     )}
                   </div>
@@ -198,7 +209,7 @@ const Dashboard = () => {
 
           {/* Tabs */}
           <Tabs defaultValue="inquiries" className="space-y-6">
-            <TabsList className="grid w-full max-w-3xl grid-cols-5">
+            <TabsList className="grid w-full max-w-3xl grid-cols-6">
               <TabsTrigger value="inquiries" className="flex items-center gap-2">
                 <MessageSquare className="h-4 w-4" />
                 <span className="hidden sm:inline">Inquiries</span>
@@ -228,6 +239,10 @@ const Dashboard = () => {
               <TabsTrigger value="profile" className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 <span className="hidden sm:inline">Profile</span>
+              </TabsTrigger>
+              <TabsTrigger value="plan" className="flex items-center gap-2">
+                <Crown className="h-4 w-4" />
+                <span className="hidden sm:inline">Plan</span>
               </TabsTrigger>
             </TabsList>
 
