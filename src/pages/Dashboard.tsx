@@ -435,6 +435,10 @@ const Dashboard = () => {
                 </Card>
               </div>
             </TabsContent>
+
+            <TabsContent value="plan">
+              <SubscriptionPanel />
+            </TabsContent>
           </Tabs>
         </main>
 
