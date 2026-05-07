@@ -2,7 +2,18 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, Phone, MapPin, Send, Loader2, Facebook, Youtube, Twitter } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Loader2, Facebook, Youtube } from "lucide-react";
+
+const XLogo = ({ className }: { className?: string }) => (
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    fill="currentColor"
+    className={className}
+  >
+    <path d="M18.244 2H21l-6.49 7.41L22 22h-6.797l-4.77-6.243L4.8 22H2.04l6.94-7.93L2 2h6.91l4.32 5.71L18.244 2Zm-2.385 18h1.86L7.23 4H5.27l10.59 16Z" />
+  </svg>
+);
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import keyNestHubLogo from "@/assets/keynesthub-logo.png";
@@ -166,10 +177,10 @@ const Footer = () => {
                   href="https://x.com/keynesthub"
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label="Twitter / X"
+                  aria-label="X"
                   className="text-gray-400 hover:text-white transition-colors"
                 >
-                  <Twitter className="w-5 h-5" />
+                  <XLogo className="w-5 h-5" />
                 </a>
                 <a
                   href="https://www.youtube.com/@KeyNestHub254"

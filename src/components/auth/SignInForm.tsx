@@ -5,6 +5,7 @@ import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -157,6 +158,15 @@ const SignInForm = ({ onSignIn, isLoading, setIsLoading }: SignInFormProps) => {
           "Sign In"
         )}
       </Button>
+
+      <div className="text-center">
+        <Link
+          to="/forgot-password"
+          className="text-sm text-primary hover:underline font-medium"
+        >
+          Forgot password?
+        </Link>
+      </div>
     </form>
   );
 };
