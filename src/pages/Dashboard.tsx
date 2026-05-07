@@ -412,8 +412,12 @@ const Dashboard = () => {
 
                 {/* Account Info */}
                 <Card className="border-border">
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="text-lg">Account Information</CardTitle>
+                    <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
+                      <Settings className="w-4 h-4 mr-1" />
+                      Settings
+                    </Button>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     <div className="flex justify-between">
