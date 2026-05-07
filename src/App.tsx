@@ -24,6 +24,8 @@ import Index from "./pages/Index";
 // Lazy-load everything else
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Auth = lazy(() => import("./pages/Auth"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const AgentDashboard = lazy(() => import("./pages/AgentDashboard"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
@@ -167,6 +169,8 @@ const App = () => {
             <Route path="/book/:id" element={<ProtectedRoute><BookProperty /></ProtectedRoute>} />
             <Route path="/discover" element={<Discover />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/agent-dashboard" element={<RoleProtectedRoute requiredRoles={['agent', 'admin']}><AgentDashboard /></RoleProtectedRoute>} />
             <Route path="/admin" element={<RoleProtectedRoute requiredRoles={['admin']}><AdminPanel /></RoleProtectedRoute>} />
