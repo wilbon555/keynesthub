@@ -449,6 +449,7 @@ const Dashboard = () => {
         </main>
 
         <Footer />
+        <AccountSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} currentEmail={user?.email ?? ""} />
       </div>
     </PageTransition>
   );
