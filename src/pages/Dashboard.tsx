@@ -27,11 +27,12 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Home, MessageSquare, Plus, Building, Heart, Clock, Eye, Sparkles,
-  Camera, Save, Loader2, User, Mail, Phone, FileText, Shield, Crown
+  Camera, Save, Loader2, User, Mail, Phone, FileText, Shield, Crown, Settings, KeyRound
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useInquiries } from "@/hooks/useInquiries";
 import { PageTransition } from "@/components/PageTransition";
+import { AccountSettingsDialog } from "@/components/AccountSettingsDialog";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -48,6 +49,7 @@ const Dashboard = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({ full_name: "", phone: "", bio: "" });
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
@@ -411,8 +413,12 @@ const Dashboard = () => {
 
                 {/* Account Info */}
                 <Card className="border-border">
-                  <CardHeader>
+                  <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle className="text-lg">Account Information</CardTitle>
+                    <Button variant="outline" size="sm" onClick={() => setSettingsOpen(true)}>
+                      <Settings className="w-4 h-4 mr-1" />
+                      Settings
+                    </Button>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     <div className="flex justify-between">
@@ -443,6 +449,7 @@ const Dashboard = () => {
         </main>
 
         <Footer />
+        <AccountSettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} currentEmail={user?.email ?? ""} />
       </div>
     </PageTransition>
   );
