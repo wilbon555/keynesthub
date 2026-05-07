@@ -83,10 +83,13 @@ const EmailConfirmationHandler = () => {
 
   useEffect(() => {
     const hash = window.location.hash;
+    // Skip handling on the password reset page — it manages its own recovery flow
+    if (location.pathname.startsWith('/reset-password')) return;
+    // Don't intercept password recovery links
+    if (hash && hash.includes('type=recovery')) return;
     const isConfirmationHash = hash && (
       hash.includes('type=signup') || 
       hash.includes('type=email') || 
-      hash.includes('type=recovery') ||
       hash.includes('access_token')
     );
 
