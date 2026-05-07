@@ -45,13 +45,16 @@ export const PropertyChatBot = () => {
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       },
       body: JSON.stringify({ messages: userMessages }),
     });
 
     if (!resp.ok) {
-      const errorData = await resp.json().catch(() => ({}));
-      throw new Error(errorData.error || 'Failed to get response');
+      const errorData = await resp.json().catch(() => ({} as { error?: string }));
+      if (resp.status === 429) throw new Error('Too many requests. Please wait a moment and try again.');
+      if (resp.status === 402) throw new Error('AI service temporarily unavailable. Please try again later.');
+      throw new Error(errorData.error || `Request failed (${resp.status})`);
     }
 
     if (!resp.body) throw new Error('No response body');
@@ -99,6 +102,10 @@ export const PropertyChatBot = () => {
         }
       }
     }
+
+    if (!assistantContent) {
+      throw new Error('No response received. Please try again.');
+    }
   }, []);
 
   const handleSend = async () => {
@@ -114,11 +121,12 @@ export const PropertyChatBot = () => {
       await streamChat(updatedMessages);
     } catch (error) {
       console.error('Chat error:', error);
+      const message = error instanceof Error ? error.message : 'I encountered an error. Please try again in a moment.';
       setMessages(prev => [
         ...prev,
         {
           role: 'assistant',
-          content: "I'm sorry, I encountered an error. Please try again in a moment."
+          content: `I'm sorry, ${message}`
         }
       ]);
     } finally {
