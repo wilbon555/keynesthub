@@ -27,11 +27,12 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Home, MessageSquare, Plus, Building, Heart, Clock, Eye, Sparkles,
-  Camera, Save, Loader2, User, Mail, Phone, FileText, Shield, Crown
+  Camera, Save, Loader2, User, Mail, Phone, FileText, Shield, Crown, Settings, KeyRound
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useInquiries } from "@/hooks/useInquiries";
 import { PageTransition } from "@/components/PageTransition";
+import { AccountSettingsDialog } from "@/components/AccountSettingsDialog";
 
 const Dashboard = () => {
   const { user } = useAuth();
