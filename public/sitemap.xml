@@ -1,32 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://keynesthub.com/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>
-  <url><loc>https://keynesthub.com/discover</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>https://keynesthub.com/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://keynesthub.com/auth</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
-  <url><loc>https://keynesthub.com/install</loc><changefreq>monthly</changefreq><priority>0.4</priority></url>
-
-  <url><loc>https://keynesthub.com/buy/residential</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>https://keynesthub.com/buy/commercial</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://keynesthub.com/buy/land</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://keynesthub.com/buy/new-developments</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-
-  <url><loc>https://keynesthub.com/rent/apartments</loc><changefreq>daily</changefreq><priority>0.9</priority></url>
-  <url><loc>https://keynesthub.com/rent/houses</loc><changefreq>daily</changefreq><priority>0.8</priority></url>
-  <url><loc>https://keynesthub.com/rent/office-spaces</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://keynesthub.com/rent/short-term</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-
-  <url><loc>https://keynesthub.com/sell/list-property</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://keynesthub.com/sell/pricing-plans</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://keynesthub.com/sell/agent-assistance</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-
-  <url><loc>https://keynesthub.com/agents/find-agent</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://keynesthub.com/agents/directory</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://keynesthub.com/become-agent</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-
-  <url><loc>https://keynesthub.com/market/property-trends</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://keynesthub.com/investment-tips</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://keynesthub.com/mortgage-calculator</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-
-  <url><loc>https://keynesthub.com/neighborhoods</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-</urlset>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap><loc>https://www.keynesthub.com/sitemap-pages.xml</loc></sitemap>
+  <sitemap><loc>https://www.keynesthub.com/sitemap-buy.xml</loc></sitemap>
+  <sitemap><loc>https://www.keynesthub.com/sitemap-rent.xml</loc></sitemap>
+  <sitemap><loc>https://www.keynesthub.com/sitemap-sell.xml</loc></sitemap>
+  <sitemap><loc>https://www.keynesthub.com/sitemap-agents.xml</loc></sitemap>
+  <sitemap><loc>https://www.keynesthub.com/sitemap-market.xml</loc></sitemap>
+  <sitemap><loc>https://www.keynesthub.com/sitemap-neighborhoods.xml</loc></sitemap>
+</sitemapindex>
