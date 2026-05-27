@@ -2,26 +2,38 @@
   command = "npm run build"
   publish = "dist"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# CRITICAL: Static files must NOT match the catch-all redirect
+# This ensures sitemap.xml, robots.txt, and other static assets are served correctly
 
-[context.production.environment]
-  NODE_ENV = "production"
-
-# Ensure sitemap XML files are served with correct MIME type
 [[headers]]
   for = "/sitemap*.xml"
   [headers.values]
     Content-Type = "application/xml; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
 
 [[headers]]
   for = "/robots.txt"
   [headers.values]
     Content-Type = "text/plain; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
 
-# Global security headers (defense-in-depth)
+[[headers]]
+  for = "/*.txt"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
+
+[[headers]]
+  for = "/favicon.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.json"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+# Global security headers
 [[headers]]
   for = "/*"
   [headers.values]
@@ -32,4 +44,22 @@
     Permissions-Policy = "geolocation=(self), camera=(), microphone=(), payment=(self)"
     X-XSS-Protection = "1; mode=block"
     Cross-Origin-Opener-Policy = "same-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://js.stripe.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nominatim.openstreetmap.org https://*.tile.openstreetmap.org https://api.stripe.com https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com https://js.stripe.com https://my.matterport.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://js.stripe.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https://www.youtube.com https://www.google.com"
+
+[context.production.environment]
+  NODE_ENV = "production"
+
+# SPA Routing: Redirect all non-matching routes to index.html for React Router
+# BUT: Exclude actual files that exist (static assets, API calls, etc.)
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Catch-all for SPA routing - MUST be last and only match route patterns
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  # Conditions ensure this doesn't catch static files
+  conditions = {Request = {header = "Accept", value = "text/html"}}
