@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
@@ -50,33 +50,53 @@ export interface Property {
 export const useProperties = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const { user } = useAuth();
+  const didFetchRef = useRef(false);
+  const PAGE_SIZE = 10;
 
-  // Fetch all available properties
-  const fetchProperties = async () => {
+  // Fetch a page of available properties (append or replace)
+  const fetchProperties = useCallback(async (opts?: { append?: boolean; offset?: number }) => {
+    const append = opts?.append ?? false;
+    const offset = opts?.offset ?? 0;
     try {
-      setLoading(true);
+      if (append) setLoadingMore(true);
+      else setLoading(true);
+      setFetchError(null);
+
       const { data, error } = await supabase
         .from('properties')
         .select('*')
         .eq('status', 'available')
         .eq('verification_status', 'verified')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(offset, offset + PAGE_SIZE - 1);
 
       if (error) throw error;
-      const propertiesWithImages = (data || []).map(property => ({
+      const mapped = (data || []).map((property: any) => ({
         ...property,
-        image: property.images?.[0] || property.image || "/placeholder.svg",
-        images: property.images || [property.image || "/placeholder.svg"]
-      }));
-      setProperties(propertiesWithImages as Property[]);
-    } catch (error) {
+        image: property.images?.[0] || property.image || '/placeholder.svg',
+        images: property.images || [property.image || '/placeholder.svg'],
+      })) as Property[];
+
+      setHasMore(mapped.length === PAGE_SIZE);
+      setProperties(prev => (append ? [...prev, ...mapped] : mapped));
+    } catch (error: any) {
       console.error('Error fetching properties:', error);
-      toast.error('Failed to load properties');
+      setFetchError('Unable to load properties right now. Please refresh.');
+      if (!append) setProperties([]);
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
-  };
+  }, []);
+
+  const loadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    return fetchProperties({ append: true, offset: properties.length });
+  }, [fetchProperties, hasMore, loadingMore, properties.length]);
 
   // Fetch user's properties
   const fetchUserProperties = async () => {
@@ -310,12 +330,18 @@ export const useProperties = () => {
   };
 
   useEffect(() => {
+    if (didFetchRef.current) return;
+    didFetchRef.current = true;
     fetchProperties();
-  }, []);
+  }, [fetchProperties]);
 
   return {
     properties,
     loading,
+    loadingMore,
+    hasMore,
+    fetchError,
+    loadMore,
     addProperty,
     updateProperty,
     updatePropertyStatus,
