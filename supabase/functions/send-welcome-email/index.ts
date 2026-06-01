@@ -126,7 +126,7 @@ const handler = async (req: Request): Promise<Response> => {
                   </ul>
                 </div>
                 
-                <p>If you have any questions or need assistance, feel free to reach out to our support team at <strong>support@keynesthub.com</strong></p>
+                <p>If you have any questions or need assistance, feel free to reach out to our support team at <strong>info@keynesthub.com</strong></p>
                 
                 <p>Happy house hunting!<br><strong>The KeyNestHub Team</strong></p>
               </div>
