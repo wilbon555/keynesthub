@@ -1,11 +1,12 @@
 import { PropertyCard } from "./PropertyCard";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { Skeleton } from "./ui/skeleton";
 import { useProperties, Property } from "@/hooks/useProperties";
 import PropertyMap from "./PropertyMap";
 import { AdvancedSearchFilters, SearchFilters, defaultFilters } from "./AdvancedSearchFilters";
 
-import { Grid, List, MapPin } from "lucide-react";
+import { Grid, List, MapPin, AlertCircle, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import property1 from "@/assets/property-1.jpg";
@@ -142,7 +143,7 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
     listingType: defaultListingType || 'all'
   });
   const [searchParams] = useSearchParams();
-  const { properties, loading } = useProperties();
+  const { properties, loading, loadingMore, hasMore, fetchError, loadMore } = useProperties();
 
   useEffect(() => {
     const typeParam = (searchParams.get("type") || defaultType || "all").toLowerCase();
@@ -300,18 +301,38 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
           </div>
         </div>
 
-        {/* Results count */}
-        <div className="mb-6">
-          <p className="text-muted-foreground">
-            Showing {filteredProperties.length} properties
-          </p>
-        </div>
-
         {/* Properties Grid/List */}
         <div className="mt-8">
           {loading ? (
-            <div className="text-center text-muted-foreground py-12">
-              <p>Loading properties...</p>
+            <div className={`grid gap-6 ${
+              viewMode === "grid"
+                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                : "grid-cols-1"
+            }`}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-lg border bg-card overflow-hidden">
+                  <Skeleton className="w-full aspect-[16/9]" />
+                  <div className="p-4 space-y-3">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <div className="flex gap-3 pt-2">
+                      <Skeleton className="h-4 w-12" />
+                      <Skeleton className="h-4 w-12" />
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                    <Skeleton className="h-6 w-1/3" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : fetchError && properties.length === 0 ? (
+            <div className="text-center py-12 border border-dashed rounded-lg bg-muted/30">
+              <AlertCircle className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+              <p className="text-foreground font-medium mb-1">{fetchError}</p>
+              <p className="text-sm text-muted-foreground mb-4">Check your connection and try again.</p>
+              <Button variant="outline" onClick={() => window.location.reload()}>
+                Refresh
+              </Button>
             </div>
           ) : filteredProperties.length === 0 ? (
             <div className="text-center text-muted-foreground py-12">
@@ -343,12 +364,27 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
                 ))}
               </div>
 
-              {/* Load More Button */}
-              <div className="text-center mt-12">
-                <Button variant="outline" size="lg" className="px-8">
-                  Load More Properties
-                </Button>
-              </div>
+              {/* Load More Button — only when more DB properties are available */}
+              {hasMore && (
+                <div className="text-center mt-12">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="px-8"
+                    onClick={() => loadMore()}
+                    disabled={loadingMore}
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Loading...
+                      </>
+                    ) : (
+                      'Load More Properties'
+                    )}
+                  </Button>
+                </div>
+              )}
             </>
           )}
         </div>
