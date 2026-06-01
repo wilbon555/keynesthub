@@ -142,7 +142,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         // Preserve asset file names exactly
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name.match(/\.(xml|txt|map)$/)) {
+          if (assetInfo.name?.match(/\.(xml|txt|map)$/)) {
             return "[name][extname]";
           }
           return "assets/[name]-[hash][extname]";
