@@ -118,7 +118,7 @@ const About = () => {
             {/* Contact Info Cards */}
             <div className="flex flex-col gap-4">
               <a
-                href="mailto:keynesthub@gmail.com"
+                href="mailto:info@keynesthub.com"
                 className="flex items-center gap-4 p-5 rounded-xl bg-card border border-border shadow-card hover:shadow-md transition-shadow"
               >
                 <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
@@ -126,7 +126,7 @@ const About = () => {
                 </div>
                 <div>
                   <span className="text-sm font-medium text-foreground block">Email Us</span>
-                  <span className="text-xs text-muted-foreground">keynesthub@gmail.com</span>
+                  <span className="text-xs text-muted-foreground">info@keynesthub.com</span>
                 </div>
               </a>
               <a

@@ -28,7 +28,7 @@ export const ContactDropdown = ({ variant = "ghost", size = "sm", className = ""
 
   const contactInfo = {
     phone: "+254701555240",
-    email: "wilbonkipkuruingeno2021@gmail.com",
+    email: "info@keynesthub.com",
     whatsapp: "+254701555240"
   };
 
