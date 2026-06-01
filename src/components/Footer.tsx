@@ -141,11 +141,11 @@ const Footer = () => {
             <h3 className="text-lg font-semibold">Contact Us</h3>
             <div className="space-y-3">
               <a 
-                href="mailto:keynesthub@gmail.com" 
+                href="mailto:info@keynesthub.com" 
                 className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors text-sm"
               >
                 <Mail className="w-4 h-4" />
-                keynesthub@gmail.com
+                info@keynesthub.com
               </a>
               <a 
                 href="tel:+254701555240" 
