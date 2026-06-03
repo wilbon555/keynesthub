@@ -24,7 +24,7 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
     listingType: defaultListingType || 'all'
   });
   const [searchParams] = useSearchParams();
-  const { properties, loading, loadingMore, hasMore, fetchError, loadMore } = useProperties();
+  const { properties, loading, loadingMore, hasMore, fetchError, loadMore, fetchProperties } = useProperties();
 
   useEffect(() => {
     const typeParam = (searchParams.get("type") || defaultType || "all").toLowerCase();
@@ -208,7 +208,7 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
               <AlertCircle className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
               <p className="text-foreground font-medium mb-1">{fetchError}</p>
               <p className="text-sm text-muted-foreground mb-4">Check your connection and try again.</p>
-              <Button variant="outline" onClick={() => window.location.reload()}>
+              <Button variant="outline" onClick={() => fetchProperties()}>
                 Refresh
               </Button>
             </div>
