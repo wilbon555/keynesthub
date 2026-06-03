@@ -1,5 +1,6 @@
 import { Navigation } from "@/components/Navigation";
 import { PhotoUpload } from "@/components/PhotoUpload";
+import { PageHead } from "@/components/seo/PageHead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, Eye, DollarSign, Clock } from "lucide-react";
 import { useState } from "react";
@@ -9,6 +10,11 @@ const ListProperty = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageHead
+        title="List Your Property on KeyNestHub — Reach Thousands of Buyers"
+        description="Create a verified property listing on KeyNestHub in minutes and reach thousands of qualified buyers and renters across Kenya."
+        canonical="https://www.keynesthub.com/sell/list-property"
+      />
       <Navigation />
       
       <main className="container mx-auto px-4 py-8">

@@ -23,7 +23,7 @@ export const PageHead = ({
   title,
   description = "Discover premium properties, land, and real estate opportunities in Kenya with KeyNestHub.",
   canonical,
-  ogImage = "/pwa-512x512.png",
+  ogImage = "https://www.keynesthub.com/pwa-512x512.png",
   ogType = "website",
   noIndex = false,
 }: PageHeadProps) => {

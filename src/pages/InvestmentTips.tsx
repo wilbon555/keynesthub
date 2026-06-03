@@ -2,10 +2,29 @@ import { Navigation } from "@/components/Navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, DollarSign, Home, MapPin, Calculator, Shield } from "lucide-react";
 import { MarketAIInsights } from "@/components/ai/MarketAIInsights";
+import { PageHead } from "@/components/seo/PageHead";
 
 const InvestmentTips = () => {
   return (
     <div className="min-h-screen bg-background">
+      <PageHead
+        title="Real Estate Investment Tips for the Kenyan Market"
+        description="Proven property investment strategies for Kenya — location analysis, financing, ROI calculations, and risk management for new and seasoned investors."
+        canonical="https://www.keynesthub.com/investment-tips"
+      />
+      <script type="application/ld+json">{JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: "Real Estate Investment Tips for the Kenyan Market",
+        description: "Proven property investment strategies for Kenya — location analysis, financing, ROI calculations, and risk management.",
+        author: { "@type": "Organization", name: "KeyNestHub" },
+        publisher: {
+          "@type": "Organization",
+          name: "KeyNestHub",
+          logo: { "@type": "ImageObject", url: "https://www.keynesthub.com/pwa-512x512.png" },
+        },
+        mainEntityOfPage: "https://www.keynesthub.com/investment-tips",
+      })}</script>
       <Navigation />
       
       <main className="container mx-auto px-4 py-8">

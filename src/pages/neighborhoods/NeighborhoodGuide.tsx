@@ -135,6 +135,22 @@ const NeighborhoodGuide = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {neighborhood && (
+        <script type="application/ld+json">{JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          headline: `${neighborhood.name} Neighborhood Guide`,
+          description: neighborhood.description,
+          about: { "@type": "Place", name: neighborhood.name, address: { "@type": "PostalAddress", addressRegion: neighborhood.region, addressCountry: "KE" } },
+          author: { "@type": "Organization", name: "KeyNestHub" },
+          publisher: {
+            "@type": "Organization",
+            name: "KeyNestHub",
+            logo: { "@type": "ImageObject", url: "https://www.keynesthub.com/pwa-512x512.png" },
+          },
+          mainEntityOfPage: `https://www.keynesthub.com/neighborhoods/${slug}`,
+        })}</script>
+      )}
       <Navigation />
       <main>
         {/* Hero */}

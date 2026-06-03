@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
+import { PageHead } from "@/components/seo/PageHead";
 
 import { Building2, Eye, Target, Users, Shield, Lightbulb, Mail, Phone, MapPin, MessageSquare, Send, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -41,6 +42,11 @@ const About = () => {
 
   return (
     <div className="min-h-screen bg-background pb-14 md:pb-0">
+      <PageHead
+        title="About KeyNestHub — Kenya's Premier Real Estate Platform"
+        description="Learn about KeyNestHub's mission to connect buyers, sellers, landlords, and agents across Kenya with verified listings and trusted service."
+        canonical="https://www.keynesthub.com/about"
+      />
       <Navigation />
 
       {/* Hero Section */}
@@ -68,7 +74,7 @@ const About = () => {
               <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                 <v.icon className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">{v.title}</h3>
+              <h2 className="text-lg font-semibold text-foreground mb-2">{v.title}</h2>
               <p className="text-muted-foreground text-sm leading-relaxed">{v.desc}</p>
             </div>
           ))}

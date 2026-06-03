@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Navigation } from '@/components/Navigation';
 import { SmartSearchInput } from '@/components/discover/SmartSearchInput';
 import { SearchResultsPanel } from '@/components/discover/SearchResultsPanel';
+import { PageHead } from '@/components/seo/PageHead';
 import { useSmartSearch } from '@/hooks/useSmartSearch';
 import { Loader2, Locate, Layers, X, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -328,6 +329,12 @@ export default function Discover() {
 
   return (
     <div className="h-screen flex flex-col bg-background">
+      <PageHead
+        title="Discover Properties in Kenya — Map & AI Search | KeyNestHub"
+        description="Explore verified properties for sale and rent across Kenya on an interactive map with AI-powered semantic search."
+        canonical="https://www.keynesthub.com/discover"
+      />
+      <h1 className="sr-only">Discover Properties in Kenya</h1>
       <Navigation />
       <DiscoverMap properties={properties} />
     </div>

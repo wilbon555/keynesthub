@@ -1,0 +1,34 @@
+# KeyNestHub
+
+> Kenya's premier real estate platform — buy, sell, and rent verified properties with AI-powered search and trusted agents.
+
+KeyNestHub connects buyers, sellers, landlords, tenants, and agents across Kenya. All listings are verified and all inquiries are mediated by approved agents for buyer protection.
+
+## Pages
+
+- [Home](/): Browse featured verified properties for sale and rent.
+- [Discover](/discover): Interactive map with AI-powered property search.
+- [Buy Residential](/buy/residential): Houses and apartments for sale.
+- [Buy Commercial](/buy/commercial): Commercial properties for sale.
+- [Buy Land](/buy/land): Plots and land for sale.
+- [Buy New Developments](/buy/new-developments): Newly built developments.
+- [Rent Apartments](/rent/apartments): Apartments for long-term rent.
+- [Rent Houses](/rent/houses): Houses for long-term rent.
+- [Rent Office Spaces](/rent/office-spaces): Office space rentals.
+- [Short-Term Rentals](/rent/short-term): Short-stay and holiday rentals.
+- [List Property](/sell/list-property): Create a property listing.
+- [Pricing Plans](/sell/pricing-plans): Subscription tiers for sellers.
+- [Agent Assistance](/sell/agent-assistance): Sell with a verified agent.
+- [Find an Agent](/agents/find): Browse the agent directory.
+- [Agents Directory](/agents/directory): Full list of verified agents.
+- [Become an Agent](/become-agent): Apply to join as a verified agent.
+- [Property Trends](/market/property-trends): Kenyan real estate market insights.
+- [Neighborhood Guides](/neighborhoods): Hyper-local area profiles.
+- [Investment Tips](/investment-tips): Real estate investment strategies.
+- [Mortgage Calculator](/mortgage-calculator): Calculate mortgage payments.
+- [About](/about): About KeyNestHub and contact form.
+- [Install App](/install): Install the KeyNestHub mobile app.
+
+## Optional
+
+- [Sign In / Sign Up](/auth): Account access (auth required).
