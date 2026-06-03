@@ -9,125 +9,6 @@ import { AdvancedSearchFilters, SearchFilters, defaultFilters } from "./Advanced
 import { Grid, List, MapPin, AlertCircle, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import property1 from "@/assets/property-1.jpg";
-import property2 from "@/assets/property-2.jpg";
-import property3 from "@/assets/property-3.jpg";
-import property4 from "@/assets/property-4.jpg";
-import property5 from "@/assets/property-5.jpg";
-import property6 from "@/assets/property-6.jpg";
-
-const sampleProperties: Property[] = [
-  {
-    id: "00000000-0000-0000-0000-000000000001",
-    title: "Modern Family Home with Garden",
-    price: "$450,000",
-    location: "Suburbia Heights, CA",
-    bedrooms: 4,
-    bathrooms: 3,
-    area: "2,400 sq ft",
-    type: "House",
-    image: property1,
-    images: [property1],
-    featured: true,
-    status: 'available',
-    listing_type: 'sale',
-    user_id: 'sample',
-    phone: '5551234567',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: "00000000-0000-0000-0000-000000000002",
-    title: "Luxury Downtown Apartment",
-    price: "$2,800/mo",
-    location: "Downtown Metro, NY",
-    bedrooms: 2,
-    bathrooms: 2,
-    area: "1,200 sq ft",
-    type: "Apartment",
-    image: property2,
-    images: [property2],
-    featured: false,
-    status: 'available',
-    listing_type: 'rent',
-    user_id: 'sample',
-    phone: '5552345678',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: "00000000-0000-0000-0000-000000000003",
-    title: "Beautiful Development Land",
-    price: "$180,000",
-    location: "Green Valley, TX",
-    area: "5.2 acres",
-    type: "Land",
-    image: property3,
-    images: [property3],
-    featured: false,
-    status: 'available',
-    listing_type: 'sale',
-    user_id: 'sample',
-    phone: '5553456789',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: "00000000-0000-0000-0000-000000000004",
-    title: "Elegant Two-Story Residence",
-    price: "$625,000",
-    location: "Maple Street, WA",
-    bedrooms: 5,
-    bathrooms: 4,
-    area: "3,100 sq ft",
-    type: "House",
-    image: property4,
-    images: [property4],
-    featured: true,
-    status: 'available',
-    listing_type: 'sale',
-    user_id: 'sample',
-    phone: '5554567890',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: "00000000-0000-0000-0000-000000000005",
-    title: "Commercial Office Building",
-    price: "$1,200,000",
-    location: "Business District, FL",
-    area: "8,500 sq ft",
-    type: "Commercial",
-    image: property5,
-    images: [property5],
-    featured: false,
-    status: 'available',
-    listing_type: 'sale',
-    user_id: 'sample',
-    phone: '5555678901',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  },
-  {
-    id: "00000000-0000-0000-0000-000000000006",
-    title: "Charming Suburban Home",
-    price: "$2,200/mo",
-    location: "Oak Lane, OR",
-    bedrooms: 3,
-    bathrooms: 2,
-    area: "1,800 sq ft",
-    type: "House",
-    image: property6,
-    images: [property6],
-    featured: true,
-    status: 'available',
-    listing_type: 'rent',
-    user_id: 'sample',
-    phone: '5556789012',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }
-];
 
 interface PropertyGridProps {
   defaultType?: string;
@@ -187,10 +68,7 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
     setSelectedType('all');
   };
 
-  // Combine database properties with sample properties, with database ones first
-  const allProperties = [...properties, ...sampleProperties];
-  
-  const filteredProperties = allProperties
+  const filteredProperties = properties
     .filter((property) => 
       defaultStatus ? property.status === defaultStatus : true
     )
