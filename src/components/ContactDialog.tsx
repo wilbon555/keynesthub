@@ -107,13 +107,17 @@ const ContactDialog = ({
       // Validate input data
       const validated = contactSchema.parse(formData);
 
+      // Capture signed-in user id so RLS can scope visibility to this user
+      const { data: { user } } = await supabase.auth.getUser();
+
       // Log the contact request - it will be routed to agents
       const { error } = await supabase.from('contact_requests').insert({
         property_id: propertyId,
         requester_name: validated.name,
         requester_email: validated.email,
         requester_phone: validated.phone || null,
-        message: validated.message || null
+        message: validated.message || null,
+        requester_user_id: user?.id ?? null
       });
 
       if (error) throw error;
