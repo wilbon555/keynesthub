@@ -18,7 +18,8 @@ async function searchProperties(query: string) {
   let queryBuilder = supabase
     .from('properties')
     .select('id, title, location, price, type, bedrooms, bathrooms, area, listing_type, image')
-    .eq('verification_status', 'approved')
+    .eq('verification_status', 'verified')
+    .eq('status', 'available')
     .limit(5);
   
   // Filter by listing type if mentioned
