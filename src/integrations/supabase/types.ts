@@ -125,6 +125,7 @@ export type Database = {
           requester_email: string
           requester_name: string
           requester_phone: string | null
+          requester_user_id: string | null
           status: string
         }
         Insert: {
@@ -138,6 +139,7 @@ export type Database = {
           requester_email: string
           requester_name: string
           requester_phone?: string | null
+          requester_user_id?: string | null
           status?: string
         }
         Update: {
@@ -151,6 +153,7 @@ export type Database = {
           requester_email?: string
           requester_name?: string
           requester_phone?: string | null
+          requester_user_id?: string | null
           status?: string
         }
         Relationships: [
