@@ -61,20 +61,41 @@ export const useProperties = () => {
   const fetchProperties = useCallback(async (opts?: { append?: boolean; offset?: number }) => {
     const append = opts?.append ?? false;
     const offset = opts?.offset ?? 0;
+    const MAX_ATTEMPTS = 3;
+    const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+
     try {
       if (append) setLoadingMore(true);
       else setLoading(true);
       setFetchError(null);
 
-      const { data, error } = await supabase
-        .from('properties')
-        .select('*')
-        .eq('status', 'available')
-        .eq('verification_status', 'verified')
-        .order('created_at', { ascending: false })
-        .range(offset, offset + PAGE_SIZE - 1);
+      let data: any[] | null = null;
+      let lastError: any = null;
 
-      if (error) throw error;
+      for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+        const { data: rows, error } = await supabase
+          .from('properties')
+          .select('*')
+          .eq('status', 'available')
+          .eq('verification_status', 'verified')
+          .order('created_at', { ascending: false })
+          .range(offset, offset + PAGE_SIZE - 1);
+
+        if (!error) {
+          data = rows;
+          lastError = null;
+          break;
+        }
+
+        lastError = error;
+        console.warn(`Properties fetch attempt ${attempt}/${MAX_ATTEMPTS} failed:`, error.message);
+        if (attempt < MAX_ATTEMPTS) {
+          // Exponential backoff: 500ms, 1000ms, 2000ms
+          await sleep(500 * Math.pow(2, attempt - 1));
+        }
+      }
+
+      if (lastError) throw lastError;
       const mapped = (data || []).map((property: any) => ({
         ...property,
         image: property.images?.[0] || property.image || '/placeholder.svg',
@@ -85,7 +106,7 @@ export const useProperties = () => {
       setProperties(prev => (append ? [...prev, ...mapped] : mapped));
     } catch (error: any) {
       console.error('Error fetching properties:', error);
-      setFetchError('Unable to load properties right now. Please refresh.');
+      setFetchError('We couldn’t load properties after several attempts. Please check your connection and try again.');
       if (!append) setProperties([]);
     } finally {
       setLoading(false);

@@ -4,6 +4,7 @@ import { PropertyGrid } from "@/components/PropertyGrid";
 import { Footer } from "@/components/Footer";
 import { PropertyJsonLd } from "@/components/seo/PropertyJsonLd";
 import { PageHead } from "@/components/seo/PageHead";
+import { ServiceStatusBanner } from "@/components/ServiceStatusBanner";
 
 import { useProperties } from "@/hooks/useProperties";
 
@@ -18,6 +19,7 @@ const Index = () => {
       />
       <Navigation />
       <PropertyJsonLd properties={properties} />
+      <ServiceStatusBanner />
       <HeroSection />
       <PropertyGrid defaultStatus="available" />
       <Footer />
