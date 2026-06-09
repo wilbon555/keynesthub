@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, Phone, MapPin, Send, Loader2, Facebook, Youtube } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Loader2, Facebook, Youtube, Instagram } from "lucide-react";
 
 const XLogo = ({ className }: { className?: string }) => (
   <svg
@@ -190,6 +190,15 @@ const Footer = () => {
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   <Youtube className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://www.instagram.com/keynesthub"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <Instagram className="w-5 h-5" />
                 </a>
               </div>
             </div>
