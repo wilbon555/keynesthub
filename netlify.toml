@@ -231,5 +231,3 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  # Conditions ensure this doesn't catch static files
-  conditions = {Request = {header = "Accept", value = "text/html"}}
