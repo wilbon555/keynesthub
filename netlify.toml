@@ -56,6 +56,176 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
+# 301 redirects for legacy / stale URLs (fixing GSC "Not found (404)" reports)
+# Keep these ABOVE the SPA catch-all so they take precedence.
+[[redirects]]
+  from = "/agents/find"
+  to = "/agents/find-agent"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/find-agent"
+  to = "/agents/find-agent"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/agents"
+  to = "/agents/directory"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/buy"
+  to = "/buy/residential"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/rent"
+  to = "/rent/apartments"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/sell"
+  to = "/sell/list-property"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/market"
+  to = "/market/property-trends"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/list-property"
+  to = "/sell/list-property"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/pricing"
+  to = "/sell/pricing-plans"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/pricing-plans"
+  to = "/sell/pricing-plans"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/agent-assistance"
+  to = "/sell/agent-assistance"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/short-term"
+  to = "/rent/short-term"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/short-term-rentals"
+  to = "/rent/short-term"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/apartments"
+  to = "/rent/apartments"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/houses"
+  to = "/rent/houses"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/office-spaces"
+  to = "/rent/office-spaces"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/residential"
+  to = "/buy/residential"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/commercial"
+  to = "/buy/commercial"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/land"
+  to = "/buy/land"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/new-developments"
+  to = "/buy/new-developments"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/property-trends"
+  to = "/market/property-trends"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/trends"
+  to = "/market/property-trends"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/become-an-agent"
+  to = "/become-agent"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/agents/find-an-agent"
+  to = "/agents/find-agent"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/contact"
+  to = "/about"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/home"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/index"
+  to = "/"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/index.html"
+  to = "/"
+  status = 301
+  force = true
+
 # Catch-all for SPA routing - MUST be last and only match route patterns
 [[redirects]]
   from = "/*"

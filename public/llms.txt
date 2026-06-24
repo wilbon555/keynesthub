@@ -19,7 +19,7 @@ KeyNestHub connects buyers, sellers, landlords, tenants, and agents across Kenya
 - [List Property](/sell/list-property): Create a property listing.
 - [Pricing Plans](/sell/pricing-plans): Subscription tiers for sellers.
 - [Agent Assistance](/sell/agent-assistance): Sell with a verified agent.
-- [Find an Agent](/agents/find): Browse the agent directory.
+- [Find an Agent](/agents/find-agent): Browse the agent directory.
 - [Agents Directory](/agents/directory): Full list of verified agents.
 - [Become an Agent](/become-agent): Apply to join as a verified agent.
 - [Property Trends](/market/property-trends): Kenyan real estate market insights.
