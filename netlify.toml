@@ -56,6 +56,26 @@
   to = "/.netlify/functions/:splat"
   status = 200
 
+# Defensive: serve sitemap/robots files directly with 200, before any other redirect.
+# This guarantees they are never rewritten to /index.html by the SPA catch-all below.
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap.xml"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/sitemap-:name.xml"
+  to = "/sitemap-:name.xml"
+  status = 200
+  force = false
+
+[[redirects]]
+  from = "/robots.txt"
+  to = "/robots.txt"
+  status = 200
+  force = false
+
 # 301 redirects for legacy / stale URLs (fixing GSC "Not found (404)" reports)
 # Keep these ABOVE the SPA catch-all so they take precedence.
 [[redirects]]
