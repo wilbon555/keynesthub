@@ -2,6 +2,11 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  # Ensure devDependencies (vite, @vitejs/plugin-react-swc, lovable-tagger, etc.)
+  # are installed during Netlify builds. Without this, NODE_ENV=production skips them.
+  NPM_FLAGS = "--include=dev"
+
 # CRITICAL: Static files must NOT match the catch-all redirect
 # This ensures sitemap.xml, robots.txt, and other static assets are served correctly
 
@@ -46,8 +51,6 @@
     Cross-Origin-Opener-Policy = "same-origin"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://js.stripe.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self' https:; frame-src 'self' https://www.youtube.com https://www.google.com"
 
-[context.production.environment]
-  NODE_ENV = "production"
 
 # SPA Routing: Redirect all non-matching routes to index.html for React Router
 # BUT: Exclude actual files that exist (static assets, API calls, etc.)
