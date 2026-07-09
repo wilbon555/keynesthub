@@ -610,10 +610,11 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    {form.watch("propertyType") === "Apartment" && (
-                                      <SelectItem value="0">Studio</SelectItem>
+                                    {form.watch("propertyType") === "Apartment" ? (
+                                      <SelectItem value="0">Studio / Bedsitter</SelectItem>
+                                    ) : (
+                                      <SelectItem value="0">Bedsitter</SelectItem>
                                     )}
-                                    <SelectItem value="0">Bedsitter</SelectItem>
                                     <SelectItem value="1">1 Bedroom</SelectItem>
                                     <SelectItem value="2">2 Bedroom</SelectItem>
                                     <SelectItem value="3">3 Bedroom</SelectItem>
