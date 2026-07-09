@@ -7,8 +7,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 export const SearchSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [priceRange, setPriceRange] = useState("");
+  const [propertyType, setPropertyType] = useState<string | undefined>(undefined);
+  const [priceRange, setPriceRange] = useState<string | undefined>(undefined);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
