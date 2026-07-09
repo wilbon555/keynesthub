@@ -33,12 +33,34 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
     // Sync URL params with filters
     const query = searchParams.get("q") || "";
     const priceParam = searchParams.get("price") || "";
-    
-    if (query || priceParam || typeParam !== "all") {
+    const bedsParam = searchParams.get("bedrooms") || "";
+
+    // Map bedrooms param to min/max bedroom filters
+    let minBedrooms = defaultFilters.minBedrooms;
+    let maxBedrooms = defaultFilters.maxBedrooms;
+    if (bedsParam) {
+      if (bedsParam === "studio" || bedsParam === "bedsitter") {
+        minBedrooms = 0;
+        maxBedrooms = 0;
+      } else if (bedsParam === "5") {
+        minBedrooms = 5;
+        maxBedrooms = 10;
+      } else {
+        const n = parseInt(bedsParam);
+        if (!Number.isNaN(n)) {
+          minBedrooms = n;
+          maxBedrooms = n;
+        }
+      }
+    }
+
+    if (query || priceParam || typeParam !== "all" || bedsParam) {
       setFilters(prev => ({
         ...prev,
         location: query,
         propertyType: typeParam,
+        minBedrooms,
+        maxBedrooms,
       }));
     }
   }, [searchParams, defaultType]);
