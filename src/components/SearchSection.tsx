@@ -9,6 +9,7 @@ export const SearchSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [propertyType, setPropertyType] = useState<string | undefined>(undefined);
   const [priceRange, setPriceRange] = useState<string | undefined>(undefined);
+  const [bedrooms, setBedrooms] = useState<string | undefined>(undefined);
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -17,9 +18,11 @@ export const SearchSection = () => {
     const q = searchParams.get('q') || '';
     const type = searchParams.get('type') || '';
     const price = searchParams.get('price') || '';
+    const beds = searchParams.get('bedrooms') || '';
     if (q) setSearchQuery(q);
     if (type) setPropertyType(type);
     if (price) setPriceRange(price);
+    if (beds) setBedrooms(beds);
   }, [searchParams]);
 
   const handleSearch = () => {
@@ -27,12 +30,19 @@ export const SearchSection = () => {
     if (searchQuery) params.set('q', searchQuery);
     if (propertyType) params.set('type', propertyType);
     if (priceRange) params.set('price', priceRange);
+    if (bedrooms) params.set('bedrooms', bedrooms);
     navigate(`/?${params.toString()}`);
   };
 
+  const showBedrooms = propertyType === 'house' || propertyType === 'apartment';
+  // Reset bedrooms if type changes to non-residential
+  useEffect(() => {
+    if (!showBedrooms && bedrooms) setBedrooms(undefined);
+  }, [showBedrooms]);
+
   return (
     <div className="bg-card/90 backdrop-blur-sm p-6 rounded-lg shadow-card border">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className={`grid grid-cols-1 gap-4 ${showBedrooms ? 'md:grid-cols-5' : 'md:grid-cols-4'}`}>
         <div className="relative">
           <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
@@ -44,7 +54,7 @@ export const SearchSection = () => {
           />
         </div>
         
-        <Select value={propertyType} onValueChange={setPropertyType}>
+        <Select value={propertyType} onValueChange={(v) => { setPropertyType(v); setBedrooms(undefined); }}>
           <SelectTrigger>
             <Home className="w-4 h-4 mr-2" />
             <SelectValue placeholder="Property Type" />
@@ -57,6 +67,25 @@ export const SearchSection = () => {
             <SelectItem value="condo">Condo</SelectItem>
           </SelectContent>
         </Select>
+
+        {showBedrooms && (
+          <Select value={bedrooms} onValueChange={setBedrooms}>
+            <SelectTrigger>
+              <SelectValue placeholder={propertyType === 'apartment' ? 'Room Type' : 'Bedrooms'} />
+            </SelectTrigger>
+            <SelectContent>
+              {propertyType === 'apartment' && (
+                <SelectItem value="studio">Studio</SelectItem>
+              )}
+              <SelectItem value="bedsitter">Bedsitter</SelectItem>
+              <SelectItem value="1">1 Bedroom</SelectItem>
+              <SelectItem value="2">2 Bedroom</SelectItem>
+              <SelectItem value="3">3 Bedroom</SelectItem>
+              <SelectItem value="4">4 Bedroom</SelectItem>
+              <SelectItem value="5">5+ Bedroom</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
         
         <Select value={priceRange} onValueChange={setPriceRange}>
           <SelectTrigger>

@@ -595,7 +595,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                               <FormLabel>
                                 {form.watch("listingType") === "rent" ? "Bedroom Type" : "Bedrooms"}
                               </FormLabel>
-                              {form.watch("listingType") === "rent" ? (
+                              {(form.watch("listingType") === "rent" || ["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType"))) ? (
                                 <Select 
                                   onValueChange={(value) => {
                                     const num = parseInt(value);
@@ -606,16 +606,23 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                 >
                                   <FormControl>
                                     <SelectTrigger>
-                                      <SelectValue placeholder="Select bedroom type" />
+                                      <SelectValue placeholder={form.watch("propertyType") === "Apartment" ? "Select room type" : "Select bedroom type"} />
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    <SelectItem value="0">Bedsitter</SelectItem>
+                                    {form.watch("propertyType") === "Apartment" ? (
+                                      <SelectItem value="0">Studio / Bedsitter</SelectItem>
+                                    ) : (
+                                      <SelectItem value="0">Bedsitter</SelectItem>
+                                    )}
                                     <SelectItem value="1">1 Bedroom</SelectItem>
                                     <SelectItem value="2">2 Bedroom</SelectItem>
                                     <SelectItem value="3">3 Bedroom</SelectItem>
                                     <SelectItem value="4">4 Bedroom</SelectItem>
                                     <SelectItem value="5">5+ Bedroom</SelectItem>
+                                    <SelectItem value="6">6 Bedroom</SelectItem>
+                                    <SelectItem value="7">7 Bedroom</SelectItem>
+                                    <SelectItem value="8">8+ Bedroom</SelectItem>
                                   </SelectContent>
                                 </Select>
                               ) : (
