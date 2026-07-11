@@ -77,7 +77,8 @@ export const SearchSection = () => {
               {propertyType === 'apartment' && (
                 <SelectItem value="studio">Studio</SelectItem>
               )}
-              <SelectItem value="bedsitter">Bedsitter</SelectItem>
+              <SelectItem value="single-room">Single Room (Not Self-contained)</SelectItem>
+              <SelectItem value="bedsitter">Bedsitter (Self-contained)</SelectItem>
               <SelectItem value="1">1 Bedroom</SelectItem>
               <SelectItem value="2">2 Bedroom</SelectItem>
               <SelectItem value="3">3 Bedroom</SelectItem>

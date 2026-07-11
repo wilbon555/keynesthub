@@ -39,7 +39,7 @@ export const PropertyGrid = ({ defaultType, defaultStatus, defaultListingType }:
     let minBedrooms = defaultFilters.minBedrooms;
     let maxBedrooms = defaultFilters.maxBedrooms;
     if (bedsParam) {
-      if (bedsParam === "studio" || bedsParam === "bedsitter") {
+      if (bedsParam === "studio" || bedsParam === "bedsitter" || bedsParam === "single-room") {
         minBedrooms = 0;
         maxBedrooms = 0;
       } else if (bedsParam === "5") {
