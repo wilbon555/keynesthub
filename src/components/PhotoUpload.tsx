@@ -602,7 +602,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                     // Bedsitter is self-contained (1 bathroom), single room shares facilities (0).
                                     let bedroomsNum = 0;
                                     let bathroomsNum = 0;
-                                    if (value === "single-room") {
+                                    if (value === "studio" || value === "single-room") {
                                       bedroomsNum = 0;
                                       bathroomsNum = 0;
                                     } else if (value === "bedsitter") {
