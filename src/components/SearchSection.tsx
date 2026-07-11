@@ -93,11 +93,14 @@ export const SearchSection = () => {
             <SelectValue placeholder="Price Range" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="0-100k">Under $100K</SelectItem>
-            <SelectItem value="100k-300k">$100K - $300K</SelectItem>
-            <SelectItem value="300k-500k">$300K - $500K</SelectItem>
-            <SelectItem value="500k-1m">$500K - $1M</SelectItem>
-            <SelectItem value="1m+">$1M+</SelectItem>
+            <SelectItem value="0-4k">Under Ksh 4K</SelectItem>
+            <SelectItem value="4k-20k">Ksh 4K - 20K</SelectItem>
+            <SelectItem value="20k-50k">Ksh 20K - 50K</SelectItem>
+            <SelectItem value="50k-100k">Ksh 50K - 100K</SelectItem>
+            <SelectItem value="100k-300k">Ksh 100K - 300K</SelectItem>
+            <SelectItem value="300k-500k">Ksh 300K - 500K</SelectItem>
+            <SelectItem value="500k-1m">Ksh 500K - 1M</SelectItem>
+            <SelectItem value="1m+">Ksh 1M+</SelectItem>
           </SelectContent>
         </Select>
         
