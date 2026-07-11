@@ -598,9 +598,22 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                               {(form.watch("listingType") === "rent" || ["House", "Apartment", "Condo", "Villa"].includes(form.watch("propertyType"))) ? (
                                 <Select 
                                   onValueChange={(value) => {
-                                    const num = parseInt(value);
-                                    field.onChange(num);
-                                    form.setValue("bathrooms", num);
+                                    // "single-room" and "bedsitter" both map to 0 bedrooms.
+                                    // Bedsitter is self-contained (1 bathroom), single room shares facilities (0).
+                                    let bedroomsNum = 0;
+                                    let bathroomsNum = 0;
+                                    if (value === "single-room") {
+                                      bedroomsNum = 0;
+                                      bathroomsNum = 0;
+                                    } else if (value === "bedsitter") {
+                                      bedroomsNum = 0;
+                                      bathroomsNum = 1;
+                                    } else {
+                                      bedroomsNum = parseInt(value);
+                                      bathroomsNum = bedroomsNum;
+                                    }
+                                    field.onChange(bedroomsNum);
+                                    form.setValue("bathrooms", bathroomsNum);
                                   }} 
                                   value={field.value?.toString()}
                                 >
@@ -611,10 +624,12 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
                                   </FormControl>
                                   <SelectContent>
                                     {form.watch("propertyType") === "Apartment" ? (
-                                      <SelectItem value="0">Studio / Bedsitter</SelectItem>
+                                      <SelectItem value="studio">Studio</SelectItem>
                                     ) : (
-                                      <SelectItem value="0">Bedsitter</SelectItem>
+                                      null
                                     )}
+                                    <SelectItem value="single-room">Single Room (Not Self-contained)</SelectItem>
+                                    <SelectItem value="bedsitter">Bedsitter (Self-contained)</SelectItem>
                                     <SelectItem value="1">1 Bedroom</SelectItem>
                                     <SelectItem value="2">2 Bedroom</SelectItem>
                                     <SelectItem value="3">3 Bedroom</SelectItem>
