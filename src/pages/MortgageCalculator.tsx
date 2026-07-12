@@ -5,8 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/Navigation";
-import { Calculator, DollarSign, TrendingUp, Home } from "lucide-react";
+import { Calculator, DollarSign, TrendingUp, Home, Wallet, RefreshCw, Scale } from "lucide-react";
 import { MarketAIInsights } from "@/components/ai/MarketAIInsights";
+import { AffordabilityCalculator } from "@/components/calculators/AffordabilityCalculator";
+import { RefinanceCalculator } from "@/components/calculators/RefinanceCalculator";
+import { RentVsBuyCalculator } from "@/components/calculators/RentVsBuyCalculator";
+import { DTICalculator } from "@/components/calculators/DTICalculator";
 
 interface CalculationResult {
   monthlyPayment: number;
@@ -79,10 +83,10 @@ const MortgageCalculator = () => {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-4">Mortgage Calculator</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-4">Financial Calculators</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-              Calculate mortgage payments and analyze investment potential for real estate properties. 
-              Perfect for investors, homebuyers, and real estate professionals.
+              Everything you need to plan your home purchase — from mortgage payments to affordability,
+              refinancing, rent vs buy, and debt-to-income analysis.
             </p>
             <MarketAIInsights 
               context="mortgage_calculator" 
@@ -91,7 +95,17 @@ const MortgageCalculator = () => {
             />
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <Tabs defaultValue="mortgage" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 mb-6 h-auto">
+              <TabsTrigger value="mortgage" className="gap-1.5"><Calculator className="w-4 h-4" /> Mortgage</TabsTrigger>
+              <TabsTrigger value="affordability" className="gap-1.5"><Wallet className="w-4 h-4" /> Affordability</TabsTrigger>
+              <TabsTrigger value="refinance" className="gap-1.5"><RefreshCw className="w-4 h-4" /> Refinance</TabsTrigger>
+              <TabsTrigger value="rentbuy" className="gap-1.5"><Home className="w-4 h-4" /> Rent vs Buy</TabsTrigger>
+              <TabsTrigger value="dti" className="gap-1.5"><Scale className="w-4 h-4" /> DTI</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="mortgage">
+              <div className="grid lg:grid-cols-2 gap-8">
             {/* Input Form */}
             <Card>
               <CardHeader>
@@ -321,7 +335,14 @@ const MortgageCalculator = () => {
                 </CardContent>
               </Card>
             )}
-          </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="affordability"><AffordabilityCalculator /></TabsContent>
+            <TabsContent value="refinance"><RefinanceCalculator /></TabsContent>
+            <TabsContent value="rentbuy"><RentVsBuyCalculator /></TabsContent>
+            <TabsContent value="dti"><DTICalculator /></TabsContent>
+          </Tabs>
 
           {/* How It Works Section */}
           <Card className="mt-8">
