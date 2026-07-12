@@ -11,6 +11,7 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import ShareButtons from "@/components/ShareButtons";
 import { VirtualTourViewer } from "@/components/VirtualTourViewer";
 import { QuickAIBadges } from "@/components/ai/QuickAIBadges";
+import { KeyNestEstimate } from "@/components/ai/KeyNestEstimate";
 import { PropertyLocationMap } from "@/components/PropertyLocationMap";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { PageHead } from "@/components/seo/PageHead";
@@ -461,6 +462,15 @@ const PropertyDetail = () => {
           {/* Right: Contact card (sticky on desktop) */}
           <div className="lg:col-span-1">
             <div className="sticky top-20 space-y-4">
+              <KeyNestEstimate
+                property={{
+                  id: property.id, title: property.title, price: property.price,
+                  location: property.location, type: property.type,
+                  bedrooms: property.bedrooms, bathrooms: property.bathrooms,
+                  area: property.area, listing_type: property.listing_type,
+                  description: property.description,
+                }}
+              />
               <div className="bg-card border border-border rounded-xl p-5 shadow-sm space-y-4">
                 <h3 className="font-semibold text-foreground text-lg">Interested in this property?</h3>
                 <p className="text-sm text-muted-foreground">
