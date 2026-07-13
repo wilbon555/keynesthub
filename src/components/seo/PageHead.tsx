@@ -28,7 +28,7 @@ export const PageHead = ({
   noIndex = false,
 }: PageHeadProps) => {
   const fullTitle = title.includes("KeyNestHub") ? title : `${title} | KeyNestHub`;
-  const url = canonical || window.location.href;
+  const url = canonical || `${window.location.origin}${window.location.pathname}`;
 
   useEffect(() => {
     document.title = fullTitle;
@@ -52,16 +52,12 @@ export const PageHead = ({
 
     // Canonical
     let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
-    if (canonical) {
-      if (!link) {
-        link = document.createElement("link");
-        link.setAttribute("rel", "canonical");
-        document.head.appendChild(link);
-      }
-      link.setAttribute("href", canonical);
-    } else if (link) {
-      link.remove();
+    if (!link) {
+      link = document.createElement("link");
+      link.setAttribute("rel", "canonical");
+      document.head.appendChild(link);
     }
+    link.setAttribute("href", url);
   }, [fullTitle, description, canonical, ogImage, ogType, noIndex, url]);
 
   return null;

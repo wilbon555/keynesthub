@@ -32,6 +32,7 @@ const copySeoFiles = () => ({
       "sitemap-agents.xml",
       "sitemap-market.xml",
       "sitemap-neighborhoods.xml",
+      "sitemap-properties.xml",
       "robots.txt",
       "CNAME",
       ".nojekyll", // Prevent GitHub Pages processing
