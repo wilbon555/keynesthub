@@ -11,15 +11,6 @@ Allow: /
 User-agent: DuckDuckBot
 Allow: /
 
-User-agent: Slurp
-Allow: /
-
-User-agent: YandexBot
-Allow: /
-
-User-agent: Baiduspider
-Allow: /
-
 # Social media crawlers
 User-agent: Twitterbot
 Allow: /
@@ -43,31 +34,7 @@ Allow: /
 User-agent: ClaudeBot
 Allow: /
 
-User-agent: Claude-Web
-Allow: /
-
-User-agent: anthropic-ai
-Allow: /
-
 User-agent: PerplexityBot
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: Applebot
-Allow: /
-
-User-agent: Applebot-Extended
-Allow: /
-
-User-agent: CCBot
-Allow: /
-
-User-agent: Meta-ExternalAgent
-Allow: /
-
-User-agent: Bytespider
 Allow: /
 
 # Default: allow all other bots
