@@ -4,8 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/generate-seo-files.mjs",
     "dev": "vite",
-    "build": "vite build",
+    "prebuild": "node scripts/generate-seo-files.mjs",
+    "build": "vite build && node scripts/create-spa-route-files.mjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview"
