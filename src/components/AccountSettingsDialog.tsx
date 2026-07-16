@@ -15,6 +15,7 @@ interface Props {
 }
 
 export const AccountSettingsDialog = ({ open, onOpenChange, currentEmail }: Props) => {
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [savingPwd, setSavingPwd] = useState(false);
@@ -23,6 +24,10 @@ export const AccountSettingsDialog = ({ open, onOpenChange, currentEmail }: Prop
   const [savingEmail, setSavingEmail] = useState(false);
 
   const handlePasswordChange = async () => {
+    if (!currentPassword) {
+      toast.error("Enter your current password");
+      return;
+    }
     if (newPassword.length < 8) {
       toast.error("Password must be at least 8 characters");
       return;
@@ -31,7 +36,21 @@ export const AccountSettingsDialog = ({ open, onOpenChange, currentEmail }: Prop
       toast.error("Passwords do not match");
       return;
     }
+    if (currentPassword === newPassword) {
+      toast.error("New password must be different from current password");
+      return;
+    }
     setSavingPwd(true);
+    // Re-authenticate to verify current password
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: currentEmail,
+      password: currentPassword,
+    });
+    if (signInError) {
+      setSavingPwd(false);
+      toast.error("Current password is incorrect");
+      return;
+    }
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     setSavingPwd(false);
     if (error) {
@@ -39,6 +58,7 @@ export const AccountSettingsDialog = ({ open, onOpenChange, currentEmail }: Prop
       return;
     }
     toast.success("Password updated successfully");
+    setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
     onOpenChange(false);
@@ -86,6 +106,17 @@ export const AccountSettingsDialog = ({ open, onOpenChange, currentEmail }: Prop
           </TabsList>
 
           <TabsContent value="password" className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="current-password">Current password</Label>
+              <Input
+                id="current-password"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter your current password"
+                autoComplete="current-password"
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="new-password">New password</Label>
               <Input
