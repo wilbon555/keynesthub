@@ -7,6 +7,29 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { KeyRound, Mail, Loader2 } from "lucide-react";
+import { Check, X } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+
+const evaluatePassword = (pwd: string) => {
+  const checks = {
+    length: pwd.length >= 8,
+    uppercase: /[A-Z]/.test(pwd),
+    lowercase: /[a-z]/.test(pwd),
+    number: /\d/.test(pwd),
+    special: /[^A-Za-z0-9]/.test(pwd),
+  };
+  const score = Object.values(checks).filter(Boolean).length;
+  const labels = ["Very weak", "Weak", "Fair", "Good", "Strong", "Very strong"];
+  const colors = [
+    "bg-destructive",
+    "bg-destructive",
+    "bg-orange-500",
+    "bg-yellow-500",
+    "bg-green-500",
+    "bg-emerald-600",
+  ];
+  return { checks, score, label: labels[score], color: colors[score] };
+};
 
 interface Props {
   open: boolean;
@@ -30,6 +53,11 @@ export const AccountSettingsDialog = ({ open, onOpenChange, currentEmail }: Prop
     }
     if (newPassword.length < 8) {
       toast.error("Password must be at least 8 characters");
+      return;
+    }
+    const { score } = evaluatePassword(newPassword);
+    if (score < 3) {
+      toast.error("Password is too weak. Meet at least 3 of the requirements.");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -126,6 +154,48 @@ export const AccountSettingsDialog = ({ open, onOpenChange, currentEmail }: Prop
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="At least 8 characters"
               />
+              {newPassword.length > 0 && (() => {
+                const { checks, score, label, color } = evaluatePassword(newPassword);
+                const items = [
+                  { ok: checks.length, text: "At least 8 characters" },
+                  { ok: checks.uppercase, text: "One uppercase letter (A-Z)" },
+                  { ok: checks.lowercase, text: "One lowercase letter (a-z)" },
+                  { ok: checks.number, text: "One number (0-9)" },
+                  { ok: checks.special, text: "One special character (!@#$...)" },
+                ];
+                return (
+                  <div className="space-y-2 pt-1">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className={`h-full transition-all ${color}`}
+                          style={{ width: `${(score / 5) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-muted-foreground w-20 text-right">
+                        {label}
+                      </span>
+                    </div>
+                    <ul className="space-y-1 text-xs">
+                      {items.map((it, i) => (
+                        <li
+                          key={i}
+                          className={`flex items-center gap-1.5 ${
+                            it.ok ? "text-green-600 dark:text-green-500" : "text-muted-foreground"
+                          }`}
+                        >
+                          {it.ok ? (
+                            <Check className="w-3.5 h-3.5" />
+                          ) : (
+                            <X className="w-3.5 h-3.5" />
+                          )}
+                          {it.text}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })()}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm new password</Label>
