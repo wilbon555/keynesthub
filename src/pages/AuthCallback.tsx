@@ -8,7 +8,7 @@ export default function AuthCallback() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Intercept auth hash tokens arriving from Zoho email redirection links
+    // Intercept auth hash tokens arriving from OAuth provider redirects
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_IN" && session) {
@@ -16,20 +16,20 @@ export default function AuthCallback() {
             title: "Account Verified!",
             description: "Welcome to KeyNestHub. Your session is now secure.",
           });
-          navigate("/Dashboard"); // Matches your Dashboard.tsx asset name capitalizations
+          navigate("/dashboard", { replace: true }); // Use lowercase route
         } else if (event === "PASSWORD_RECOVERY") {
           toast({
             title: "Identity Authenticated",
             description: "Please supply your new secure password configuration below.",
           });
-          navigate("/ResetPassword"); // Redirects to your existing ResetPassword.tsx path
+          navigate("/reset-password", { replace: true }); // Use lowercase route
         }
       }
     );
 
     // Backup navigation route if authentication fails to resolve
     const routeTimeout = setTimeout(() => {
-      navigate("/Auth"); 
+      navigate("/auth", { replace: true }); // Use lowercase route
     }, 4500);
 
     return () => {
