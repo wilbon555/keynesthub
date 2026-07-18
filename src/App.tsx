@@ -20,6 +20,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 // Eager-load the landing page for fast first paint
 import Index from "./pages/Index";
+import AuthCallback from "./pages/AuthCallback";
 
 // Lazy-load everything else
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -172,6 +173,8 @@ const App = () => {
             <Route path="/book/:id" element={<ProtectedRoute><BookProperty /></ProtectedRoute>} />
             <Route path="/discover" element={<Discover />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
