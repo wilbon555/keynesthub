@@ -33,14 +33,20 @@ const renderUrlset = (entries) => [
 const fetchVerifiedProperties = async () => {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return [];
 
-  const endpoint = new URL("/rest/v1/properties", SUPABASE_URL);
-  endpoint.searchParams.set("select", "id,updated_at,created_at");
-  endpoint.searchParams.set("status", "eq.available");
-  endpoint.searchParams.set("verification_status", "eq.verified");
-  endpoint.searchParams.set("order", "updated_at.desc");
-  endpoint.searchParams.set("limit", "5000");
-
   try {
+    // Safely check if the base URL structure is fully valid
+    let baseUrl = SUPABASE_URL;
+    if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
+      baseUrl = `https://${baseUrl}`;
+    }
+
+    const endpoint = new URL("/rest/v1/properties", baseUrl);
+    endpoint.searchParams.set("select", "id,updated_at,created_at");
+    endpoint.searchParams.set("status", "eq.available");
+    endpoint.searchParams.set("verification_status", "eq.verified");
+    endpoint.searchParams.set("order", "updated_at.desc");
+    endpoint.searchParams.set("limit", "5000");
+
     const response = await fetch(endpoint, {
       headers: {
         apikey: SUPABASE_ANON_KEY,
@@ -63,10 +69,11 @@ const fetchVerifiedProperties = async () => {
         }))
       : [];
   } catch (error) {
-    console.warn(`Skipping property sitemap: ${error instanceof Error ? error.message : String(error)}`);
+    console.warn(`Skipping property sitemap error caught safely: ${error instanceof Error ? error.message : String(error)}`);
     return [];
   }
 };
+
 
 mkdirSync(PUBLIC_DIR, { recursive: true });
 
