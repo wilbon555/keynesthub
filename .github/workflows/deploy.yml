@@ -30,12 +30,34 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps || npm install --legacy-peer-deps
 
-      - name: Build
-        run: npm run build
+      - name: Verify environment variables
+        run: |
+          echo "Checking Supabase environment variables..."
+          if [ -z "$VITE_SUPABASE_URL" ]; then echo "ERROR: VITE_SUPABASE_URL is not set"; exit 1; fi
+          if [ -z "$VITE_SUPABASE_PUBLISHABLE_KEY" ]; then echo "ERROR: VITE_SUPABASE_PUBLISHABLE_KEY is not set"; exit 1; fi
+          echo "✓ Environment variables are set"
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
           VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+
+      - name: Build with verbose output
+        run: |
+          echo "Starting Vite build..."
+          npm run build 2>&1 | tee build.log
+          if [ $? -ne 0 ]; then
+            echo "BUILD FAILED - Full output:"
+            cat build.log
+            exit 1
+          fi
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_SUPABASE_PROJECT_ID: ${{ secrets.VITE_SUPABASE_PROJECT_ID }}
+
+      - name: List dist contents (debug)
+        if: always()
+        run: ls -la dist/ || echo "dist directory not found"
 
       - name: Verify SEO files
         run: test -f dist/sitemap.xml && test -f dist/404.html && test -f dist/discover/index.html
