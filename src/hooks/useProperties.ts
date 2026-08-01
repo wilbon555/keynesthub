@@ -47,15 +47,51 @@ export interface Property {
   physical_inspection_done?: boolean;
 }
 
+const PAGE_SIZE = 10;
+
+/**
+ * Module-level shared store.
+ * `useProperties` is mounted by many components at once (every PropertyCard, etc.).
+ * Without this, each mount fired its own identical query, producing a request storm
+ * that Supabase throttles — which is what made listings intermittently fail to load.
+ */
+type Snapshot = {
+  properties: Property[];
+  loading: boolean;
+  loadingMore: boolean;
+  hasMore: boolean;
+  fetchError: string | null;
+};
+
+let snapshot: Snapshot = {
+  properties: [],
+  loading: true,
+  loadingMore: false,
+  hasMore: false,
+  fetchError: null,
+};
+let listeners = new Set<() => void>();
+let inFlight: Promise<void> | null = null;
+let hasLoadedOnce = false;
+
+const setSnapshot = (patch: Partial<Snapshot>) => {
+  snapshot = { ...snapshot, ...patch };
+  listeners.forEach((l) => l());
+};
+
 export const useProperties = () => {
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(false);
-  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [, forceRender] = useState(0);
   const { user } = useAuth();
-  const didFetchRef = useRef(false);
-  const PAGE_SIZE = 10;
+
+  useEffect(() => {
+    const listener = () => forceRender((n) => n + 1);
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  }, []);
+
+  const { properties, loading, loadingMore, hasMore, fetchError } = snapshot;
 
   // Fetch a page of available properties (append or replace)
   const fetchProperties = useCallback(async (opts?: { append?: boolean; offset?: number }) => {
@@ -64,10 +100,12 @@ export const useProperties = () => {
     const MAX_ATTEMPTS = 3;
     const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
 
+    // Dedupe concurrent identical loads across all hook consumers
+    if (inFlight) return inFlight;
+
+    const run = async () => {
     try {
-      if (append) setLoadingMore(true);
-      else setLoading(true);
-      setFetchError(null);
+      setSnapshot(append ? { loadingMore: true, fetchError: null } : { loading: true, fetchError: null });
 
       let data: any[] | null = null;
       let lastError: any = null;
@@ -102,16 +140,25 @@ export const useProperties = () => {
         images: property.images || [property.image || '/placeholder.svg'],
       })) as Property[];
 
-      setHasMore(mapped.length === PAGE_SIZE);
-      setProperties(prev => (append ? [...prev, ...mapped] : mapped));
+      setSnapshot({
+        hasMore: mapped.length === PAGE_SIZE,
+        properties: append ? [...snapshot.properties, ...mapped] : mapped,
+      });
+      hasLoadedOnce = true;
     } catch (error: any) {
       console.error('Error fetching properties:', error);
-      setFetchError('We couldn’t load properties after several attempts. Please check your connection and try again.');
-      if (!append) setProperties([]);
+      setSnapshot({
+        fetchError: 'We couldn’t load properties after several attempts. Please check your connection and try again.',
+        ...(append ? {} : { properties: [] }),
+      });
     } finally {
-      setLoading(false);
-      setLoadingMore(false);
+      setSnapshot({ loading: false, loadingMore: false });
+      inFlight = null;
     }
+    };
+
+    inFlight = run();
+    return inFlight;
   }, []);
 
   const loadMore = useCallback(() => {
@@ -351,8 +398,7 @@ export const useProperties = () => {
   };
 
   useEffect(() => {
-    if (didFetchRef.current) return;
-    didFetchRef.current = true;
+    if (hasLoadedOnce || inFlight) return;
     fetchProperties();
   }, [fetchProperties]);
 
