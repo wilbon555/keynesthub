@@ -398,8 +398,7 @@ export const useProperties = () => {
   };
 
   useEffect(() => {
-    if (didFetchRef.current) return;
-    didFetchRef.current = true;
+    if (hasLoadedOnce || inFlight) return;
     fetchProperties();
   }, [fetchProperties]);
 
