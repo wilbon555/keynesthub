@@ -48,9 +48,10 @@ const priceField = z
 interface PhotoUploadProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultListingType?: 'sale' | 'rent';
 }
 
-export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
+export const PhotoUpload = ({ open, onOpenChange, defaultListingType = 'sale' }: PhotoUploadProps) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -127,7 +128,7 @@ export const PhotoUpload = ({ open, onOpenChange }: PhotoUploadProps) => {
       country: "",
       location: "",
       propertyType: "",
-      listingType: "sale",
+      listingType: defaultListingType,
       bedrooms: undefined,
       bathrooms: undefined,
       area: "",

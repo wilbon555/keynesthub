@@ -18,6 +18,7 @@ export const sitemapGroups = {
     { path: "/rent/houses", changefreq: "daily", priority: "0.8" },
     { path: "/rent/office-spaces", changefreq: "weekly", priority: "0.7" },
     { path: "/rent/short-term", changefreq: "weekly", priority: "0.7" },
+    { path: "/rent/list-property", changefreq: "monthly", priority: "0.7" },
   ],
   sell: [
     { path: "/sell/list-property", changefreq: "monthly", priority: "0.7" },

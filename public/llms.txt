@@ -16,8 +16,9 @@ KeyNestHub connects buyers, sellers, landlords, tenants, and agents across Kenya
 - [Rent Houses](/rent/houses): Houses for long-term rent.
 - [Rent Office Spaces](/rent/office-spaces): Office space rentals.
 - [Short-Term Rentals](/rent/short-term): Short-stay and holiday rentals.
-- [List Property](/sell/list-property): Create a property listing.
-- [Pricing Plans](/sell/pricing-plans): Subscription tiers for sellers.
+- [List Property for Sale](/sell/list-property): Create a property listing for sale.
+- [List Property for Rent](/rent/list-property): Create a property listing for rent.
+- [Pricing Plans](/sell/pricing-plans): Subscription tiers for sellers and landlords.
 - [Agent Assistance](/sell/agent-assistance): Sell with a verified agent.
 - [Find an Agent](/agents/find-agent): Browse the agent directory.
 - [Agents Directory](/agents/directory): Full list of verified agents.

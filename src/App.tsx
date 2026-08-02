@@ -190,7 +190,7 @@ const App = () => {
             <Route path="/buy/new-developments" element={<NewDevelopments />} />
             
             {/* Sell Routes */}
-            <Route path="/sell/list-property" element={<ListProperty />} />
+            <Route path="/sell/list-property" element={<ListProperty defaultListingType="sale" />} />
             <Route path="/sell/pricing-plans" element={<PricingPlans />} />
             <Route path="/sell/agent-assistance" element={<AgentAssistance />} />
             <Route path="/sell/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
@@ -200,6 +200,7 @@ const App = () => {
             <Route path="/rent/houses" element={<Houses />} />
             <Route path="/rent/office-spaces" element={<OfficeSpaces />} />
             <Route path="/rent/short-term" element={<ShortTerm />} />
+            <Route path="/rent/list-property" element={<ListProperty defaultListingType="rent" />} />
             
             {/* Agent Routes */}
             <Route path="/agents/find-agent" element={<FindAgent />} />
