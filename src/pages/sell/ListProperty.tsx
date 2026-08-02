@@ -5,24 +5,35 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, Eye, DollarSign, Clock } from "lucide-react";
 import { useState } from "react";
 
-const ListProperty = () => {
+interface ListPropertyProps {
+  defaultListingType?: 'sale' | 'rent';
+}
+
+const ListProperty = ({ defaultListingType = 'sale' }: ListPropertyProps) => {
   const [uploadOpen, setUploadOpen] = useState(false);
+  const isRent = defaultListingType === 'rent';
 
   return (
     <div className="min-h-screen bg-background">
       <PageHead
-        title="List Your Property on KeyNestHub — Reach Thousands of Buyers"
-        description="Create a verified property listing on KeyNestHub in minutes and reach thousands of qualified buyers and renters across Kenya."
-        canonical="https://www.keynesthub.com/sell/list-property"
+        title={isRent ? "List Your Rental Property on KeyNestHub" : "List Your Property on KeyNestHub — Reach Thousands of Buyers"}
+        description={isRent
+          ? "Create a verified rental property listing on KeyNestHub in minutes and reach thousands of qualified tenants across Kenya."
+          : "Create a verified property listing on KeyNestHub in minutes and reach thousands of qualified buyers and renters across Kenya."}
+        canonical={isRent ? "https://www.keynesthub.com/rent/list-property" : "https://www.keynesthub.com/sell/list-property"}
       />
       <Navigation />
       
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-4">List Your Property</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-4">
+              {isRent ? "List Your Rental Property" : "List Your Property"}
+            </h1>
             <p className="text-lg text-muted-foreground">
-              Reach thousands of potential buyers and renters. Create your listing in minutes with our easy-to-use form.
+              {isRent
+                ? "Reach thousands of potential tenants. Create your rental listing in minutes with our easy-to-use form."
+                : "Reach thousands of potential buyers. Create your sale listing in minutes with our easy-to-use form."}
             </p>
           </div>
 
@@ -50,7 +61,9 @@ const ListProperty = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Your property will be visible to thousands of active buyers and renters.
+                  {isRent
+                    ? "Your rental property will be visible to thousands of active tenants."
+                    : "Your property will be visible to thousands of active buyers and renters."}
                 </p>
               </CardContent>
             </Card>
@@ -85,7 +98,9 @@ const ListProperty = () => {
           </div>
 
           <div className="bg-card border border-border rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Create Your Property Listing</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-4">
+              {isRent ? "Create Your Rental Listing" : "Create Your Property Listing"}
+            </h2>
             <p className="text-muted-foreground mb-4">
               Fill out the form below to list your property. Our team will review and publish your listing within 24 hours.
             </p>
@@ -101,7 +116,7 @@ const ListProperty = () => {
         </div>
       </main>
 
-      <PhotoUpload open={uploadOpen} onOpenChange={setUploadOpen} />
+      <PhotoUpload open={uploadOpen} onOpenChange={setUploadOpen} defaultListingType={defaultListingType} />
     </div>
   );
 };
