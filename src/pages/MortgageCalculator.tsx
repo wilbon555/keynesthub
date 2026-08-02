@@ -85,7 +85,7 @@ const MortgageCalculator = () => {
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-4">Financial Calculators</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-              Everything you need to plan your home purchase — from mortgage payments to affordability,
+              Everything you need to plan your home purchase, from mortgage payments to affordability,
               refinancing, rent vs buy, and debt-to-income analysis.
             </p>
             <MarketAIInsights 
@@ -120,7 +120,7 @@ const MortgageCalculator = () => {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="loanAmount">Property Value ($)</Label>
+                    <Label htmlFor="loanAmount">Property Value (Ksh)</Label>
                     <Input
                       id="loanAmount"
                       type="number"
@@ -130,7 +130,7 @@ const MortgageCalculator = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="downPayment">Down Payment ($)</Label>
+                    <Label htmlFor="downPayment">Down Payment (Ksh)</Label>
                     <Input
                       id="downPayment"
                       type="number"
@@ -167,7 +167,7 @@ const MortgageCalculator = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="propertyTax">Annual Property Tax ($)</Label>
+                    <Label htmlFor="propertyTax">Annual Property Tax (Ksh)</Label>
                     <Input
                       id="propertyTax"
                       type="number"
@@ -177,7 +177,7 @@ const MortgageCalculator = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="insurance">Annual Insurance ($)</Label>
+                    <Label htmlFor="insurance">Annual Insurance (Ksh)</Label>
                     <Input
                       id="insurance"
                       type="number"
@@ -190,7 +190,7 @@ const MortgageCalculator = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="hoaFees">Annual HOA Fees ($)</Label>
+                    <Label htmlFor="hoaFees">Annual HOA Fees (Ksh)</Label>
                     <Input
                       id="hoaFees"
                       type="number"
@@ -200,7 +200,7 @@ const MortgageCalculator = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="pmi">Annual PMI ($)</Label>
+                    <Label htmlFor="pmi">Annual PMI (Ksh)</Label>
                     <Input
                       id="pmi"
                       type="number"
@@ -212,7 +212,7 @@ const MortgageCalculator = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="rentalIncome">Monthly Rental Income ($)</Label>
+                  <Label htmlFor="rentalIncome">Monthly Rental Income (Ksh)</Label>
                   <Input
                     id="rentalIncome"
                     type="number"
