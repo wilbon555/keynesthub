@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/Navigation";
-import { Calculator, DollarSign, TrendingUp, Home, Wallet, RefreshCw, Scale } from "lucide-react";
+import { Calculator, TrendingUp, Home, Wallet, RefreshCw, Scale } from "lucide-react";
 import { MarketAIInsights } from "@/components/ai/MarketAIInsights";
 import { AffordabilityCalculator } from "@/components/calculators/AffordabilityCalculator";
 import { RefinanceCalculator } from "@/components/calculators/RefinanceCalculator";
@@ -236,7 +236,7 @@ const MortgageCalculator = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="w-5 h-5" />
+                    <Wallet className="w-5 h-5" />
                     Calculation Results
                   </CardTitle>
                 </CardHeader>
@@ -349,7 +349,7 @@ const MortgageCalculator = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Home className="w-5 h-5" />
-                How the Mortgage Calculator Works
+                How the Financial Calculators Work
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none">
