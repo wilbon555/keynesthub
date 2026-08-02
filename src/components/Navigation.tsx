@@ -129,6 +129,13 @@ export const Navigation = () => {
                           <a href="/rent/short-term" className="block rounded-md p-2 hover:bg-accent text-foreground">Short Term</a>
                         </NavigationMenuLink>
                       </li>
+                      <li>
+                        <NavigationMenuLink asChild>
+                          <a href="/rent/list-property" className="block rounded-md p-2 hover:bg-accent text-foreground font-medium text-primary">
+                            List Your Property for Rent
+                          </a>
+                        </NavigationMenuLink>
+                      </li>
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -301,6 +308,9 @@ export const Navigation = () => {
                     <a href="/rent/houses" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Houses</a>
                     <a href="/rent/office-spaces" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Office Spaces</a>
                     <a href="/rent/short-term" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Short Term</a>
+                    <a href="/rent/list-property" className="py-2 pl-4 text-primary font-medium hover:text-primary/80 transition-smooth">
+                      List Your Property for Rent
+                    </a>
                   </CollapsibleContent>
                 </Collapsible>
 

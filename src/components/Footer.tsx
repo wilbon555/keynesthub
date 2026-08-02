@@ -66,7 +66,8 @@ const Footer = () => {
     { label: "Home", path: "/" },
     { label: "Buy Property", path: "/buy/residential" },
     { label: "Rent Property", path: "/rent/apartments" },
-    { label: "List Property", path: "/sell/list-property" },
+    { label: "List Property for Sale", path: "/sell/list-property" },
+    { label: "List Property for Rent", path: "/rent/list-property" },
     { label: "Find Agent", path: "/agents/find-agent" },
     { label: "About Us", path: "/about" },
   ];
