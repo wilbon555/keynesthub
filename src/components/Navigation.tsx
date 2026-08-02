@@ -172,7 +172,7 @@ export const Navigation = () => {
                       </li>
                       <li>
                         <NavigationMenuLink asChild>
-                          <a href="/mortgage-calculator" className="block rounded-md p-2 hover:bg-accent text-foreground">Mortgage Calculator</a>
+                          <a href="/mortgage-calculator" className="block rounded-md p-2 hover:bg-accent text-foreground">Financial Calculators</a>
                         </NavigationMenuLink>
                       </li>
                       <li>
@@ -328,7 +328,7 @@ export const Navigation = () => {
                   </CollapsibleTrigger>
                   <CollapsibleContent className="flex flex-col">
                     <a href="/market/property-trends" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Property Trends</a>
-                    <a href="/mortgage-calculator" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Mortgage Calculator</a>
+                    <a href="/mortgage-calculator" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Financial Calculators</a>
                     <a href="/investment-tips" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Investment Tips</a>
                     <a href="/neighborhoods" className="py-2 pl-4 text-foreground hover:text-primary transition-smooth">Neighborhood Guides</a>
                   </CollapsibleContent>

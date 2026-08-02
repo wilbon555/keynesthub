@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Navigation } from "@/components/Navigation";
-import { Calculator, DollarSign, TrendingUp, Home, Wallet, RefreshCw, Scale } from "lucide-react";
+import { Calculator, TrendingUp, Home, Wallet, RefreshCw, Scale } from "lucide-react";
 import { MarketAIInsights } from "@/components/ai/MarketAIInsights";
 import { AffordabilityCalculator } from "@/components/calculators/AffordabilityCalculator";
 import { RefinanceCalculator } from "@/components/calculators/RefinanceCalculator";
@@ -85,7 +85,7 @@ const MortgageCalculator = () => {
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-4">Financial Calculators</h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-              Everything you need to plan your home purchase — from mortgage payments to affordability,
+              Everything you need to plan your home purchase, from mortgage payments to affordability,
               refinancing, rent vs buy, and debt-to-income analysis.
             </p>
             <MarketAIInsights 
@@ -120,7 +120,7 @@ const MortgageCalculator = () => {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="loanAmount">Property Value ($)</Label>
+                    <Label htmlFor="loanAmount">Property Value (Ksh)</Label>
                     <Input
                       id="loanAmount"
                       type="number"
@@ -130,7 +130,7 @@ const MortgageCalculator = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="downPayment">Down Payment ($)</Label>
+                    <Label htmlFor="downPayment">Down Payment (Ksh)</Label>
                     <Input
                       id="downPayment"
                       type="number"
@@ -167,7 +167,7 @@ const MortgageCalculator = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="propertyTax">Annual Property Tax ($)</Label>
+                    <Label htmlFor="propertyTax">Annual Property Tax (Ksh)</Label>
                     <Input
                       id="propertyTax"
                       type="number"
@@ -177,7 +177,7 @@ const MortgageCalculator = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="insurance">Annual Insurance ($)</Label>
+                    <Label htmlFor="insurance">Annual Insurance (Ksh)</Label>
                     <Input
                       id="insurance"
                       type="number"
@@ -190,7 +190,7 @@ const MortgageCalculator = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="hoaFees">Annual HOA Fees ($)</Label>
+                    <Label htmlFor="hoaFees">Annual HOA Fees (Ksh)</Label>
                     <Input
                       id="hoaFees"
                       type="number"
@@ -200,7 +200,7 @@ const MortgageCalculator = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="pmi">Annual PMI ($)</Label>
+                    <Label htmlFor="pmi">Annual PMI (Ksh)</Label>
                     <Input
                       id="pmi"
                       type="number"
@@ -212,7 +212,7 @@ const MortgageCalculator = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="rentalIncome">Monthly Rental Income ($)</Label>
+                  <Label htmlFor="rentalIncome">Monthly Rental Income (Ksh)</Label>
                   <Input
                     id="rentalIncome"
                     type="number"
@@ -236,7 +236,7 @@ const MortgageCalculator = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="w-5 h-5" />
+                    <Wallet className="w-5 h-5" />
                     Calculation Results
                   </CardTitle>
                 </CardHeader>
@@ -252,25 +252,25 @@ const MortgageCalculator = () => {
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">Principal & Interest</div>
                           <div className="text-2xl font-bold text-primary">
-                            ${result.monthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.monthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">Property Tax</div>
                           <div className="text-2xl font-bold">
-                            ${result.monthlyTaxes.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.monthlyTaxes.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">Insurance</div>
                           <div className="text-2xl font-bold">
-                            ${result.monthlyInsurance.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.monthlyInsurance.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">PMI</div>
                           <div className="text-2xl font-bold">
-                            ${result.monthlyPMI.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.monthlyPMI.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                       </div>
@@ -279,7 +279,7 @@ const MortgageCalculator = () => {
                         <div className="text-center">
                           <div className="text-sm text-muted-foreground">Total Monthly Payment</div>
                           <div className="text-3xl font-bold text-primary">
-                            ${result.totalMonthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.totalMonthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                       </div>
@@ -287,11 +287,11 @@ const MortgageCalculator = () => {
                       <div className="grid grid-cols-1 gap-4">
                         <div className="flex justify-between py-2 border-b">
                           <span className="text-muted-foreground">Total Interest Paid</span>
-                          <span className="font-semibold">${result.totalInterest.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
+                          <span className="font-semibold">Ksh {result.totalInterest.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
                         </div>
                         <div className="flex justify-between py-2 border-b">
                           <span className="text-muted-foreground">Total Amount Paid</span>
-                          <span className="font-semibold">${result.totalPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
+                          <span className="font-semibold">Ksh {result.totalPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
                         </div>
                       </div>
                     </TabsContent>
@@ -301,7 +301,7 @@ const MortgageCalculator = () => {
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">Monthly Cash Flow</div>
                           <div className={`text-2xl font-bold ${result.cashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            ${result.cashFlow.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.cashFlow.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                         <div className="bg-muted p-4 rounded-lg">
@@ -313,7 +313,7 @@ const MortgageCalculator = () => {
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">Down Payment</div>
                           <div className="text-2xl font-bold">
-                            ${downPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {downPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                       </div>
@@ -324,9 +324,9 @@ const MortgageCalculator = () => {
                           Investment Summary
                         </h4>
                         <ul className="text-sm space-y-1 text-muted-foreground">
-                          <li>• Monthly rental income: ${rentalIncome.toLocaleString()}</li>
-                          <li>• Monthly expenses: ${result.totalMonthlyPayment.toLocaleString()}</li>
-                          <li>• Annual cash flow: ${(result.cashFlow * 12).toLocaleString()}</li>
+                          <li>• Monthly rental income: Ksh {rentalIncome.toLocaleString()}</li>
+                          <li>• Monthly expenses: Ksh {result.totalMonthlyPayment.toLocaleString()}</li>
+                          <li>• Annual cash flow: Ksh {(result.cashFlow * 12).toLocaleString()}</li>
                           <li>• Break-even point: {result.cashFlow >= 0 ? 'Positive cash flow' : 'Negative cash flow'}</li>
                         </ul>
                       </div>
@@ -349,7 +349,7 @@ const MortgageCalculator = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Home className="w-5 h-5" />
-                How the Mortgage Calculator Works
+                How the Financial Calculators Work
               </CardTitle>
             </CardHeader>
             <CardContent className="prose max-w-none">

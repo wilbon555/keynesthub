@@ -25,7 +25,7 @@ KeyNestHub connects buyers, sellers, landlords, tenants, and agents across Kenya
 - [Property Trends](/market/property-trends): Kenyan real estate market insights.
 - [Neighborhood Guides](/neighborhoods): Hyper-local area profiles.
 - [Investment Tips](/investment-tips): Real estate investment strategies.
-- [Mortgage Calculator](/mortgage-calculator): Calculate mortgage payments.
+- [Financial Calculators](/mortgage-calculator): Calculate mortgage payments, affordability, refinance, rent vs buy, and debt-to-income.
 - [About](/about): About KeyNestHub and contact form.
 - [Install App](/install): Install the KeyNestHub mobile app.
 
