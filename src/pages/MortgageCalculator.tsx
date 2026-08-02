@@ -252,25 +252,25 @@ const MortgageCalculator = () => {
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">Principal & Interest</div>
                           <div className="text-2xl font-bold text-primary">
-                            ${result.monthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.monthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">Property Tax</div>
                           <div className="text-2xl font-bold">
-                            ${result.monthlyTaxes.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.monthlyTaxes.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">Insurance</div>
                           <div className="text-2xl font-bold">
-                            ${result.monthlyInsurance.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.monthlyInsurance.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">PMI</div>
                           <div className="text-2xl font-bold">
-                            ${result.monthlyPMI.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.monthlyPMI.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                       </div>
@@ -279,7 +279,7 @@ const MortgageCalculator = () => {
                         <div className="text-center">
                           <div className="text-sm text-muted-foreground">Total Monthly Payment</div>
                           <div className="text-3xl font-bold text-primary">
-                            ${result.totalMonthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.totalMonthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                       </div>
@@ -287,11 +287,11 @@ const MortgageCalculator = () => {
                       <div className="grid grid-cols-1 gap-4">
                         <div className="flex justify-between py-2 border-b">
                           <span className="text-muted-foreground">Total Interest Paid</span>
-                          <span className="font-semibold">${result.totalInterest.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
+                          <span className="font-semibold">Ksh {result.totalInterest.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
                         </div>
                         <div className="flex justify-between py-2 border-b">
                           <span className="text-muted-foreground">Total Amount Paid</span>
-                          <span className="font-semibold">${result.totalPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
+                          <span className="font-semibold">Ksh {result.totalPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}</span>
                         </div>
                       </div>
                     </TabsContent>
@@ -301,7 +301,7 @@ const MortgageCalculator = () => {
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">Monthly Cash Flow</div>
                           <div className={`text-2xl font-bold ${result.cashFlow >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            ${result.cashFlow.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {result.cashFlow.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                         <div className="bg-muted p-4 rounded-lg">
