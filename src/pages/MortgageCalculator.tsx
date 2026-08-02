@@ -313,7 +313,7 @@ const MortgageCalculator = () => {
                         <div className="bg-muted p-4 rounded-lg">
                           <div className="text-sm text-muted-foreground">Down Payment</div>
                           <div className="text-2xl font-bold">
-                            ${downPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                            Ksh {downPayment.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                           </div>
                         </div>
                       </div>
@@ -324,9 +324,9 @@ const MortgageCalculator = () => {
                           Investment Summary
                         </h4>
                         <ul className="text-sm space-y-1 text-muted-foreground">
-                          <li>• Monthly rental income: ${rentalIncome.toLocaleString()}</li>
-                          <li>• Monthly expenses: ${result.totalMonthlyPayment.toLocaleString()}</li>
-                          <li>• Annual cash flow: ${(result.cashFlow * 12).toLocaleString()}</li>
+                          <li>• Monthly rental income: Ksh {rentalIncome.toLocaleString()}</li>
+                          <li>• Monthly expenses: Ksh {result.totalMonthlyPayment.toLocaleString()}</li>
+                          <li>• Annual cash flow: Ksh {(result.cashFlow * 12).toLocaleString()}</li>
                           <li>• Break-even point: {result.cashFlow >= 0 ? 'Positive cash flow' : 'Negative cash flow'}</li>
                         </ul>
                       </div>
