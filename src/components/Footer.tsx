@@ -4,6 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, Phone, MapPin, Send, Loader2, Facebook, Youtube, Instagram } from "lucide-react";
 
+const TikTokLogo = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" className={className}>
+    <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 1 1-1.85-2.48v-3.2a5.79 5.79 0 1 0 4.94 5.72V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3a4.29 4.29 0 0 1-3.24-1.48Z" />
+  </svg>
+);
+
 const XLogo = ({ className }: { className?: string }) => (
   <svg
     viewBox="0 0 24 24"
@@ -200,6 +206,15 @@ const Footer = () => {
                   className="text-gray-400 hover:text-white transition-colors"
                 >
                   <Instagram className="w-5 h-5" />
+                </a>
+                <a
+                  href="https://www.tiktok.com/@keynesthub"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="TikTok"
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <TikTokLogo className="w-5 h-5" />
                 </a>
               </div>
             </div>
