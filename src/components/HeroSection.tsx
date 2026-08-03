@@ -11,6 +11,7 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 export const HeroSection = () => {
   const [showUpload, setShowUpload] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { user } = useSupabaseAuth();
@@ -26,26 +27,43 @@ export const HeroSection = () => {
     }
   }, [searchParams, user, navigate]);
 
+  // Defer the background video until after first paint, and skip it entirely on
+  // small screens or slow/data-saver connections so the LCP image loads fast.
+  useEffect(() => {
+    const conn = (navigator as any).connection;
+    const slow =
+      conn?.saveData ||
+      (typeof conn?.effectiveType === "string" && /2g/.test(conn.effectiveType));
+    if (slow) return;
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) return;
+    const id = window.setTimeout(() => setShowVideo(true), 1200);
+    return () => window.clearTimeout(id);
+  }, []);
+
   return (
     <section className="relative min-h-[60vh] md:min-h-[80vh] flex items-center justify-center bg-gradient-hero overflow-hidden pb-4 md:pb-0">
       {/* Background Video */}
       <div className="absolute inset-0">
+        <img
+          src={heroImage}
+          alt="Premium real estate properties in Kenya - KeyNestHub"
+          fetchPriority="high"
+          decoding="async"
+          className="w-full h-full object-cover opacity-25"
+        />
+        {showVideo && (
         <video
           autoPlay
           muted
           loop
           playsInline
+          preload="none"
           poster={heroImage}
-          className="w-full h-full object-cover opacity-25"
+          className="absolute inset-0 w-full h-full object-cover opacity-25"
         >
           <source src="https://videos.pexels.com/video-files/7578548/7578548-hd_1920_1080_30fps.mp4" type="video/mp4" />
-          {/* Fallback image if video fails */}
-          <img 
-            src={heroImage} 
-            alt="Premium real estate properties in Kenya - KeyNestHub" 
-            className="w-full h-full object-cover"
-          />
         </video>
+        )}
         <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/20" />
       </div>
       

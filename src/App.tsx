@@ -8,8 +8,12 @@ import { ThemeProvider } from "next-themes";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
-import { PropertyChatBot } from "@/components/chat/PropertyChatBot";
-import { IntentTriageModal } from "@/components/onboarding/IntentTriageModal";
+const PropertyChatBot = lazy(() =>
+  import("@/components/chat/PropertyChatBot").then((m) => ({ default: m.PropertyChatBot }))
+);
+const IntentTriageModal = lazy(() =>
+  import("@/components/onboarding/IntentTriageModal").then((m) => ({ default: m.IntentTriageModal }))
+);
 import { SplashScreen } from "@/components/SplashScreen";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -163,8 +167,10 @@ const App = () => {
       <BrowserRouter>
         <EmailConfirmationHandler />
         <GlobalUnconfirmedBanner />
-        <PropertyChatBot />
-        <IntentTriageModal />
+        <Suspense fallback={null}>
+          <PropertyChatBot />
+          <IntentTriageModal />
+        </Suspense>
         <MobileBottomNav />
         <Suspense fallback={<PageLoader />}>
           <Routes>
