@@ -145,6 +145,15 @@ const EmailConfirmationHandler = () => {
 };
 
 const GlobalUnconfirmedBanner = () => {
+  return <GlobalUnconfirmedBannerInner />;
+};
+
+const OnboardingSync = () => {
+  useOnboardingSync();
+  return null;
+};
+
+const GlobalUnconfirmedBannerInner = () => {
   const { user, loading } = useAuth();
   const location = useLocation();
   if (loading || !user) return null;
