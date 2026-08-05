@@ -22,8 +22,7 @@ const Auth = () => {
   }, [user, navigate, searchParams]);
 
   const handleSignUp = async (email: string, password: string, metadata?: Record<string, string>) => {
-    const redirectUrl = `${window.location.origin}/`;
-    const { error } = await signUp(email, password);
+    const { error } = await signUp(email, password, metadata);
     return { error };
   };
 

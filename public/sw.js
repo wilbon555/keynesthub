@@ -1,4 +1,12 @@
 // Service Worker for Push Notifications
+// Bump CACHE_VERSION whenever a stale-asset issue is suspected.
+const CACHE_VERSION = 'keynesthub-v3';
+
+// Never keep stale app shell/bundles around: this SW is push-only.
+self.addEventListener('install', function () {
+  self.skipWaiting();
+});
+
 self.addEventListener('push', function(event) {
   if (!event.data) return;
 
@@ -52,7 +60,16 @@ self.addEventListener('notificationclick', function(event) {
   );
 });
 
-// Handle service worker activation
+// Handle service worker activation: purge every cache from older versions so
+// users never get served an outdated bundle.
 self.addEventListener('activate', function(event) {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys.filter((k) => k !== CACHE_VERSION).map((k) => caches.delete(k))
+      );
+      await self.clients.claim();
+    })()
+  );
 });
