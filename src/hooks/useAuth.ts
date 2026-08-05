@@ -35,14 +35,26 @@ export const useAuth = () => {
     return { error };
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    metadata?: Record<string, string>
+  ) => {
     const redirectUrl = `${window.location.origin}/`;
-    
+
+    const fullName = metadata
+      ? [metadata.first_name, metadata.last_name].filter(Boolean).join(" ").trim()
+      : undefined;
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: redirectUrl
+        emailRedirectTo: redirectUrl,
+        data: {
+          ...(metadata || {}),
+          ...(fullName ? { full_name: fullName } : {}),
+        },
       }
     });
     return { error };

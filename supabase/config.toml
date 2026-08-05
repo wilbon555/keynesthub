@@ -20,3 +20,15 @@ verify_jwt = false
 
 [functions.rss-feed]
 verify_jwt = false
+
+[functions.send-welcome-email]
+verify_jwt = false
+
+[functions.send-signup-verification]
+verify_jwt = false
+
+[functions.notify-agent-application]
+verify_jwt = false
+
+[functions.send-newsletter-welcome]
+verify_jwt = false
