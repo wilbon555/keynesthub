@@ -21,6 +21,7 @@ import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
 import { Skeleton } from "@/components/ui/skeleton";
 import { UnconfirmedEmailNotice } from "@/components/auth/UnconfirmedEmailNotice";
 import { useAuth } from "@/hooks/useAuth";
+import { useOnboardingSync } from "@/hooks/useOnboardingSync";
 
 // Eager-load the landing page for fast first paint
 import Index from "./pages/Index";
@@ -166,6 +167,7 @@ const App = () => {
       <Sonner />
       <BrowserRouter>
         <EmailConfirmationHandler />
+        <OnboardingSync />
         <GlobalUnconfirmedBanner />
         <Suspense fallback={null}>
           <PropertyChatBot />
