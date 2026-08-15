@@ -11,7 +11,9 @@ type Message = {
   content: string;
 };
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/property-chatbot`;
+const SUPABASE_URL = "https://tyhcmtdppcxslyzfuqvk.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5aGNtdGRwcGN4c2x5emZ1cXZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ3Mjk0MDEsImV4cCI6MjA3MDMwNTQwMX0.xP7K2FYmTaTqb7INL-dBag6yP6ey6s8xv2w4aSLQJdU";
+const CHAT_URL = `${SUPABASE_URL}/functions/v1/property-chatbot`;
 
 export const PropertyChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,8 +46,8 @@ export const PropertyChatBot = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        apikey: SUPABASE_ANON_KEY,
       },
       body: JSON.stringify({ messages: userMessages }),
     });
