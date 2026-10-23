@@ -15,6 +15,7 @@ import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { compressImages } from "@/lib/imageCompression";
 
 // Parse human-friendly price strings: "1B", "1.5 m", "100k", "2,500,000", "10 billion".
 // Returns a number or NaN if unparseable.
@@ -199,6 +200,23 @@ export const PhotoUpload = ({ open, onOpenChange, defaultListingType = 'sale' }:
     console.log('Current user:', user?.id);
     console.log('User auth state:', user);
 
+    // Compress photos client-side first: phone photos are often >5MB and the
+    // storage bucket rejects files over its 5MB limit, which failed listings.
+    const compressedFiles = await compressImages(selectedFiles);
+    const oversized = compressedFiles.filter((f) => f.size > 5 * 1024 * 1024);
+    if (oversized.length > 0) {
+      toast.error(
+        `${oversized.length} photo(s) are still too large after compression (over 5MB). Please use smaller photos.`
+      );
+      setIsSubmitting(false);
+      return;
+    }
+    console.log(
+      'Photo sizes before/after compression (KB):',
+      selectedFiles.map((f) => Math.round(f.size / 1024)),
+      compressedFiles.map((f) => Math.round(f.size / 1024))
+    );
+
     try {
       const currency = getCurrencyInfo(values.country);
       
@@ -230,7 +248,7 @@ export const PhotoUpload = ({ open, onOpenChange, defaultListingType = 'sale' }:
         total_units: values.listingType === 'rent' ? (values.totalUnits || 1) : undefined,
         vacant_units: values.listingType === 'rent' ? (values.vacantUnits ?? values.totalUnits ?? 1) : undefined,
         stay_type: values.listingType === 'rent' ? (values.stayType || 'long-term') : undefined,
-        uploadedFiles: selectedFiles // Pass files to be uploaded
+        uploadedFiles: compressedFiles // Pass compressed files to be uploaded
       };
 
       console.log('Calling addProperty with data:', newProperty);
