@@ -96,6 +96,9 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
         throw new Error("Vacant units cannot exceed total units");
       }
 
+      // Compress new photos client-side so they stay under the 5MB storage limit
+      const compressed = uploadedFiles.length > 0 ? await compressImages(uploadedFiles) : [];
+
       await onSave({
         ...formData,
         bedrooms: formData.bedrooms ? parseInt(formData.bedrooms) : undefined,
@@ -103,7 +106,7 @@ export const EditPropertyDialog = ({ isOpen, onClose, property, onSave }: EditPr
         total_units: formData.listing_type === 'rent' ? totalUnits : undefined,
         vacant_units: formData.listing_type === 'rent' ? vacantUnits : undefined,
         stay_type: formData.listing_type === 'rent' ? formData.stay_type : undefined,
-        uploadedFiles: uploadedFiles.length > 0 ? uploadedFiles : undefined,
+        uploadedFiles: compressed.length > 0 ? compressed : undefined,
         images: existingImages,
       });
       onClose();
