@@ -9,6 +9,7 @@ import { Property } from "@/hooks/useProperties";
 import { X, Home, Trash2, Plus, ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { useSubscription } from "@/hooks/useSubscription";
+import { compressImages } from "@/lib/imageCompression";
 
 interface EditPropertyDialogProps {
   isOpen: boolean;
