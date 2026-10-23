@@ -15,6 +15,7 @@ import { useProperties } from "@/hooks/useProperties";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { UpgradePrompt } from "@/components/UpgradePrompt";
+import { compressImages } from "@/lib/imageCompression";
 
 // Parse human-friendly price strings: "1B", "1.5 m", "100k", "2,500,000", "10 billion".
 // Returns a number or NaN if unparseable.
