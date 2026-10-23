@@ -199,6 +199,23 @@ export const PhotoUpload = ({ open, onOpenChange, defaultListingType = 'sale' }:
     console.log('Current user:', user?.id);
     console.log('User auth state:', user);
 
+    // Compress photos client-side first: phone photos are often >5MB and the
+    // storage bucket rejects files over its 5MB limit, which failed listings.
+    const compressedFiles = await compressImages(selectedFiles);
+    const oversized = compressedFiles.filter((f) => f.size > 5 * 1024 * 1024);
+    if (oversized.length > 0) {
+      toast.error(
+        `${oversized.length} photo(s) are still too large after compression (over 5MB). Please use smaller photos.`
+      );
+      setIsSubmitting(false);
+      return;
+    }
+    console.log(
+      'Photo sizes before/after compression (KB):',
+      selectedFiles.map((f) => Math.round(f.size / 1024)),
+      compressedFiles.map((f) => Math.round(f.size / 1024))
+    );
+
     try {
       const currency = getCurrencyInfo(values.country);
       
