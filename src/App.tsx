@@ -33,6 +33,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const LandlordDashboard = lazy(() => import("./pages/LandlordDashboard"));
 const AgentDashboard = lazy(() => import("./pages/AgentDashboard"));
 const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const InvestmentTips = lazy(() => import("./pages/InvestmentTips"));
@@ -195,6 +196,7 @@ const App = () => {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/landlord-dashboard" element={<ProtectedRoute><LandlordDashboard /></ProtectedRoute>} />
             <Route path="/agent-dashboard" element={<RoleProtectedRoute requiredRoles={['agent', 'admin']}><AgentDashboard /></RoleProtectedRoute>} />
             <Route path="/admin" element={<RoleProtectedRoute requiredRoles={['admin']}><AdminPanel /></RoleProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

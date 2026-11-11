@@ -1,0 +1,1 @@
+Keep landlord portfolio views in a dedicated protected route, and derive income summaries only from the signed-in user's listings because transaction records are not available.
