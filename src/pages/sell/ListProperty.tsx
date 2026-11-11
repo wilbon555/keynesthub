@@ -4,6 +4,9 @@ import { PageHead } from "@/components/seo/PageHead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Upload, Eye, DollarSign, Clock } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { LayoutDashboard } from "lucide-react";
 
 interface ListPropertyProps {
   defaultListingType?: 'sale' | 'rent';
@@ -11,6 +14,7 @@ interface ListPropertyProps {
 
 const ListProperty = ({ defaultListingType = 'sale' }: ListPropertyProps) => {
   const [uploadOpen, setUploadOpen] = useState(false);
+  const navigate = useNavigate();
   const isRent = defaultListingType === 'rent';
 
   return (
@@ -27,6 +31,11 @@ const ListProperty = ({ defaultListingType = 'sale' }: ListPropertyProps) => {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
+            <div className="mb-5 flex justify-center">
+              <Button variant="outline" onClick={() => navigate("/landlord-dashboard")}>
+                <LayoutDashboard className="h-4 w-4" /> Landlord Dashboard
+              </Button>
+            </div>
             <h1 className="text-4xl font-bold text-foreground mb-4">
               {isRent ? "List Your Rental Property" : "List Your Property"}
             </h1>
