@@ -109,7 +109,7 @@ const LandlordDashboard = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
         <Navigation />
         <main className="container mx-auto px-4 py-8 md:py-12">
           <div className="mx-auto max-w-6xl">

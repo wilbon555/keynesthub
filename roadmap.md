@@ -1,0 +1,4 @@
+- [ ] Build protected landlord dashboard with owned property photos, listings, and clearly labeled rental-income potential.
+- [ ] Link both sale and rental listing pages to the landlord dashboard.
+- [ ] Inspect mobile navigation placement and fix the misplaced navigation buttons.
+- [ ] Verify desktop/mobile presentation and check preview build diagnostics.

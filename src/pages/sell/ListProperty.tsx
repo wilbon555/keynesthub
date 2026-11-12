@@ -2,11 +2,10 @@ import { Navigation } from "@/components/Navigation";
 import { PhotoUpload } from "@/components/PhotoUpload";
 import { PageHead } from "@/components/seo/PageHead";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Upload, Eye, DollarSign, Clock } from "lucide-react";
+import { Upload, Eye, DollarSign, Clock, LayoutDashboard } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard } from "lucide-react";
 
 interface ListPropertyProps {
   defaultListingType?: 'sale' | 'rent';
@@ -18,7 +17,7 @@ const ListProperty = ({ defaultListingType = 'sale' }: ListPropertyProps) => {
   const isRent = defaultListingType === 'rent';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-[calc(4rem+env(safe-area-inset-bottom))] md:pb-0">
       <PageHead
         title={isRent ? "List Your Rental Property on KeyNestHub" : "List Your Property on KeyNestHub — Reach Thousands of Buyers"}
         description={isRent
