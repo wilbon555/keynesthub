@@ -67,7 +67,7 @@ const ResetPassword = () => {
       navigate("/auth", { replace: true });
     } catch (err: any) {
       if (err instanceof z.ZodError) {
-        toast({ variant: "destructive", title: "Validation error", description: err.errors[0].message });
+        toast({ variant: "destructive", title: "Validation error", description: err.issues[0]?.message ?? "Please check your password and try again." });
       } else {
         toast({ variant: "destructive", title: "Couldn't update password", description: err.message });
       }

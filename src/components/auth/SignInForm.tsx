@@ -62,7 +62,7 @@ const SignInForm = ({ onSignIn, isLoading, setIsLoading }: SignInFormProps) => {
       }
     } catch (error) {
       if (error instanceof z.ZodError) {
-        toast({ variant: "destructive", title: "Validation Error", description: error.errors[0].message });
+        toast({ variant: "destructive", title: "Validation Error", description: error.issues[0]?.message ?? "Please check the information you entered." });
       }
     }
 

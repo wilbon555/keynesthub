@@ -36,7 +36,7 @@ const ForgotPassword = () => {
       setSent(true);
     } catch (err) {
       if (err instanceof z.ZodError) {
-        toast({ variant: "destructive", title: "Invalid email", description: err.errors[0].message });
+        toast({ variant: "destructive", title: "Invalid email", description: err.issues[0]?.message ?? "Please enter a valid email address." });
       }
     } finally {
       setLoading(false);

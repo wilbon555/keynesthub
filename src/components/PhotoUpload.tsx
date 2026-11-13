@@ -69,7 +69,7 @@ export const PhotoUpload = ({ open, onOpenChange, defaultListingType = 'sale' }:
       country: z.string().min(2, "Country is required"),
       location: z.string().min(2, "Location is required"),
       propertyType: z.string().min(1, "Property type is required"),
-      listingType: z.enum(['sale', 'rent'], { required_error: "Please select listing type" }),
+      listingType: z.enum(['sale', 'rent']),
       bedrooms: z.coerce.number().min(0, "Bedrooms must be 0 or more").optional(),
       bathrooms: z.coerce.number().min(0, "Bathrooms must be 0 or more").optional(),
       area: z.string().optional(),

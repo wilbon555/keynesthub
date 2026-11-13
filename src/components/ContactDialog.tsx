@@ -143,7 +143,7 @@ const ContactDialog = ({
       if (error instanceof z.ZodError) {
         toast({
           title: "Validation Error",
-          description: error.errors[0].message,
+          description: error.issues[0]?.message ?? "Please check the information you entered.",
           variant: "destructive"
         });
       } else if (error && typeof error === 'object' && 'message' in error && 
